@@ -4,17 +4,20 @@ import { styled } from "@mui/material/styles";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-
-import MoreIcon from "@mui/icons-material/More";
+import MailOutlinedIcon from "@mui/icons-material/MailOutlined";
 import Badge from "@mui/material/Badge";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
+import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MailIcon from "@mui/icons-material/Mail";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import { Box, IconButton } from "@mui/material";
 import Progress from "../common/Progress";
 import { useNavigate } from "react-router-dom";
+import Avatar from "@mui/material/Avatar";
+// import profileImage from "../../assets/images/image1.jpeg";
+import profileImage2 from "../../assets/images/image2.png";
 
 const drawerWidth = 240;
 const closedDrawerWidth = 64; // 슬라이드바가 닫혔을 때의 넓이
@@ -139,7 +142,6 @@ const TopBar = ({ open }) => {
         </IconButton>
         <p>Messages</p>
       </MenuItem>
-
       <MenuItem>
         <IconButton
           size="large"
@@ -147,12 +149,11 @@ const TopBar = ({ open }) => {
           color="inherit"
         >
           <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
+            <NotificationsNoneOutlinedIcon />
           </Badge>
         </IconButton>
         <p>Notifications</p>
       </MenuItem>
-
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           size="large"
@@ -178,7 +179,13 @@ const TopBar = ({ open }) => {
         justifyContent: "space-between",
       }}
     >
-      <Toolbar sx={{ backgroundColor: "white", color: "black" }}>
+      <Toolbar
+        sx={{
+          backgroundColor: "white",
+          color: "black",
+          justifyContent: "space-between",
+        }}
+      >
         <Typography
           variant="h6"
           noWrap
@@ -190,15 +197,22 @@ const TopBar = ({ open }) => {
 
         <Progress />
 
-        <Box sx={{ flexGrow: 1 }} />
-        <Box sx={{ display: { xs: "none", md: "flex" } }}>
+        <Box
+          sx={{
+            display: {
+              xs: "none",
+              md: "flex",
+            },
+            alignItems: "center",
+          }}
+        >
           <IconButton
             size="large"
             aria-label="show 4 new mails"
             color="inherit"
           >
             <Badge badgeContent={4} color="error">
-              <MailIcon />
+              <MailOutlinedIcon />
             </Badge>
           </IconButton>
           <IconButton
@@ -207,7 +221,7 @@ const TopBar = ({ open }) => {
             color="inherit"
           >
             <Badge badgeContent={17} color="error">
-              <NotificationsIcon />
+              <NotificationsNoneOutlinedIcon />
             </Badge>
           </IconButton>
           <IconButton
@@ -219,9 +233,10 @@ const TopBar = ({ open }) => {
             onClick={handleProfileMenuOpen}
             color="inherit"
           >
-            <AccountCircle />
+            <Avatar src={profileImage2} />
           </IconButton>
         </Box>
+
         <Box sx={{ display: { xs: "flex", md: "none" } }}>
           <IconButton
             size="large"
@@ -231,7 +246,7 @@ const TopBar = ({ open }) => {
             onClick={handleMobileMenuOpen}
             color="inherit"
           >
-            <MoreIcon />
+            <MenuIcon />
           </IconButton>
         </Box>
       </Toolbar>

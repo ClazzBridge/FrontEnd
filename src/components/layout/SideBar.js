@@ -9,11 +9,15 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
+import TvOutlinedIcon from "@mui/icons-material/TvOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import ModeCommentOutlinedIcon from "@mui/icons-material/ModeCommentOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Box } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
-import HomeIcon from "@mui/icons-material/Home";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import { MailOutline } from "@mui/icons-material";
 
 export const drawerWidth = 240;
 const closedDrawerWidth = 64;
@@ -22,11 +26,13 @@ const topBarHeight = 64; // 탑바의 높이 설정
 const menuItems = [
   {
     title: "홈",
-    icon: <HomeIcon />,
+    icon: <HomeOutlinedIcon />,
     link: "/",
   },
   {
     title: "게시판",
+    link: "/board",
+    icon: <AssignmentOutlinedIcon />,
     subItems: [
       {
         title: "자유게시판",
@@ -44,6 +50,7 @@ const menuItems = [
   },
   {
     title: "강의실",
+    icon: <TvOutlinedIcon />,
     subItems: [
       {
         title: "과제",
@@ -62,6 +69,7 @@ const menuItems = [
   },
   {
     title: "채팅",
+    icon: <ModeCommentOutlinedIcon />,
     subItems: [
       {
         title: "전체채팅",
@@ -79,6 +87,7 @@ const menuItems = [
   },
   {
     title: "캘린더",
+    icon: <CalendarMonthOutlinedIcon />,
     subItems: [],
     link: "/calendar",
   },
@@ -102,6 +111,15 @@ const StyledListItemText = styled(ListItemText)({
   "& .MuiTypography-root": {
     fontWeight: "normal",
     color: "gray",
+  },
+});
+
+const StyledListMainItemText = styled(ListItemText)({
+  "& .MuiTypography-root": {
+    color: "gray",
+    fontSize: "12px",
+    // display: open ? "block" : "none",
+    fontWeight: "bold",
   },
 });
 
@@ -220,14 +238,13 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                         },
                   ]}
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  {text.icon}
+                  {/* {index % 2 === 0 ? <InboxIcon /> : <MailOutline />} */}
                 </ListItemIcon>
-                <span
+                <StyledListMainItemText
+                  primary={text.title}
                   style={{
-                    color: "gray",
-                    fontSize: "12px",
                     display: open ? "block" : "none",
-                    fontWeight: "bold",
                   }}
                   sx={[
                     open
@@ -238,9 +255,7 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                           opacity: 0,
                         },
                   ]}
-                >
-                  {text.title}
-                </span>
+                />
               </StyledListItemButton>
 
               {text.subItems &&

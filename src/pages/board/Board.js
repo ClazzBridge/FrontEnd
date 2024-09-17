@@ -1,20 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
-const Board = () => {
-  return (
-    <div>
-      <h1>Board Page</h1>
-      <ul>
-        <li>
-          <Link to="/freeboard">Free Board</Link>
-        </li>
-        <li>
-          <Link to="/noticeboard">Notice Board</Link>
-        </li>
-      </ul>
-    </div>
-  );
-};
-
-export default Board;
+export default function Board() {
+  return <div>게시판, 공지사항 둘다 보여주는 페이지</div>;
+}
