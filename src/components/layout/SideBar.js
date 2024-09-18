@@ -14,10 +14,10 @@ import TvOutlinedIcon from "@mui/icons-material/TvOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import ModeCommentOutlinedIcon from "@mui/icons-material/ModeCommentOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
+import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import { MailOutline } from "@mui/icons-material";
 
 export const drawerWidth = 240;
 const closedDrawerWidth = 64;
@@ -51,6 +51,7 @@ const menuItems = [
   {
     title: "강의실",
     icon: <TvOutlinedIcon />,
+    link: "/lectureroom",
     subItems: [
       {
         title: "과제",
@@ -70,6 +71,7 @@ const menuItems = [
   {
     title: "채팅",
     icon: <ModeCommentOutlinedIcon />,
+    link: "/chat",
     subItems: [
       {
         title: "전체채팅",
@@ -118,7 +120,6 @@ const StyledListMainItemText = styled(ListItemText)({
   "& .MuiTypography-root": {
     color: "gray",
     fontSize: "12px",
-    // display: open ? "block" : "none",
     fontWeight: "bold",
   },
 });
@@ -238,8 +239,29 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                         },
                   ]}
                 >
-                  {text.icon}
-                  {/* {index % 2 === 0 ? <InboxIcon /> : <MailOutline />} */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0px",
+                    }}
+                  >
+                    {text.icon}
+                    <Typography
+                      sx={{
+                        width: "24px",
+                        fontSize: "10px",
+                        marginTop: "2px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      {text.title}
+                    </Typography>
+                  </Box>
                 </ListItemIcon>
                 <StyledListMainItemText
                   primary={text.title}

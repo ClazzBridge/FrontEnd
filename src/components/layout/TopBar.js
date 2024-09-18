@@ -62,6 +62,12 @@ const TopBar = ({ open }) => {
         return "공지사항";
       case "/profile":
         return "마이페이지";
+      case "/chat":
+        return "채팅";
+      case "/lectureroom":
+        return "강의실";
+      case "/calendar":
+        return "캘린더";
       default:
         return "Clazz";
     }
