@@ -18,6 +18,11 @@ import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import CampaignOutlinedIcon from "@mui/icons-material/CampaignOutlined";
+import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
+import PollOutlinedIcon from "@mui/icons-material/PollOutlined";
+import ContactSupportOutlinedIcon from "@mui/icons-material/ContactSupportOutlined";
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 
 export const drawerWidth = 240;
 const closedDrawerWidth = 64;
@@ -37,13 +42,13 @@ const menuItems = [
       {
         title: "자유게시판",
         notifications: 2,
-        icon: <InboxIcon />,
+        icon: <AssignmentOutlinedIcon />,
         link: "/freeboard",
       },
       {
         title: "공지사항",
         notifications: 5,
-        icon: <InboxIcon />,
+        icon: <CampaignOutlinedIcon />,
         link: "/noticeboard",
       },
     ],
@@ -56,16 +61,21 @@ const menuItems = [
       {
         title: "과제",
         notifications: 3,
-        icon: <InboxIcon />,
+        icon: <CreateOutlinedIcon />,
         link: "/assignment",
       },
       {
         title: "질의응답",
         notifications: 3,
-        icon: <InboxIcon />,
+        icon: <ContactSupportOutlinedIcon />,
         link: "/qna",
       },
-      { title: "투표", notifications: 3, icon: <InboxIcon />, link: "/vote" },
+      {
+        title: "투표",
+        notifications: 3,
+        icon: <PollOutlinedIcon />,
+        link: "/vote",
+      },
     ],
   },
   {
@@ -76,13 +86,13 @@ const menuItems = [
       {
         title: "전체채팅",
         notifications: 1,
-        icon: <InboxIcon />,
+        icon: <ModeCommentOutlinedIcon />,
         link: "/chat",
       },
       {
         title: "1:1 채팅",
         notifications: 4,
-        icon: <InboxIcon />,
+        icon: <ForumOutlinedIcon />,
         link: "/privatechat",
       },
     ],

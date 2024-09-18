@@ -17,9 +17,13 @@ import Profile from "../pages/user/Profile";
 
 // 강의실 페이지
 import LectureRoom from "../pages/lectureRoom/LectureRoom";
+import Assignment from "../pages/lectureRoom/Assignment";
+import Qna from "../pages/lectureRoom/Qna";
+import Vote from "../pages/lectureRoom/Vote";
 
 // 채팅 페이지
 import Chat from "../pages/chat/Chat";
+import Privatechat from "../pages/chat/Privatechat";
 
 // 캘린더 페이지
 import Calendar from "../pages/calendar/Calendar";
@@ -37,6 +41,10 @@ const Router = () => {
           <Route path="lectureroom" element={<LectureRoom />} />
           <Route path="chat" element={<Chat />} />
           <Route path="calendar" element={<Calendar />} />
+          <Route path="assignment" element={<Assignment />} />
+          <Route path="qna" element={<Qna />} />
+          <Route path="vote" element={<Vote />} />
+          <Route path="privatechat" element={<Privatechat />} />
         </Route>
       </Routes>
     </BrowserRouter>

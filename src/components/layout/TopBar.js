@@ -68,6 +68,14 @@ const TopBar = ({ open }) => {
         return "강의실";
       case "/calendar":
         return "캘린더";
+      case "/assignment":
+        return "과제";
+      case "/qna":
+        return "질의응답";
+      case "/vote":
+        return "투표";
+      case "/privatechat":
+        return "1:1 채팅";
       default:
         return "Clazz";
     }
