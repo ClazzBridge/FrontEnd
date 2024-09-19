@@ -50,7 +50,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <Box sx={{ display: "flex", backgroundColor: "#f5f5f5", height: "100%" }}>
+    <Box sx={{ display: "flex", height: "100%" }}>
       <CssBaseline />
       <TopBar open={open} />
       <SideBar open={open} handleDrawerToggle={handleDrawerToggle} />

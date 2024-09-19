@@ -10,16 +10,18 @@ import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import { Box, Icon, IconButton, SvgIcon, svgIconClasses } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 // import profileImage from "../../assets/images/image1.jpeg";
-import profileImage2 from "../../assets/images/image2.png";
-import profileImage3 from "../../assets/images/image3.jpeg";
+// import profileImage2 from "../../assets/images/image2.png";
+// import profileImage3 from "../../assets/images/image3.jpeg";
+import profileImage4 from "../../assets/images/image4.jpeg";
 
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import Stack from "@mui/material/Stack";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
+import { GitHub } from "@mui/icons-material";
 
 const drawerWidth = 240;
 const closedDrawerWidth = 64; // 슬라이드바가 닫혔을 때의 넓이
@@ -45,6 +47,18 @@ const AppBar = styled(MuiAppBar, {
     width: `calc(100% - ${closedDrawerWidth}px)`,
   }),
 }));
+
+const CustomIconButton = styled(IconButton)({
+  borderRadius: "8px",
+  color: "#59636E",
+  border: "1px solid #D1D9E0",
+});
+
+const CustomBadge = styled(Badge)({
+  "& .MuiBadge-standard": {
+    top: "-7px", // 위치 조정
+  },
+});
 
 const TopBar = ({ open }) => {
   const navigate = useNavigate();
@@ -117,6 +131,12 @@ const TopBar = ({ open }) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const handleGitHubClick = () => {
+    // const githubUrl = user.githubUrl; // 유저 데이터에서 깃허브 URL 가져오기
+    // window.open(githubUrl, "_blank");
+    window.open("https://github.com/", "_blank");
+  };
+
   const handleProfileClick = () => {
     handleMenuClose();
     navigate("/profile");
@@ -138,6 +158,9 @@ const TopBar = ({ open }) => {
       }}
       open={isMenuOpen}
       onClose={handleMenuClose}
+      sx={{
+        top: "48px",
+      }}
     >
       <MenuItem onClick={handleProfileClick}>마이페이지</MenuItem>
       <MenuItem onClick={handleMenuClose}>로그아웃</MenuItem>
@@ -208,7 +231,7 @@ const TopBar = ({ open }) => {
     >
       <Toolbar
         sx={{
-          backgroundColor: "white",
+          backgroundColor: "#f6f8fa",
           color: "black",
           justifyContent: "space-between",
         }}
@@ -231,36 +254,44 @@ const TopBar = ({ open }) => {
             alignItems: "center",
           }}
         >
-          {/* 채팅 */}
-          <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
-            <LightTooltip title="채팅">
-              <IconButton>
-                <Badge badgeContent={4} color="error" max={9}>
-                  <ForumOutlinedIcon fontSize="medium" />
-                </Badge>
-              </IconButton>
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+            {/* 깃허브 */}
+            <LightTooltip title="GitHub">
+              <CustomIconButton onClick={handleGitHubClick}>
+                <GitHub fontSize="small" />
+              </CustomIconButton>
             </LightTooltip>
+
+            {/* 채팅 */}
+            <LightTooltip title="채팅">
+              <CustomIconButton>
+                <CustomBadge badgeContent={4} color="error" max={9}>
+                  <ForumOutlinedIcon fontSize="small" />
+                </CustomBadge>
+              </CustomIconButton>
+            </LightTooltip>
+
             {/* 알림 */}
             <LightTooltip title="알림">
-              <IconButton>
-                <Badge badgeContent={19} color="error" max={9}>
-                  <NotificationsNoneOutlinedIcon fontSize="medium" />
-                </Badge>
-              </IconButton>
+              <CustomIconButton>
+                <CustomBadge badgeContent={19} color="error" max={9}>
+                  <NotificationsNoneOutlinedIcon fontSize="small" />
+                </CustomBadge>
+              </CustomIconButton>
             </LightTooltip>
 
             {/* 유저 */}
-            <LightTooltip title="내 정보">
-              <IconButton
-                onClick={handleProfileMenuOpen}
-                sx={{ width: "46px", height: "46px" }}
-              >
+            <IconButton
+              onClick={handleProfileMenuOpen}
+              sx={{ width: "40px", height: "40px" }}
+            >
+              <LightTooltip title="내 정보">
                 <Avatar
-                  src={profileImage3}
-                  sx={{ width: "44px", height: "44px" }}
+                  src={profileImage4}
+                  sx={{ width: "40px", height: "40px", marginLeft: "8px" }}
                 />
-              </IconButton>
-            </LightTooltip>
+              </LightTooltip>
+            </IconButton>
           </Stack>
         </Box>
 

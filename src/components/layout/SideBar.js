@@ -106,10 +106,10 @@ const menuItems = [
 
 const StyledListItemButton = styled(ListItemButton)({
   "&.Mui-selected": {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f6f8fa",
 
     "&:hover": {
-      backgroundColor: "#f5f5f5",
+      backgroundColor: "#f6f8fa",
     },
   },
   "&.Mui-selected .MuiTypography-root": {
