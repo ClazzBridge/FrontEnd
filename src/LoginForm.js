@@ -5,13 +5,13 @@ import {
     TextField,
     Box,
     Typography,
-    Avatar,           // 여기에서 Avatar를 import합니다.
+    Avatar,
     Container,
     CssBaseline,
     Alert,
     CircularProgress,
 } from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import LaptopIcon from '@mui/icons-material/Laptop';
 
 function LoginForm({ onLoginSuccess }) {
     const [userName, setUserName] = useState("");
@@ -33,7 +33,7 @@ function LoginForm({ onLoginSuccess }) {
 
         try {
             console.log("1111=============>");
-            const response = await axios.post("http://127.0.0.1:8080/api/sign", {
+            const response = await axios.post("http://127.0.0.1:8080/api/user/sign", {
                 userName,
                 password,
             });
@@ -71,7 +71,7 @@ function LoginForm({ onLoginSuccess }) {
                 }}
             >
                 <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-                    <LockOutlinedIcon />
+                    <LaptopIcon />
                 </Avatar>
                 <Typography
                     component="h1"
@@ -105,12 +105,7 @@ function LoginForm({ onLoginSuccess }) {
                             backgroundColor: "white",
                             borderRadius: 1,
                         }}
-                        InputLabelProps={{
-                            sx: {
-                                color: "black",
-                                fontWeight: "bold",
-                            },
-                        }}
+
                     />
                     <TextField
                         variant="filled"
@@ -128,12 +123,7 @@ function LoginForm({ onLoginSuccess }) {
                             backgroundColor: "white",
                             borderRadius: 1,
                         }}
-                        InputLabelProps={{
-                            sx: {
-                                color: "black",
-                                fontWeight: "bold",
-                            },
-                        }}
+
                     />
                     {error && (
                         <Alert severity="error" sx={{ mt: 2 }}>

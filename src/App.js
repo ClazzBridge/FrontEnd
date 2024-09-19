@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import LoginForm from "./LoginForm";
-import Dashboard from "./Dashboard";
 import { Box, Typography, Container } from "@mui/material";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import Router from "./shared/Router";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +21,7 @@ function App() {
         setIsLoggedIn(true);
       } else if (refreshToken) {
         try {
-          const response = await axios.post("http://127.0.0.1:8080/auth/refresh", {
+          const response = await axios.post("http://127.0.0.1:8080/api/auth/refresh", {
             value: refreshToken
           }, {
             withCredentials: true
@@ -92,7 +92,11 @@ function App() {
     >
       {
         isLoggedIn ? (
-          <Dashboard onLogout={handleLogout} />
+          <Box sx={{ display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
+            <Router>
+
+            </Router>
+          </Box>
         ) :
           <Container maxWidth="xs">
             <Typography
