@@ -4,20 +4,22 @@ import { styled } from "@mui/material/styles";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import MailOutlinedIcon from "@mui/icons-material/MailOutlined";
 import Badge from "@mui/material/Badge";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import MailIcon from "@mui/icons-material/Mail";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import { Box, IconButton } from "@mui/material";
-import Progress from "../common/Progress";
+import { Box, Icon, IconButton, SvgIcon, svgIconClasses } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 // import profileImage from "../../assets/images/image1.jpeg";
 import profileImage2 from "../../assets/images/image2.png";
+import profileImage3 from "../../assets/images/image3.jpeg";
+
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
+import Stack from "@mui/material/Stack";
+import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 
 const drawerWidth = 240;
 const closedDrawerWidth = 64; // 슬라이드바가 닫혔을 때의 넓이
@@ -80,6 +82,17 @@ const TopBar = ({ open }) => {
         return "Clazz";
     }
   };
+
+  const LightTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: theme.palette.common.white,
+      color: "rgba(0, 0, 0, 0.87)",
+      boxShadow: theme.shadows[1],
+      fontSize: 11,
+    },
+  }));
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -151,7 +164,7 @@ const TopBar = ({ open }) => {
       <MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="error">
-            <MailIcon />
+            <ForumOutlinedIcon />
           </Badge>
         </IconButton>
         <p>Messages</p>
@@ -209,8 +222,6 @@ const TopBar = ({ open }) => {
           {getTitle(location.pathname)}
         </Typography>
 
-        <Progress />
-
         <Box
           sx={{
             display: {
@@ -220,35 +231,37 @@ const TopBar = ({ open }) => {
             alignItems: "center",
           }}
         >
-          <IconButton
-            size="large"
-            aria-label="show 4 new mails"
-            color="inherit"
-          >
-            <Badge badgeContent={4} color="error">
-              <MailOutlinedIcon />
-            </Badge>
-          </IconButton>
-          <IconButton
-            size="large"
-            aria-label="show 17 new notifications"
-            color="inherit"
-          >
-            <Badge badgeContent={17} color="error">
-              <NotificationsNoneOutlinedIcon />
-            </Badge>
-          </IconButton>
-          <IconButton
-            size="large"
-            edge="end"
-            aria-label="account of current user"
-            aria-controls={menuId}
-            aria-haspopup="true"
-            onClick={handleProfileMenuOpen}
-            color="inherit"
-          >
-            <Avatar src={profileImage2} />
-          </IconButton>
+          {/* 채팅 */}
+          <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+            <LightTooltip title="채팅">
+              <IconButton>
+                <Badge badgeContent={4} color="error" max={9}>
+                  <ForumOutlinedIcon fontSize="medium" />
+                </Badge>
+              </IconButton>
+            </LightTooltip>
+            {/* 알림 */}
+            <LightTooltip title="알림">
+              <IconButton>
+                <Badge badgeContent={19} color="error" max={9}>
+                  <NotificationsNoneOutlinedIcon fontSize="medium" />
+                </Badge>
+              </IconButton>
+            </LightTooltip>
+
+            {/* 유저 */}
+            <LightTooltip title="내 정보">
+              <IconButton
+                onClick={handleProfileMenuOpen}
+                sx={{ width: "46px", height: "46px" }}
+              >
+                <Avatar
+                  src={profileImage3}
+                  sx={{ width: "44px", height: "44px" }}
+                />
+              </IconButton>
+            </LightTooltip>
+          </Stack>
         </Box>
 
         <Box sx={{ display: { xs: "flex", md: "none" } }}>
