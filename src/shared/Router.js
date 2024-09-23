@@ -27,7 +27,7 @@ import Chat from "../pages/chat/Chat";
 import Privatechat from "../pages/chat/Privatechat";
 
 // 캘린더 페이지
-import Calendar from "../pages/calendar/Calendar";
+import Calendar from "../pages/calendar/Calendars";
 
 const Router = () => {
   return (

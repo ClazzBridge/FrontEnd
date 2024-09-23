@@ -98,14 +98,9 @@ const ProfileForm = () => {
   };
 
   const handlePhoneChange = (newValue) => {
-    setProfile(prevState => ({ ...prevState, phone: newValue }));
 
-    const phonePattern = /^\+82\d{9,11}$/; // 한국 전화번호 패턴
-    if (!phonePattern.test(newValue)) {
-      setPhoneError('올바른 전화번호 형식이 아닙니다.');
-    } else {
-      setPhoneError('');
-    }
+    // 전화번호 값을 업데이트
+    setProfile(prevState => ({ ...prevState, phone: newValue }));
   };
 
   const handlePrivacyChange = (e) => {
@@ -126,6 +121,7 @@ const ProfileForm = () => {
     }
 
     if (phoneError) {
+      setError('올바른 전화번호를 입력해주세요.');
       return;
     }
 
