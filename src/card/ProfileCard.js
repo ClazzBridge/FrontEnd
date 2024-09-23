@@ -114,7 +114,7 @@ function ProfileCard({
                 width: "50px",
                 height: "50px",
                 filter: isOnline ? "none" : "grayscale(100%)", // 오프라인: 흑백 필터
-                transition: "transform 1s ease", // 호버 애니메이션 추가
+                transition: "transform 0.3s ease", // 호버 애니메이션 추가
                 transform: hovered ? "scale(1.1)" : "scale(1)", // 호버 시 이미지 확대
                 cursor: "pointer", // 클릭 가능한 상태를 나타내는 커서
               }}
@@ -122,7 +122,9 @@ function ProfileCard({
               alt={`${name}'s profile`}
               onMouseEnter={() => setHovered(true)} // 호버 시작
               onMouseLeave={() => setHovered(false)} // 호버 종료
-              onClick={() => openModal(name, email, github, phone, message, imgSrc)} // 클릭하면 모달 열기 (imgSrc 추가)
+              onClick={() =>
+                openModal(name, email, github, phone, message, imgSrc)
+              } // 클릭하면 모달 열기 (imgSrc 추가)
             />
           </Badge>
         )}
@@ -163,7 +165,7 @@ export default function StudentRoom() {
         console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
       }
     };
-  
+
     // 비동기 함수 호출
     fetchData();
   }, []);
