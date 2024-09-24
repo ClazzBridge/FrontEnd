@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";   //React, 훅 import
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material'; // MUI 컴포넌트 import
 import axios from 'axios'; // 데이터 통신용 Axios import
 import Pagination from "@mui/material/Pagination"; // 페이지네이션 컴포넌트 import
+import { Routes, Route, Link } from "react-router-dom"
+import QuestionDetail from "./QuestionDetail";
 
 function QuestionList() {
     const [questions, setQuestions] = useState([]); // 질문 목록 상태
@@ -47,7 +49,9 @@ function QuestionList() {
                         <TableRow key={question.id}>
                             <TableCell>{question.id}</TableCell>
                             <TableCell>
-                                <Button href={`/questions/${question.id}`}>{question.content}</Button>
+                                <nav>
+                                    <Link to={`/question/${question.id}`}>{question.content}</Link>
+                                </nav>
                             </TableCell>
                             <TableCell>{question.isRecommended ? '필독' : '일반'}</TableCell>
                             <TableCell>{question.isSolved ? '해결됨' : '미해결'}</TableCell>

@@ -1,28 +1,34 @@
 import React from "react";
 import axios from 'axios';
+import { useEffect, useState } from "react";   //React, 훅 import
 import { Paper, Typography, List, ListItem } from '@mui/material';
+import { useParams } from "react-router-dom";
 
-function QuestionDetail({ match }) {
+function QuestionDetail() {
     const [question, setQuestion] = useState(null);
     const [answers, setAnswers] = useState([]);
+    const { match } = useParams(); // 전달받아서 모아서 객체
 
     axios.defaults.baseURL = 'http://localhost:8080';
 
     useEffect(() => {
         const fetchQuestionAndAnwers = async () => {
             try {
-                const questionId = match.params.id;
+                const questionId = match;
                 const questionResponse = await axios.get(`/api/questions/${questionId}`);
                 const answersResponse = await axios.get(`/api/answers/${questionId}`);
                 setQuestion(questionResponse.data);
                 setAnswers(answersResponse.data);
+                console.log(questionResponse);
             } catch (error) {
-                consolw.error("Failed to fetch question or answers", error);
+                console.error("Failed to fetch question or answers", error);
+
             }
         };
 
+
         fetchQuestionAndAnwers();
-    }, [match.params.id]);
+    }, [match]);
 
     if (!question) return <div>Loading...</div>
 
