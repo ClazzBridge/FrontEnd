@@ -35,13 +35,13 @@ function QuestionDetail() {
     return (
         <Paper style={{ padding: '20px' }}>
             <Typography variant="h4">{question.content}</Typography>
-            <Typography variant="subtitle1">작성 날짜: {new Date(question.created_at).toLocaleDateString()}</Typography>  {/* 작성 날짜 표시 */}
+            <Typography variant="subtitle1">작성 날짜: {new Date(question.createDate).toLocaleDateString()}</Typography>  {/* 작성 날짜 표시 */}
             <Typography variant="h5" style={{ marginTop: '20px' }}>답변</Typography>  {/* 답변 섹션 제목 */}
             <List>
                 {answers.map((answer) => (
                     <ListItem key={answer.id}>
                         <Typography>{answer.content}</Typography>  {/* 답변 내용 */}
-                        <Typography variant="caption">{new Date(answer.created_at).toLocaleDateString()}</Typography>  {/* 답변 작성 날짜 */}
+                        <Typography variant="caption">{new Date(answer.createdAt).toLocaleDateString()}</Typography>  {/* 답변 작성 날짜 */}
                     </ListItem>
                 ))}
             </List>

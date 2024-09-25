@@ -12,11 +12,10 @@ function QuestionList() {
 
     axios.defaults.baseURL = 'http://localhost:8080';
 
-
     // 서버로부터 질문 목록을 가져오는 함수 (Axios 사용)
     const fetchQuestions = async (page) => {
         try {
-            const response = await axios.get(`api/questions/view?page=${page}`);
+            const response = await axios.get(`api/questions?page=${page}`);
             setQuestions(response.data.questions);
             setTotalPages(response.data.totalPages);
         } catch (error) {
