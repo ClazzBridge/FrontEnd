@@ -11,8 +11,11 @@ import {
   DialogContent,
   Stack,
   Box,
+  TextField,
+  Link,
 } from "@mui/material";
 import WbIncandescentIcon from "@mui/icons-material/WbIncandescent";
+import CloseIcon from "@mui/icons-material/Close";
 
 // 프로필 카드 컴포넌트
 function ProfileCard({
@@ -89,7 +92,9 @@ function ProfileCard({
         padding: "0px",
         margin: "0px",
         height: "155px",
-        boxShadow: isSelf ? "0 4px 12px rgba(0, 0, 0, 0.2)" : "0 4px 8px rgba(0, 0, 0, 0.1)", // 본인일 경우 더 강한 그림자
+        boxShadow: isSelf
+          ? "0 4px 12px rgba(0, 0, 0, 0.2)"
+          : "0 4px 8px rgba(0, 0, 0, 0.1)", // 본인일 경우 더 강한 그림자
         border: isSelf ? "2px solid transparent" : "none", // 테두리 없을 때 기본값
         backgroundImage: isSelf
           ? "linear-gradient(white, white), linear-gradient(to right, #6a11cb, #2575fc)" // 본인일 경우 그라데이션 테두리
@@ -141,18 +146,13 @@ function ProfileCard({
         </div>
 
         {/* 공석일 경우 이름과 상태를 숨기고 프로필 이미지만 흐리게 표시 */}
-        <Stack
-          direction="row"
-          spacing={2}
-          justifyContent="center"
-          alignItems="center"
-        >
+        <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
           {!isSelf ? (
             <StyledBadge
               sx={{
                 "& .MuiBadge-badge": {
-                  width: "12px", // 배지의 크기를 키움
-                  height: "12px", // 배지의 크기를 키움
+                  width: "10px", // 배지의 크기를 키움
+                  height: "10px", // 배지의 크기를 키움
                   borderRadius: "50%", // 원형 유지
                 },
               }}
@@ -172,7 +172,7 @@ function ProfileCard({
                     height: "14px",
                     color: "white",
                     backgroundColor: isOnline ? "#28a745" : "#b0b0b0", // 온라인: 초록색, 오프라인: 회색
-                    border: `2px solid `,
+                    border: "2px solid",
                     transition: "transform 0.3s ease, opacity 0.3s ease", // 애니메이션 적용
                     transform: hovered ? "scale(1.1)" : "scale(1)", // 호버 시 확대
                   }}
@@ -196,9 +196,7 @@ function ProfileCard({
                 alt={`${name}'s profile`}
                 onMouseEnter={() => setHovered(true)} // 호버 시작
                 onMouseLeave={() => setHovered(false)} // 호버 종료
-                onClick={() =>
-                  openModal(name, email, github, phone, message, imgSrc)
-                } // 클릭하면 모달 열기
+                onClick={() => openModal(name, email, github, phone, message, imgSrc)} // 클릭하면 모달 열기
               />
             </StyledBadge>
           ) : (
@@ -219,181 +217,160 @@ function ProfileCard({
               alt={`${name}'s profile`}
               onMouseEnter={() => setHovered(true)} // 호버 시작
               onMouseLeave={() => setHovered(false)} // 호버 종료
-              onClick={() =>
-                openModal(name, email, github, phone, message, imgSrc)
-              } // 클릭하면 모달 열기
+              onClick={() => openModal(name, email, github, phone, message, imgSrc)} // 클릭하면 모달 열기
             />
           )}
         </Stack>
 
-        {/* 이름 (공석일 경우 표시 안함) */}
-        {!isEmpty && (
-          <Typography
-            sx={{
-              marginTop: "8px",
-              fontSize: "16px",
-              fontWeight: "600",
-              color: isOnline ? "#333" : "#b0b0b0", // 온라인: 진한 색, 오프라인: 회색
-            }}
-          >
-            {name}
-          </Typography>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-// 메인 컴포넌트
-export default function StudentRoom() {
-  const [open, setOpen] = useState(false);
-  const [currentProfile, setCurrentProfile] = useState({});
-  const [profiles, setProfiles] = useState([]);
-
-  // 서버에서 좌석 데이터를 가져오는 함수
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("http://localhost:8081/api/seat/");
-        console.log(response.data); // 브라우저 콘솔에서 데이터를 확인
-        setProfiles(response.data); // 받아온 데이터를 상태로 저장
-      } catch (error) {
-        console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
-      }
-    };
-
-    // 비동기 함수 호출
-    fetchData();
-  }, []);
-
-  // 모달 열기 함수
-  const openProfileModal = (name, email, github, phone, message, imgSrc) => {
-    setCurrentProfile({
-      name,
-      email,
-      github,
-      phone,
-      message,
-      imgSrc, // 프로필 이미지도 상태로 저장
-    });
-    setOpen(true);
-  };
-
-  // 모달 닫기 함수
-  const closeProfileModal = () => {
-    setOpen(false);
-  };
-
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(5, 1fr)",
-        gap: "20px",
-        marginLeft: "250px",
-        marginRight: "100px",
-      }}
-    >
-      {profiles.map((profile, index) => (
-        <ProfileCard
-          key={index}
-          seatNumber={profile.seatNumber}
-          name={profile.user ? profile.user.name : "빈 좌석"}
-          imgSrc={profile.user ? profile.user.profileImage.pictureUrl : ""}
-          email={profile.user ? profile.user.email : ""}
-          github={profile.user ? profile.user.gitUrl : ""}
-          phone={profile.user ? profile.user.phone : ""}
-          message={profile.user ? profile.user.bio : ""}
-          status={profile.occupied ? "online" : "offline"} // 상태 전달
-          isSelf={profile.user.name === "권준성"} // 본인 여부 확인
-          openModal={openProfileModal}
-          isEmpty={!profile.user} // 공석 여부 확인
-        />
-      ))}
-
-      {/* 모달 컴포넌트 */}
-      <Dialog open={open} onClose={closeProfileModal}>
-        <DialogContent
-          sx={{
-            padding: "30px",
-          }}
-        >
-          {/* 프로필 카드와 동일한 이미지 사용 */}
-          <Avatar
-            src={currentProfile.imgSrc} // 모달에서 프로필 카드의 이미지 사용
-            alt={`${currentProfile.name}'s profile`}
-            style={{
-              width: "100px",
-              height: "100px",
-              marginLeft: "42px",
-            }}
-          />
-          <Typography
-            sx={{
-              fontSize: "12px",
-              marginTop: "30px",
-            }}
-            variant="h6"
-          >
-            <strong>이름:</strong>
-          </Typography>
-          <Typography sx={{}}>{currentProfile.name}</Typography>
-          <Typography
-            sx={{
-              fontSize: "12px",
-              marginTop: "5px",
-            }}
-          >
-            <strong>이메일:</strong>
-          </Typography>
-          <Typography sx={{}}>{currentProfile.email}</Typography>
-          <Typography
-            sx={{
-              fontSize: "12px",
-              marginTop: "5px",
-            }}
-          >
-            <strong>GitHub:</strong>
-            <Typography>
-              <a
-                style={{
-                  color: "black",
-                  textDecoration: "none",
-                }}
-                href={currentProfile.github}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {currentProfile.github}
-              </a>
+                 {/* 이름 (공석일 경우 표시 안함) */}
+                 {!isEmpty && (
+            <Typography
+              sx={{
+                marginTop: "8px",
+                fontSize: "16px",
+                fontWeight: "600",
+                color: isOnline ? "#333" : "#b0b0b0", // 온라인: 진한 색, 오프라인: 회색
+              }}
+            >
+              {name}
             </Typography>
-          </Typography>
-          <Typography
-            sx={{
-              marginTop: "5px",
-              fontSize: "12px",
-            }}
-          >
-            <strong>핸드폰 번호:</strong>
-          </Typography>
-          <Typography sx={{}}>{currentProfile.phone}</Typography>
-          <Typography
-            sx={{
-              fontSize: "12px",
-              padding: "1px 1px",
-              marginTop: "3px",
-            }}
-          >
-            <strong>소개 메시지:</strong>
-          </Typography>
-          <textarea
-            value={currentProfile.message}
-            readOnly
-            rows={4}
-            style={{ width: "100%", height: "120px", outline: "none" }}
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // 메인 컴포넌트
+  export default function StudentRoom() {
+    const [open, setOpen] = useState(false);
+    const [currentProfile, setCurrentProfile] = useState({});
+    const [profiles, setProfiles] = useState([]);
+  
+    // 서버에서 좌석 데이터를 가져오는 함수
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await axios.get("http://localhost:8081/api/seat/");
+          console.log(response.data); // 브라우저 콘솔에서 데이터를 확인
+          setProfiles(response.data); // 받아온 데이터를 상태로 저장
+        } catch (error) {
+          console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
+        }
+      };
+  
+      // 비동기 함수 호출
+      fetchData();
+    }, []);
+  
+    // 모달 열기 함수
+    const openProfileModal = (name, email, github, phone, message, imgSrc) => {
+      setCurrentProfile({
+        name,
+        email,
+        github,
+        phone,
+        message,
+        imgSrc, // 프로필 이미지도 상태로 저장
+      });
+      setOpen(true);
+    };
+  
+    // 모달 닫기 함수
+    const closeProfileModal = () => {
+      setOpen(false);
+    };
+  
+    return (
+      <div
+        style={{
+          display: "grid",
+          gap: "20px",
+          marginLeft: "auto",
+          marginRight: "auto",
+          padding: "20px",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", // 최소 200px, 가변 너비로 자동 배치
+          maxWidth: "1200px", // 최대 5개의 카드를 한 줄에 배치할 수 있도록 최대 너비 설정 (200px * 5 = 1000px)
+        }}
+      >
+        {profiles.map((profile, index) => (
+          <ProfileCard
+            key={index}
+            seatNumber={profile.seatNumber}
+            name={profile.user ? profile.user.name : "빈 좌석"}
+            imgSrc={profile.user ? profile.user.profileImage.pictureUrl : ""}
+            email={profile.user ? profile.user.email : ""}
+            github={profile.user ? profile.user.gitUrl : ""}
+            phone={profile.user ? profile.user.phone : ""}
+            message={profile.user ? profile.user.bio : ""}
+            status={profile.occupied ? "online" : "offline"} // 상태 전달
+            isSelf={profile.user?.name === "권준성"} // 본인 여부 확인
+            openModal={openProfileModal}
+            isEmpty={!profile.user} // 공석 여부 확인
           />
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
+        ))}
+  
+        {/* 모달 컴포넌트 */}
+        <Dialog
+  open={open}
+  onClose={closeProfileModal}
+  BackdropProps={{ style: { backgroundColor: 'transparent' } }}
+  sx={{ '& .MuiDialog-paper': { maxWidth: '300px', width: '80%', margin: 'auto' } }} // 모달 크기 조정
+>
+<DialogContent>
+  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 1 }}>
+    <Avatar
+      src={currentProfile.imgSrc}
+      alt={`${currentProfile.name}'s profile`}
+      sx={{ width: 100, height: 100, mt: 1, mb: 1 }}
+    />
+    <Box sx={{ width: '100%', mt: 1 }}>
+      {[
+        { label: "Name", value: currentProfile.name },
+        { label: "Phone Number", value: currentProfile.phone },
+        { label: "Email", value: currentProfile.email },
+        { label: "GitHub", value: currentProfile.github, isLink: true },
+        { label: "Bio", value: currentProfile.message, isMultiline: true }
+      ].map((item, index) => (
+        <Box key={index} sx={{ mt: 1 }}>
+          <Typography variant="subtitle2" gutterBottom sx={{ fontSize: '0.7rem' }}>
+            {item.label}
+          </Typography>
+          {item.isLink ? (
+            <Link href={item.value} target="_blank" style={{ textDecoration: 'none' }}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                value={item.value}
+                InputProps={{
+                  readOnly: true,
+                  disableUnderline: true
+                }}
+                sx={{ fontSize: '0.55rem' }}
+              />
+            </Link>
+          ) : (
+            <TextField
+              fullWidth
+              variant="outlined"
+              value={item.value}
+              InputProps={{
+                readOnly: true,
+                disableUnderline: true,
+                style:{pointerEvents: "none",}
+              }}
+              multiline={item.isMultiline}
+              rows={item.isMultiline ? 3 : 1}
+              sx={{ fontSize: '0.55rem' }}
+            />
+          )}
+        </Box>
+      ))}
+    </Box>
+  </Box>
+</DialogContent>
+</Dialog>
+
+
+      </div>
+    );
+  }
