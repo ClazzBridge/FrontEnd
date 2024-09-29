@@ -281,33 +281,23 @@ function ProfileCard({
     };
   
     return (
-      <div
-        style={{
-          display: "grid",
-          gap: "20px",
-          marginLeft: "auto",
-          marginRight: "auto",
-          padding: "20px",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", // 최소 200px, 가변 너비로 자동 배치
-          maxWidth: "1200px", // 최대 5개의 카드를 한 줄에 배치할 수 있도록 최대 너비 설정 (200px * 5 = 1000px)
-        }}
-      >
-        {profiles.map((profile, index) => (
-          <ProfileCard
-            key={index}
-            seatNumber={profile.seatNumber}
-            name={profile.user ? profile.user.name : "빈 좌석"}
-            imgSrc={profile.user ? profile.user.profileImage.pictureUrl : ""}
-            email={profile.user ? profile.user.email : ""}
-            github={profile.user ? profile.user.gitUrl : ""}
-            phone={profile.user ? profile.user.phone : ""}
-            message={profile.user ? profile.user.bio : ""}
-            status={profile.occupied ? "online" : "offline"} // 상태 전달
-            isSelf={profile.user?.name === "권준성"} // 본인 여부 확인
-            openModal={openProfileModal}
-            isEmpty={!profile.user} // 공석 여부 확인
-          />
-        ))}
+    <div style={{ display: "grid", gap: "20px", marginLeft: "auto", marginRight: "auto", padding: "20px", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", maxWidth: "1200px" }}>
+      {profiles.map((profile, index) => (
+        <ProfileCard
+          key={index}
+          seatNumber={profile.seatNumber}
+          name={profile.user ? profile.user.name : "Empty Seat"}
+          imgSrc={profile.user ? profile.user.profileImage.pictureUrl : ""}
+          email={profile.user ? profile.user.email : ""}
+          github={profile.user ? profile.user.gitUrl : ""}
+          phone={profile.user ? profile.user.phone : ""}
+          message={profile.user ? profile.user.bio : ""}
+          status={profile.occupied ? "online" : "offline"}
+          isSelf={profile.user?.name === "권준성"}
+          openModal={openProfileModal}
+          isEmpty={!profile.user}
+        />
+      ))}
   
         {/* 모달 컴포넌트 */}
         <Dialog
