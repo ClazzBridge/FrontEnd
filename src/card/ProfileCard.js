@@ -146,142 +146,170 @@ function ProfileCard({
         </div>
 
         {/* 공석일 경우 이름과 상태를 숨기고 프로필 이미지만 흐리게 표시 */}
-        <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
-          {!isSelf ? (
-            <StyledBadge
-              sx={{
-                "& .MuiBadge-badge": {
-                  width: "10px", // 배지의 크기를 키움
-                  height: "10px", // 배지의 크기를 키움
-                  borderRadius: "50%", // 원형 유지
-                },
-              }}
-              overlap="circular"
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              variant="dot"
-              badgeContent={
-                <Box
-                  label={isOnline ? "온라인" : "오프라인"}
-                  alt="Small Avatar"
+        <Stack
+          direction="row"
+          spacing={2}
+          justifyContent="center"
+          alignItems="center"
+        >
+          {isEmpty ? (
+            // 공석일 때 아무 것도 표시하지 않음
+            <Typography sx={{ mt: 2, color: "#aaa" }}></Typography>
+          ) : (
+            // 공석이 아닐 때 아래 로직 실행
+            <>
+              {!isSelf ? (
+                <StyledBadge
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                    },
+                  }}
+                  overlap="circular"
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  variant="dot"
+                  badgeContent={
+                    <Box
+                      label={isOnline ? "온라인" : "오프라인"}
+                      alt="Small Avatar"
+                      onMouseEnter={() => setHovered(true)}
+                      onMouseLeave={() => setHovered(false)}
+                      sx={{
+                        marginLeft: "11px",
+                        borderRadius: "50%",
+                        width: "14px",
+                        height: "14px",
+                        color: "white",
+                        backgroundColor: isOnline ? "#28a745" : "#b0b0b0",
+                        border: "2px solid",
+                        transition: "transform 0.3s ease, opacity 0.3s ease",
+                        transform: hovered ? "scale(1.1)" : "scale(1)",
+                      }}
+                    />
+                  }
+                >
+                  <Avatar
+                    sx={{
+                      marginTop: "5px",
+                      width: "50px",
+                      height: "50px",
+                      filter: isOffline ? "grayscale(100%)" : "none",
+                      transition: "transform 0.3s ease",
+                      transform: hovered ? "scale(1.1)" : "scale(1)",
+                      cursor: "pointer",
+                      border: "1px solid #ddd",
+                      boxShadow: "0 1px 3px",
+                      textAlign: "center",
+                    }}
+                    src={imgSrc}
+                    alt={`${name}'s profile`}
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
+                    onClick={() =>
+                      openModal(name, email, github, phone, message, imgSrc)
+                    }
+                  />
+                </StyledBadge>
+              ) : (
+                <Avatar
+                  sx={{
+                    marginLeft: "0px",
+                    marginTop: "5px",
+                    width: "50px",
+                    height: "50px",
+                    transition: "transform 0.3s ease",
+                    transform: hovered ? "scale(1.1)" : "scale(1)",
+                    cursor: "pointer",
+                    border: "1px solid #ddd",
+                    boxShadow: "0 1px 3px",
+                    textAlign: "center",
+                  }}
+                  src={imgSrc}
+                  alt={`${name}'s profile`}
                   onMouseEnter={() => setHovered(true)}
                   onMouseLeave={() => setHovered(false)}
-                  sx={{
-                    marginLeft: "11px",
-                    borderRadius: "50%",
-                    width: "14px",
-                    height: "14px",
-                    color: "white",
-                    backgroundColor: isOnline ? "#28a745" : "#b0b0b0", // 온라인: 초록색, 오프라인: 회색
-                    border: "2px solid",
-                    transition: "transform 0.3s ease, opacity 0.3s ease", // 애니메이션 적용
-                    transform: hovered ? "scale(1.1)" : "scale(1)", // 호버 시 확대
-                  }}
+                  onClick={() =>
+                    openModal(name, email, github, phone, message, imgSrc)
+                  }
                 />
-              }
-            >
-              <Avatar
-                sx={{
-                  marginTop: "5px",
-                  width: "50px", // 큰 아바타 크기
-                  height: "50px",
-                  filter: isOffline ? "grayscale(100%)" : "none", // 오프라인: 흑백 필터
-                  transition: "transform 0.3s ease", // 호버 애니메이션 추가
-                  transform: hovered ? "scale(1.1)" : "scale(1)", // 호버 시 이미지 확대
-                  cursor: "pointer", // 클릭 가능한 상태를 나타내는 커서
-                  border: "1px solid #ddd",
-                  boxShadow: "0 1px 3px",
-                  textAlign: "center",
-                }}
-                src={imgSrc}
-                alt={`${name}'s profile`}
-                onMouseEnter={() => setHovered(true)} // 호버 시작
-                onMouseLeave={() => setHovered(false)} // 호버 종료
-                onClick={() => openModal(name, email, github, phone, message, imgSrc)} // 클릭하면 모달 열기
-              />
-            </StyledBadge>
-          ) : (
-            <Avatar
-              sx={{
-                marginLeft: "0px",
-                marginTop: "5px",
-                width: "50px", // 큰 아바타 크기
-                height: "50px",
-                transition: "transform 0.3s ease", // 호버 애니메이션 추가
-                transform: hovered ? "scale(1.1)" : "scale(1)", // 호버 시 이미지 확대
-                cursor: "pointer", // 클릭 가능한 상태를 나타내는 커서
-                border: "1px solid #ddd",
-                boxShadow: "0 1px 3px",
-                textAlign: "center",
-              }}
-              src={imgSrc}
-              alt={`${name}'s profile`}
-              onMouseEnter={() => setHovered(true)} // 호버 시작
-              onMouseLeave={() => setHovered(false)} // 호버 종료
-              onClick={() => openModal(name, email, github, phone, message, imgSrc)} // 클릭하면 모달 열기
-            />
+              )}
+            </>
           )}
         </Stack>
 
-                 {/* 이름 (공석일 경우 표시 안함) */}
-                 {!isEmpty && (
-            <Typography
-              sx={{
-                marginTop: "8px",
-                fontSize: "16px",
-                fontWeight: "600",
-                color: isOnline ? "#333" : "#b0b0b0", // 온라인: 진한 색, 오프라인: 회색
-              }}
-            >
-              {name}
-            </Typography>
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
-  
-  // 메인 컴포넌트
-  export default function StudentRoom() {
-    const [open, setOpen] = useState(false);
-    const [currentProfile, setCurrentProfile] = useState({});
-    const [profiles, setProfiles] = useState([]);
-  
-    // 서버에서 좌석 데이터를 가져오는 함수
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const response = await axios.get("http://localhost:8081/api/seat/");
-          console.log(response.data); // 브라우저 콘솔에서 데이터를 확인
-          setProfiles(response.data); // 받아온 데이터를 상태로 저장
-        } catch (error) {
-          console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
-        }
-      };
-  
-      // 비동기 함수 호출
-      fetchData();
-    }, []);
-  
-    // 모달 열기 함수
-    const openProfileModal = (name, email, github, phone, message, imgSrc) => {
-      setCurrentProfile({
-        name,
-        email,
-        github,
-        phone,
-        message,
-        imgSrc, // 프로필 이미지도 상태로 저장
-      });
-      setOpen(true);
+        {/* 이름 (공석일 경우 표시 안함) */}
+        {!isEmpty && (
+          <Typography
+            sx={{
+              marginTop: "8px",
+              fontSize: "16px",
+              fontWeight: "600",
+              color: isOnline ? "#333" : "#b0b0b0", // 온라인: 진한 색, 오프라인: 회색
+            }}
+          >
+            {name}
+          </Typography>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// 메인 컴포넌트
+export default function StudentRoom() {
+  const [open, setOpen] = useState(false);
+  const [currentProfile, setCurrentProfile] = useState({});
+  const [profiles, setProfiles] = useState([]);
+
+  // 서버에서 좌석 데이터를 가져오는 함수
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:8081/api/seat/");
+        console.log(response.data); // 브라우저 콘솔에서 데이터를 확인
+        setProfiles(response.data); // 받아온 데이터를 상태로 저장
+      } catch (error) {
+        console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
+      }
     };
-  
-    // 모달 닫기 함수
-    const closeProfileModal = () => {
-      setOpen(false);
-    };
-  
-    return (
-    <div style={{ display: "grid", gap: "20px", marginLeft: "auto", marginRight: "auto", padding: "20px", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", maxWidth: "1200px" }}>
+
+    // 비동기 함수 호출
+    fetchData();
+  }, []);
+
+  // 모달 열기 함수
+  const openProfileModal = (name, email, github, phone, message, imgSrc) => {
+    setCurrentProfile({
+      name,
+      email,
+      github,
+      phone,
+      message,
+      imgSrc, // 프로필 이미지도 상태로 저장
+    });
+    setOpen(true);
+  };
+
+  // 모달 닫기 함수
+  const closeProfileModal = () => {
+    setOpen(false);
+  };
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gap: "20px",
+        marginLeft: "auto",
+        marginRight: "auto",
+        padding: "20px",
+        maxWidth: "1200px", // 좌우 간격 제한
+        gridTemplateColumns: "repeat(5, 1fr)",
+      }}
+    >
+      {/* <div style={{ display: "grid", gap: "20px", marginLeft: "auto", marginRight: "auto", padding: "20px", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", maxWidth: "1200px" }}></div> */}
       {profiles.map((profile, index) => (
         <ProfileCard
           key={index}
@@ -298,69 +326,92 @@ function ProfileCard({
           isEmpty={!profile.user}
         />
       ))}
-  
-        {/* 모달 컴포넌트 */}
-        <Dialog
-  open={open}
-  onClose={closeProfileModal}
-  BackdropProps={{ style: { backgroundColor: 'transparent' } }}
-  sx={{ '& .MuiDialog-paper': { maxWidth: '300px', width: '80%', margin: 'auto' } }} // 모달 크기 조정
->
-<DialogContent>
-  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 1 }}>
-    <Avatar
-      src={currentProfile.imgSrc}
-      alt={`${currentProfile.name}'s profile`}
-      sx={{ width: 100, height: 100, mt: 1, mb: 1 }}
-    />
-    <Box sx={{ width: '100%', mt: 1 }}>
-      {[
-        { label: "Name", value: currentProfile.name },
-        { label: "Phone Number", value: currentProfile.phone },
-        { label: "Email", value: currentProfile.email },
-        { label: "GitHub", value: currentProfile.github, isLink: true },
-        { label: "Bio", value: currentProfile.message, isMultiline: true }
-      ].map((item, index) => (
-        <Box key={index} sx={{ mt: 1 }}>
-          <Typography variant="subtitle2" gutterBottom sx={{ fontSize: '0.7rem' }}>
-            {item.label}
-          </Typography>
-          {item.isLink ? (
-            <Link href={item.value} target="_blank" style={{ textDecoration: 'none' }}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                value={item.value}
-                InputProps={{
-                  readOnly: true,
-                  disableUnderline: true
-                }}
-                sx={{ fontSize: '0.55rem' }}
-              />
-            </Link>
-          ) : (
-            <TextField
-              fullWidth
-              variant="outlined"
-              value={item.value}
-              InputProps={{
-                readOnly: true,
-                disableUnderline: true,
-                style:{pointerEvents: "none",}
-              }}
-              multiline={item.isMultiline}
-              rows={item.isMultiline ? 3 : 1}
-              sx={{ fontSize: '0.55rem' }}
+
+      {/* 모달 컴포넌트 */}
+      <Dialog
+        open={open}
+        onClose={closeProfileModal}
+        BackdropProps={{ style: { backgroundColor: "transparent" } }}
+        sx={{
+          "& .MuiDialog-paper": {
+            maxWidth: "300px",
+            width: "80%",
+            margin: "auto",
+          },
+        }} // 모달 크기 조정
+      >
+        <DialogContent>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: 1,
+            }}
+          >
+            <Avatar
+              src={currentProfile.imgSrc}
+              alt={`${currentProfile.name}'s profile`}
+              sx={{ width: 100, height: 100, mt: 1, mb: 1 }}
             />
-          )}
-        </Box>
-      ))}
-    </Box>
-  </Box>
-</DialogContent>
-</Dialog>
-
-
-      </div>
-    );
-  }
+            <Box sx={{ width: "100%", mt: 1 }}>
+              {[
+                { label: "Name", value: currentProfile.name },
+                { label: "Phone Number", value: currentProfile.phone },
+                { label: "Email", value: currentProfile.email },
+                { label: "GitHub", value: currentProfile.github, isLink: true },
+                {
+                  label: "Bio",
+                  value: currentProfile.message,
+                  isMultiline: true,
+                },
+              ].map((item, index) => (
+                <Box key={index} sx={{ mt: 1 }}>
+                  <Typography
+                    variant="subtitle2"
+                    gutterBottom
+                    sx={{ fontSize: "0.7rem" }}
+                  >
+                    {item.label}
+                  </Typography>
+                  {item.isLink ? (
+                    <Link
+                      href={item.value}
+                      target="_blank"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        value={item.value}
+                        InputProps={{
+                          readOnly: true,
+                          disableUnderline: true,
+                        }}
+                        sx={{ fontSize: "0.55rem" }}
+                      />
+                    </Link>
+                  ) : (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      value={item.value}
+                      InputProps={{
+                        readOnly: true,
+                        disableUnderline: true,
+                        style: { pointerEvents: "none" },
+                      }}
+                      multiline={item.isMultiline}
+                      rows={item.isMultiline ? 3 : 1}
+                      sx={{ fontSize: "0.55rem" }}
+                    />
+                  )}
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
