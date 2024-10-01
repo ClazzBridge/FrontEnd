@@ -15,6 +15,7 @@ import {
   Link,
 } from "@mui/material";
 import WbIncandescentIcon from "@mui/icons-material/WbIncandescent";
+import AppleIcon from "@mui/icons-material/Apple";
 import CloseIcon from "@mui/icons-material/Close";
 
 // 프로필 카드 컴포넌트
@@ -22,20 +23,24 @@ function ProfileCard({
   seatNumber,
   name,
   imgSrc,
-  status,
+  isOccupied,
   isSelf,
   openModal,
   email,
   github,
   phone,
   message,
+  isUnderstand,
   isEmpty,
 }) {
-  const isOnline = status === "online";
-  const isOffline = status === "offline";
-  const seatAbsent = status === "no_seat";
+  const isOnline = isOccupied === "online";
+  const isOffline = isOccupied === "offline";
+  const seatAbsent = isOccupied === "no_seat";
 
-  const showStatus = !isSelf && !isEmpty && !seatAbsent;
+  const isGoodStatus = isUnderstand === "good";
+  const isBadStatus = isUnderstand === "bad";
+
+  const showisOccupied = !isSelf && !isEmpty && !seatAbsent;
 
   const [hovered, setHovered] = useState(false); // 이미지 호버 상태 관리
   const [comprehension, setComprehension] = useState(true); // 이해도 상태 (true: 이해함, false: 이해 못함)
@@ -47,7 +52,7 @@ function ProfileCard({
 
   // 이해도에 따른 색상
   const getComprehensionColor = () => {
-    return comprehension ? "green" : "red"; // 이해함: 초록색, 이해 못함: 빨간색
+    return comprehension ? "#28a745" : "red"; // 이해함: 초록색, 이해 못함: 빨간색
   };
 
   // 스타일 설정: 온라인 상태일 때 애니메이션 효과 적용
@@ -95,10 +100,11 @@ function ProfileCard({
         boxShadow: isSelf
           ? "0 4px 12px rgba(0, 0, 0, 0.2)"
           : "0 4px 8px rgba(0, 0, 0, 0.1)", // 본인일 경우 더 강한 그림자
-        border: isSelf ? "2px solid transparent" : "none", // 테두리 없을 때 기본값
-        backgroundImage: isSelf
-          ? "linear-gradient(white, white), linear-gradient(to right, #6a11cb, #2575fc)" // 본인일 경우 그라데이션 테두리
-          : "none",
+        border: isUnderstand && !isOffline ? "2px solid transparent" : "none", // 상태가 있고 오프라인이 아닌 경우에만 테두리
+        backgroundImage:
+          isUnderstand && !isOffline
+            ? "linear-gradient(white, white), linear-gradient(to right, #28a745, #28a745)" // 상태가 있고 오프라인이 아닌 경우 그라데이션 테두리
+            : "none",
         backgroundOrigin: "border-box",
         backgroundClip: "content-box, border-box",
         filter: isEmpty || isOffline ? "grayscale(100%)" : "none", // 공석 또는 오프라인일 경우 흑백 필터 적용
@@ -123,26 +129,15 @@ function ProfileCard({
         >
           <Typography
             sx={{
-              fontSize: "17px",
+              fontSize: "14px",
               fontWeight: "500",
-              fontFamily: "Arial sansSerif",
+              fontFamily: "",
               color: isOnline ? "#333" : "#b0b0b0", // 온라인: 진한 색, 오프라인: 회색
               margin: "10px",
             }}
           >
             No. {seatNumber}
           </Typography>
-
-          {/* 이해도 표시 아이콘 */}
-          {isSelf && (
-            <WbIncandescentIcon
-              sx={{
-                color: getComprehensionColor(), // 이해도에 따른 색상 적용
-                cursor: "pointer", // 클릭 가능하도록 커서 설정
-              }}
-              onClick={toggleComprehension} // 클릭 시 이해도 토글
-            />
-          )}
         </div>
 
         {/* 공석일 경우 이름과 상태를 숨기고 프로필 이미지만 흐리게 표시 */}
@@ -267,7 +262,7 @@ export default function StudentRoom() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8081/api/seat/");
+        const response = await axios.get("http://localhost:8082/api/seat/");
         console.log(response.data); // 브라우저 콘솔에서 데이터를 확인
         setProfiles(response.data); // 받아온 데이터를 상태로 저장
       } catch (error) {
@@ -305,25 +300,24 @@ export default function StudentRoom() {
         marginLeft: "auto",
         marginRight: "auto",
         padding: "20px",
-        maxWidth: "1200px", // 좌우 간격 제한
-        gridTemplateColumns: "repeat(5, 1fr)",
+        maxWidth: "1000px",
+        gridTemplateColumns: "repeat(5, 1fr)", // 한 줄에 5개의 칸
       }}
     >
-      {/* <div style={{ display: "grid", gap: "20px", marginLeft: "auto", marginRight: "auto", padding: "20px", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", maxWidth: "1200px" }}></div> */}
       {profiles.map((profile, index) => (
         <ProfileCard
           key={index}
           seatNumber={profile.seatNumber}
-          name={profile.user ? profile.user.name : "Empty Seat"}
-          imgSrc={profile.user ? profile.user.profileImage.pictureUrl : ""}
-          email={profile.user ? profile.user.email : ""}
-          github={profile.user ? profile.user.gitUrl : ""}
-          phone={profile.user ? profile.user.phone : ""}
-          message={profile.user ? profile.user.bio : ""}
-          status={profile.occupied ? "online" : "offline"}
-          isSelf={profile.user?.name === "권준성"}
+          name={profile.member ? profile.member.name : "Empty Seat"}
+          imgSrc={profile.member ? profile.member.profileImage.pictureUrl : ""}
+          email={profile.member ? profile.member.email : ""}
+          github={profile.member ? profile.member.gitUrl : ""}
+          phone={profile.member ? profile.member.phone : ""}
+          message={profile.member ? profile.member.bio : ""}
+          isOccupied={profile.occupied ? "online" : "offline"}
           openModal={openProfileModal}
-          isEmpty={!profile.user}
+          isEmpty={!profile.member}
+          isUnderstand={profile.understand}
         />
       ))}
 
@@ -338,7 +332,7 @@ export default function StudentRoom() {
             width: "80%",
             margin: "auto",
           },
-        }} // 모달 크기 조정
+        }}
       >
         <DialogContent>
           <Box
