@@ -14,7 +14,7 @@ import {
 import LaptopIcon from '@mui/icons-material/Laptop';
 
 function LoginForm({ onLoginSuccess }) {
-    const [userName, setUserName] = useState("");
+    const [memberId, setMemberId] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ function LoginForm({ onLoginSuccess }) {
         try {
             console.log("1111=============>");
             const response = await axios.post("http://127.0.0.1:8080/api/user/sign", {
-                userName,
+                memberId,
                 password,
             });
             console.log("2222=============>");
@@ -46,7 +46,7 @@ function LoginForm({ onLoginSuccess }) {
                 console.log("response.data.refreshToken: " + response.data.refreshTokenCookie)
                 document.cookie = `refreshToken=${response.data.refreshTokenCookie.value}; path=/;`;
 
-                onLoginSuccess(userName);
+                onLoginSuccess(memberId);
                 setError("");
             } else {
                 setError("아이디 또는 비밀번호가 올바르지 않습니다.");
@@ -99,8 +99,8 @@ function LoginForm({ onLoginSuccess }) {
                         name="userName"
                         autoComplete="userName"
                         autoFocus
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
+                        value={memberId}
+                        onChange={(e) => setMemberId(e.target.value)}
                         sx={{
                             backgroundColor: "white",
                             borderRadius: 1,

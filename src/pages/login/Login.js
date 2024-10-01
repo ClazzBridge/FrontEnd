@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import LoginForm from "../../LoginForm";
+import LoginForm from "./LoginForm";
 import { Box, Typography, Container } from "@mui/material";
 import axios from "axios";
 import Cookies from "js-cookie";

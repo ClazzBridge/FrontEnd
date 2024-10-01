@@ -23,7 +23,7 @@ import avatar1 from '../../assets/images/image1.jpeg';
 const ProfileForm = () => {
   const [profile, setProfile] = useState({
     name: '',
-    userName: '',
+    memberId: '',
     password: '',
     confirmPassword: '',
     email: '',
@@ -36,7 +36,6 @@ const ProfileForm = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [phoneError, setPhoneError] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -120,11 +119,6 @@ const ProfileForm = () => {
       return;
     }
 
-    if (phoneError) {
-      setError('올바른 전화번호를 입력해주세요.');
-      return;
-    }
-
     axios.post('http://localhost:8080/userlist/update', profile)
       .then(response => {
         alert('변경되었습니다.');
@@ -141,7 +135,8 @@ const ProfileForm = () => {
         {/* 좌측 프로필 이미지 */}
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <img
-            src={selectedAvatar}
+            // src={selectedAvatar}
+            src="https://mblogthumb-phinf.pstatic.net/MjAyMzA5MDlfMTIx/MDAxNjk0MjI5NzM2Njc2.LzOebx7NB3lKGhRrTwRdExfbmsSToAArZn7GCXKtivsg.ehUkqrK_yYjmi4Jb3E0_Hiau3LDRcJ5wKION1A4yxhYg.PNG.chois909/bj_%EC%9C%A0%ED%98%9C%EB%94%94_%EB%AF%B8%EC%8A%A4%ED%8B%B1_%EC%A7%84%EC%84%B1%EC%A4%80_%EC%9E%84%EC%8B%A0_%EB%82%99%ED%83%9C_%EC%86%8C%EB%83%A5%EC%9D%B4_%EC%A0%84%EC%99%80%EC%9D%B4%ED%94%84_%EC%9C%A0%EC%B9%B4_%EC%9D%B4%ED%98%BC_%EC%9E%85%EC%9E%A5%EB%AC%B8_%EB%B8%94%EB%A1%9C%EA%B7%B810.png?type=w800"
             alt="Profile Avatar"
             style={{ width: 150, height: 150, borderRadius: '50%' }}
           />
@@ -173,8 +168,8 @@ const ProfileForm = () => {
                   variant="outlined"
                   fullWidth
                   label="아이디"
-                  name="userName"
-                  value={profile.userName || ""}
+                  name="memberId"
+                  value={profile.memberId || ""}
                   InputProps={{
                     readOnly: true,
                   }}
