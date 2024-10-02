@@ -46,13 +46,23 @@ const PasswordCheck = () => {
             }
         }
     }, []);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            console.log("userId : ", userId)
+            console.log("userId : ", userId);
+
+            // JWT 토큰을 localStorage에서 가져옵니다.
+            const token = localStorage.getItem('token');
+
             // 서버에 비밀번호 확인 요청
-            const response = await axios.post('http://localhost:8080/userlist/check-password', { password, userId });
+            const response = await axios.post('http://localhost:8080/userlist/check-password',
+                { password, userId }, // 요청 본문
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Authorization 헤더에 토큰 추가
+                    }
+                }
+            );
 
             if (response.data.success) {
                 console.log(response.data.success);
@@ -65,6 +75,7 @@ const PasswordCheck = () => {
             setError('오류가 발생했습니다. 다시 시도해주세요.');
         }
     };
+
 
     return (
         <Container component="main" maxWidth="xs">

@@ -14,7 +14,7 @@ import {
 import LaptopIcon from '@mui/icons-material/Laptop';
 
 function LoginForm({ onLoginSuccess }) {
-    const [memberId, setMemberId] = useState("");
+    const [memberId, setmemberId] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -94,13 +94,13 @@ function LoginForm({ onLoginSuccess }) {
                         margin="normal"
                         required
                         fullWidth
-                        id="userName"
+                        id="memberId"
                         label="ID"
-                        name="userName"
-                        autoComplete="userName"
+                        name="memberId"
+                        autoComplete="memberId"
                         autoFocus
                         value={memberId}
-                        onChange={(e) => setMemberId(e.target.value)}
+                        onChange={(e) => setmemberId(e.target.value)}
                         sx={{
                             backgroundColor: "white",
                             borderRadius: 1,

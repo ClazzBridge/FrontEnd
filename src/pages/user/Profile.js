@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode'; // named export로 임포트
 import { MuiTelInput } from 'mui-tel-input';
+
 import {
   Button,
   Radio,
@@ -30,9 +31,10 @@ const ProfileForm = () => {
     phone: '',
     gitUrl: '',
     bio: '',
-    profileImageId: 1, // 기본 아바타 이미지 ID
+    profileImage: '', // 프로필 이미지 ID 초기값
     privacy: 'private', // 공개/비공개 기본값 설정
   });
+
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -53,6 +55,7 @@ const ProfileForm = () => {
           }
         })
           .then(response => {
+            console.log("서버에서 받은 응답:", response.data);
             setProfile(response.data);
             setLoading(false);
           })
@@ -67,11 +70,8 @@ const ProfileForm = () => {
   }, []);
 
 
-  const avatarImages = {
-    1: avatar1
-  };
 
-  const selectedAvatar = avatarImages[profile.profileImageId] || avatar1;
+  const selectedAvatar = profile.profileImage.id ? profile.profileImage.pictureUrl : avatar1 // 기본 아바타 설정
 
   if (loading) {
     return <Typography>Loading...</Typography>;
@@ -119,7 +119,14 @@ const ProfileForm = () => {
       return;
     }
 
-    axios.post('http://localhost:8080/userlist/update', profile)
+    // 로컬 스토리지에서 JWT 토큰을 가져옵니다.
+    const token = localStorage.getItem('token'); // 저장된 토큰 키를 확인하세요.
+
+    axios.put('http://localhost:8080/userlist/update', profile, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Bearer 토큰 방식으로 추가
+      },
+    })
       .then(response => {
         alert('변경되었습니다.');
       })
@@ -128,6 +135,7 @@ const ProfileForm = () => {
       });
   };
 
+
   return (
     <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
       <CssBaseline />
@@ -135,10 +143,9 @@ const ProfileForm = () => {
         {/* 좌측 프로필 이미지 */}
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <img
-            // src={selectedAvatar}
-            src="https://mblogthumb-phinf.pstatic.net/MjAyMzA5MDlfMTIx/MDAxNjk0MjI5NzM2Njc2.LzOebx7NB3lKGhRrTwRdExfbmsSToAArZn7GCXKtivsg.ehUkqrK_yYjmi4Jb3E0_Hiau3LDRcJ5wKION1A4yxhYg.PNG.chois909/bj_%EC%9C%A0%ED%98%9C%EB%94%94_%EB%AF%B8%EC%8A%A4%ED%8B%B1_%EC%A7%84%EC%84%B1%EC%A4%80_%EC%9E%84%EC%8B%A0_%EB%82%99%ED%83%9C_%EC%86%8C%EB%83%A5%EC%9D%B4_%EC%A0%84%EC%99%80%EC%9D%B4%ED%94%84_%EC%9C%A0%EC%B9%B4_%EC%9D%B4%ED%98%BC_%EC%9E%85%EC%9E%A5%EB%AC%B8_%EB%B8%94%EB%A1%9C%EA%B7%B810.png?type=w800"
-            alt="Profile Avatar"
-            style={{ width: 150, height: 150, borderRadius: '50%' }}
+            src={selectedAvatar}
+            alt={`${profile.name}'s profile`}
+            style={{ width: 250, height: 250, borderRadius: '50%' }}
           />
         </Box>
 
