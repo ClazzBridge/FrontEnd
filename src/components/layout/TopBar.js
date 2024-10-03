@@ -142,6 +142,10 @@ const TopBar = ({ open }) => {
     navigate("/profile");
   };
 
+  const handleNotificationClick = () => {
+    alert("알림");
+  };
+
   const menuId = "primary-search-account-menu";
   const renderMenu = (
     <Menu
@@ -273,7 +277,7 @@ const TopBar = ({ open }) => {
 
             {/* 알림 */}
             <LightTooltip title="알림">
-              <CustomIconButton>
+              <CustomIconButton onClick={handleNotificationClick}>
                 <CustomBadge badgeContent={19} color="error" max={9}>
                   <NotificationsNoneOutlinedIcon fontSize="small" />
                 </CustomBadge>

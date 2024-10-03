@@ -190,7 +190,6 @@ const MenuButtonContainer = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   zIndex: theme.zIndex.drawer + 2,
-
   margin: "auto", // 가운데 정렬
 }));
 

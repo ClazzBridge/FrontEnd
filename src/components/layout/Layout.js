@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import TopBar from "./TopBar";
 import SideBar from "./SideBar";
+import { useSidebar } from "../../context/SidebarContext"; // Context import
 
 const drawerWidth = 240;
 const closedDrawerWidth = 64; // 슬라이드바가 닫혔을 때의 넓이
@@ -36,25 +37,14 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const Layout = ({ children }) => {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const savedOpenState = localStorage.getItem("drawerOpen") === "true";
-    setOpen(savedOpenState);
-  }, []);
-
-  const handleDrawerToggle = () => {
-    const newOpenState = !open;
-    setOpen(newOpenState);
-    localStorage.setItem("drawerOpen", newOpenState);
-  };
+  const { open, toggleSidebar } = useSidebar(); // Context에서 값 가져오기
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
       <CssBaseline />
       <TopBar open={open} />
-      <SideBar open={open} handleDrawerToggle={handleDrawerToggle} />
-      <Main open={open}>
+      <SideBar open={open} handleDrawerToggle={toggleSidebar} />
+      <Main open={open} sx={{ overflowX: "hidden" }}>
         <DrawerHeader />
         {children}
       </Main>
