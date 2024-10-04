@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // 추가
 import { jwtDecode } from 'jwt-decode'; // named export로 임포트
 import {
@@ -11,7 +10,8 @@ import {
     CssBaseline,
     Alert
 } from "@mui/material";
-import Profile from "../user/Profile";
+import apiClient from '../../shared/apiClient';
+
 
 const PasswordCheck = () => {
     const [password, setPassword] = useState('');
@@ -28,11 +28,7 @@ const PasswordCheck = () => {
                 setUserId(userId);
                 console.log("토큰 디코더", decodedToken)
                 console.log("id 추출", userId)
-                axios.get(`http://localhost:8080/userlist/${userId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                })
+                apiClient.get(`http://localhost:8080/userlist/${userId}`)
                     .then(response => {
 
 
@@ -55,7 +51,7 @@ const PasswordCheck = () => {
             const token = localStorage.getItem('token');
 
             // 서버에 비밀번호 확인 요청
-            const response = await axios.post('http://localhost:8080/userlist/check-password',
+            const response = await apiClient.post('http://localhost:8080/userlist/check-password',
                 { password, userId }, // 요청 본문
                 {
                     headers: {
@@ -105,6 +101,7 @@ const PasswordCheck = () => {
                         fullWidth
                         variant="contained"
                         color="primary"
+
                         sx={{ mt: 3 }}
                     >
                         확인
