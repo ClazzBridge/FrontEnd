@@ -33,12 +33,6 @@ const columns = [
     headerName: "제목",
     resizable: false,
   },
-  // {
-  //   field: "content",
-  //   flex: 1,
-  //   headerName: "내용",
-  //   resizable: false,
-  // },
   {
     field: "authorName",
     headerName: "작성자",
@@ -127,12 +121,16 @@ export default function FreeBoardData() {
   };
 
   const deletePost = async (selectedIds) => {
-    await deletePostApi(selectedIds);
-    setSnackbarMessage("게시물이 성공적으로 삭제되었습니다."); // 메시지 설정
-    setOpenSnackbar(true); // Snackbar 열기
-    await fetchData(); // 데이터 새로 고침
-    closeDeleteModal();
-    setOpenDrawer(false);
+    try {
+      await deletePostApi(selectedIds);
+      setSnackbarMessage("게시물이 성공적으로 삭제되었습니다."); // 메시지 설정
+      setOpenSnackbar(true); // Snackbar 열기
+      await fetchData(); // 데이터 새로 고침
+      closeDeleteModal();
+      setOpenDrawer(false);
+    } catch (error) {
+      alert(error.response.data);
+    }
   };
 
   const handleRowClick = (params) => {
@@ -140,7 +138,6 @@ export default function FreeBoardData() {
     setSelectedRow(params.row); // 클릭된 행 데이터 저장
     setOpenDrawer(true); // Drawer 열기
     // 추가 작업 수행 (예: 상세 보기, 편집 등)
-    readPost(params.row.id);
   };
 
   const handleCloseDrawer = () => {
@@ -148,16 +145,32 @@ export default function FreeBoardData() {
     setSelectedRow(null); // 선택된 행 데이터 초기화
   };
 
-  const readPost = async (id) => {};
-
   return (
     <>
-      <Button variant="outlined" onClick={openModal}>
-        +
-      </Button>
-      <Button variant="outlined" onClick={openDeleteModal}>
-        -
-      </Button>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          width: "100%",
+          height: "40px",
+          gap: "12px",
+        }}
+      >
+        <Button
+          variant="outlined"
+          sx={{ width: "38px", height: "38px" }}
+          onClick={openModal}
+        >
+          +
+        </Button>
+        <Button
+          variant="outlined"
+          sx={{ width: "38px", height: "38px" }}
+          onClick={openDeleteModal}
+        >
+          -
+        </Button>
+      </Box>
       <CustomModal isOpen={isDeleteModalOpen} closeModal={closeDeleteModal}>
         <Box
           sx={{
@@ -171,11 +184,15 @@ export default function FreeBoardData() {
           }}
         >
           <h3>게시글 삭제하기</h3>
-          <p>해당 게시글을 삭제하시겠습니까?</p>
+          <p>
+            {selectedIds.length === 1
+              ? "해당 게시글을 삭제하시겠습니까?"
+              : `${selectedIds.length}개의 게시글을 삭제하시겠습니까?`}
+          </p>
+
           <Box
             sx={{
               display: "flex",
-
               width: "100%",
               alignItems: "center",
               justifyContent: "center",
@@ -287,9 +304,80 @@ export default function FreeBoardData() {
 
       <Box sx={{ height: "400px", whiteSpace: "100%" }}>
         <DataGrid
+          sx={{
+            backgroundColor: "white", // 배경색
+            border: "none", // 테두리
+            "--DataGrid-rowBorderColor": "transparent",
+            "& .MuiDataGrid-cell": {
+              border: "none",
+            },
+            "& .MuiDataGrid-row": {
+              borderBottom: "1px solid #f6f8fa",
+            },
+            "& .MuiDataGrid-filler": {
+              display: "none",
+            },
+            "& .MuiDataGrid-footerContainer": {
+              border: "none",
+            },
+            "& .MuiDataGrid-columnHeaderTitleContainer": {
+              fontSize: "12px",
+              fontWeight: "bold",
+              color: "#222831",
+            },
+            "& .MuiDataGrid-columnSeparator--sideRight": {
+              display: "none",
+            },
+            "& .MuiDataGrid-columnHeader": {
+              color: "black", // 헤더 글자색
+              border: "none",
+            },
+          }}
           rows={rows}
           checkboxSelection
           onRowClick={handleRowClick}
+          localeText={{
+            // 선택된 행 수 텍스트 변경
+            footerRowSelected: (count) => `${count}개 선택됨`, // 예: "11개 선택됨"
+            // 필터 관련 텍스트 변경
+            filterOperatorContains: "포함",
+            filterOperatorEquals: "같음",
+            filterOperatorStartsWith: "시작함",
+            filterOperatorEndsWith: "끝남",
+            filterOperatorIs: "이것",
+            filterOperatorNot: "아니오",
+            filterOperatorAfter: "이후",
+            filterOperatorBefore: "이전",
+            filterOperatorIsEmpty: "비어 있음",
+            filterOperatorIsNotEmpty: "비어 있지 않음",
+
+            // 필터 메뉴 텍스트
+            filterPanelInputLabel: "필터",
+            filterPanelAddFilter: "필터 추가",
+            filterPanelDeleteIconLabel: "삭제",
+            filterPanelOperator: "연산자",
+            filterPanelValue: "값",
+            filterPanelOperatorAnd: "그리고",
+            filterPanelOperatorOr: "또는",
+            sortAscending: "오름차순 정렬",
+            sortDescending: "내림차순 정렬",
+            columnMenuSortAsc: "오름차순 정렬", // "Sort Ascending" 텍스트 변경
+            columnMenuSortDesc: "내림차순 정렬", // "Sort Descending" 텍스트 변경
+            columnMenuShowAll: "모두 표시", // "Show All" 텍스트 변경
+            columnMenuFilter: "필터", // "Filter" 텍스트 변경
+            columnMenuUnsort: "정렬 해제", // "Unsort" 텍스트 변경
+            columnMenuHideColumn: "숨기기", // "Hide" 텍스트 변경
+            columnMenuHideOn: "숨기기", // "Hide on" 텍스트 변경
+            columnMenuManageColumns: "관리", // "Manage" 텍스트 변경
+            // 페이지 관련 텍스트 변경
+            page: "페이지",
+            noRowsLabel: "데이터가 없습니다.",
+            noResultsOverlayLabel: "결과가 없습니다.",
+            errorOverlayDefaultLabel: "오류가 발생했습니다.",
+            // 페이지네이션 관련 텍스트
+            pageSize: "페이지 크기",
+            pageSizeOptions: ["5", "10", "20"],
+          }}
           onRowSelectionModelChange={handleSelectionChange}
           columns={columns}
           initialState={{
@@ -307,7 +395,7 @@ export default function FreeBoardData() {
       {/* Snackbar 컴포넌트 */}
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={2000} // 6초 후 자동으로 닫힘
+        autoHideDuration={2500}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
@@ -354,13 +442,13 @@ export default function FreeBoardData() {
               >
                 <Typography
                   sx={{
-                    fontSize: "38px",
+                    fontSize: "30px",
                     fontWeight: "bold",
                   }}
                 >
                   {selectedRow.title}
                 </Typography>
-                <Box sx={{ color: "gray" }}>
+                <Box sx={{ color: "gray", marginLeft: "10px", width: "116px" }}>
                   <Typography sx={{ fontSize: "12px" }}>
                     작성자: {selectedRow.authorName}
                   </Typography>

@@ -244,7 +244,7 @@ const TopBar = ({ open }) => {
           variant="h6"
           noWrap
           component="div"
-          sx={{ display: { xs: "none", sm: "block" } }}
+          sx={{ display: { xs: "none", sm: "block" }, fontWeight: 700 }}
         >
           {getTitle(location.pathname)}
         </Typography>
