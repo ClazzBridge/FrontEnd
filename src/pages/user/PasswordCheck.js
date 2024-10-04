@@ -28,7 +28,7 @@ const PasswordCheck = () => {
                 setUserId(userId);
                 console.log("토큰 디코더", decodedToken)
                 console.log("id 추출", userId)
-                apiClient.get(`http://localhost:8080/userlist/${userId}`)
+                apiClient.get(`http://localhost:8080/api/userlist/${userId}`)
                     .then(response => {
 
 
@@ -51,7 +51,7 @@ const PasswordCheck = () => {
             const token = localStorage.getItem('token');
 
             // 서버에 비밀번호 확인 요청
-            const response = await apiClient.post('http://localhost:8080/userlist/check-password',
+            const response = await apiClient.post('http://localhost:8080/api/userlist/check-password',
                 { password, userId }, // 요청 본문
                 {
                     headers: {
