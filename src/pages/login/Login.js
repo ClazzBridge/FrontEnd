@@ -16,19 +16,21 @@ function Login() {
       const token = localStorage.getItem("token");
       const refreshToken = Cookies.get("refreshToken");
 
-
       if (token && isTokenValid(token)) {
         setIsLoggedIn(true);
       } else if (refreshToken) {
         try {
-          const response = await axios.post("http://127.0.0.1:8080/api/auth/refresh", {
-            value: refreshToken
-          }, {
-            withCredentials: true
-          });
+          const response = await axios.post(
+            "http://127.0.0.1:8080/api/auth/refresh",
+            {
+              value: refreshToken,
+            },
+            {
+              withCredentials: true,
+            }
+          );
           localStorage.setItem("token", response.data.accessToken);
           setIsLoggedIn(true);
-
         } catch (error) {
           console.error("Refresh token failed:", error);
           handleLogout();
@@ -45,13 +47,13 @@ function Login() {
 
   const isTokenValid = (token) => {
     try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const jsonPayload = decodeURIComponent(
         atob(base64)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
       );
 
       const { exp } = JSON.parse(jsonPayload);
@@ -68,7 +70,7 @@ function Login() {
   };
 
   const handleLogout = () => {
-    console.log("=================logout")
+    console.log("=================logout");
     setIsLoggedIn(false);
     localStorage.removeItem("token");
     Cookies.remove("refreshToken");
@@ -90,27 +92,31 @@ function Login() {
         width: "100vw",
       }}
     >
-      {
-        isLoggedIn ? (
-          <Box sx={{ display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
-            <Router>
-
-            </Router>
-          </Box>
-        ) :
-          <Container maxWidth="xs">
-            <Typography
-              variant="h3"
-              component="h1"
-              align="center"
-              gutterBottom
-              sx={{ color: "Red", mb: 4 }}
-            >
-              ClazzBridge
-            </Typography>
-            <LoginForm onLoginSuccess={handleLoginSuccess} />
-          </Container>
-      }
+      {isLoggedIn ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            width: "100%",
+          }}
+        >
+          <Router></Router>
+        </Box>
+      ) : (
+        <Container maxWidth="xs">
+          <Typography
+            variant="h3"
+            component="h1"
+            align="center"
+            gutterBottom
+            sx={{ color: "Red", mb: 4 }}
+          >
+            ClazzBridge
+          </Typography>
+          <LoginForm onLoginSuccess={handleLoginSuccess} />
+        </Container>
+      )}
     </Box>
   );
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
-import TopBar from "./TopBar";
+import TopBar from "./TopBar2";
 import SideBar from "./SideBar";
 import { useSidebar } from "../../context/SidebarContext"; // Context import
 

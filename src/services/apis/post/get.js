@@ -1,8 +1,8 @@
-import axiosInstance from "../../../services/axiosInstance";
+import axios from "../../../shared/apiClient";
 
 export const getPost = async (postId) => {
   try {
-    const response = await axiosInstance.get(`api/post/${postId}`);
+    const response = await axios.get(`post/${postId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching post:", error);
@@ -12,7 +12,7 @@ export const getPost = async (postId) => {
 
 export const getAllPosts = async () => {
   try {
-    const response = await axiosInstance.get("api/post");
+    const response = await axios.get("post");
     return response.data;
   } catch (error) {
     console.error("Error fetching all posts:", error);

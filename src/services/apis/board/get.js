@@ -1,8 +1,8 @@
-import axiosInstance from "../../../services/axiosInstance";
+import axios from "../../../shared/apiClient";
 
 export const getBoard = async (boardId) => {
   try {
-    const response = await axiosInstance.get(`api/board/${boardId}`);
+    const response = await axios.get(`board/${boardId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching board:", error);
@@ -12,7 +12,7 @@ export const getBoard = async (boardId) => {
 
 export const getAllBoards = async () => {
   try {
-    const response = await axiosInstance.get("api/board");
+    const response = await axios.get("board");
     return response.data;
   } catch (error) {
     console.error("Error fetching all boards:", error);

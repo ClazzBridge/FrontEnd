@@ -1,4 +1,4 @@
-import axiosInstance from "../../../services/axiosInstance";
+import axios from "../../../shared/apiClient";
 
 export const savePost = async (testData) => {
   const { title, content, boardId } = testData;
@@ -12,7 +12,7 @@ export const savePost = async (testData) => {
   };
 
   try {
-    const response = await axiosInstance.post(`api/post`, savedPost);
+    const response = await axios.post(`post`, savedPost);
     return response.data;
   } catch (error) {
     console.error("Error fetching post:", error);
