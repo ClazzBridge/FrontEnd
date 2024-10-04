@@ -1,6 +1,6 @@
 import "./App.css";
 import { SidebarProvider } from "./context/SidebarContext";
-// import Login from "./pages/login/Login";
+import Login from "./pages/login/Login";
 import Router from "./shared/Router";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
@@ -12,11 +12,12 @@ const theme = createTheme({
 
 function App() {
   return (
-    // <Login/>
     <ThemeProvider theme={theme}>
-      <SidebarProvider>
-        <Router />
-      </SidebarProvider>
+      <Login>
+        <SidebarProvider>
+          <Router />
+        </SidebarProvider>
+      </Login>
     </ThemeProvider>
   );
 }
