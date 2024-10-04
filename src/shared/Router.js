@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // 홈 페이지
 import Home from "../pages/Home";
@@ -31,23 +31,25 @@ import Calendar from "../pages/calendar/Calendars";
 
 const Router = () => {
   return (
-    <Routes>
-      <Route element={<LayoutWrapper />}>
-        <Route path="/" element={<Home />} />
-        <Route path="freeboard" element={<FreeBoard />} />
-        <Route path="noticeboard" element={<NoticeBoard />} />
-        <Route path="board" element={<Board />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="PasswordCheck" element={<PasswordCheck />} />
-        <Route path="lectureroom" element={<LectureRoom />} />
-        <Route path="chat" element={<Chat />} />
-        <Route path="calendar" element={<Calendar />} />
-        <Route path="assignment" element={<Assignment />} />
-        <Route path="qna" element={<Qna />} />
-        <Route path="vote" element={<Vote />} />
-        <Route path="privatechat" element={<Privatechat />} />
-      </Route>
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<LayoutWrapper />}>
+          <Route path="/" element={<Home />} />
+          <Route path="freeboard" element={<FreeBoard />} />
+          <Route path="noticeboard" element={<NoticeBoard />} />
+          <Route path="board" element={<Board />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="PasswordCheck" element={<PasswordCheck />} />
+          <Route path="lectureroom" element={<LectureRoom />} />
+          <Route path="chat" element={<Chat />} />
+          <Route path="calendar" element={<Calendar />} />
+          <Route path="assignment" element={<Assignment />} />
+          <Route path="qna" element={<Qna />} />
+          <Route path="vote" element={<Vote />} />
+          <Route path="privatechat" element={<Privatechat />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 };
 

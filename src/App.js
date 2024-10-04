@@ -1,4 +1,5 @@
 import "./App.css";
+import React, { useState } from "react";
 import { SidebarProvider } from "./context/SidebarContext";
 import Login from "./pages/login/Login";
 import Router from "./shared/Router";
@@ -11,13 +12,21 @@ const theme = createTheme({
 });
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+  };
+
   return (
     <ThemeProvider theme={theme}>
-      <Login>
+      {isLoggedIn ? (
         <SidebarProvider>
-          <Router />
+          <Router /> // 로그인 후 Router 화면
         </SidebarProvider>
-      </Login>
+      ) : (
+        <Login onLoginSuccess={handleLoginSuccess} /> // Login 컴포넌트
+      )}
     </ThemeProvider>
   );
 }
