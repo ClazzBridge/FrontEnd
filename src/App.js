@@ -1,12 +1,9 @@
-import logo from "./logo.svg";
 import "./App.css";
-import Router from "./shared/Router";
+import Login from "./pages/login/Login";
 
 function App() {
   return (
-    <>
-      <Router />
-    </>
+    <Login />
   );
 }
 
