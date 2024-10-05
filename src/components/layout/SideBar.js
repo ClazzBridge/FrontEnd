@@ -86,7 +86,7 @@ const menuItems = [
         title: "전체채팅",
         notifications: 1,
         icon: <ModeCommentOutlinedIcon />,
-        link: "/chat",
+        link: "/allchat",
       },
       {
         title: "1:1 채팅",
@@ -120,7 +120,8 @@ const StyledListItemButton = styled(ListItemButton)({
 
 const StyledListItemText = styled(ListItemText)({
   "& .MuiTypography-root": {
-    fontWeight: "normal",
+    fontWeight: "600",
+    fontSize: "12px",
     color: "gray",
   },
 });
@@ -129,7 +130,7 @@ const StyledListMainItemText = styled(ListItemText)({
   "& .MuiTypography-root": {
     color: "gray",
     fontSize: "12px",
-    fontWeight: "bold",
+    fontWeight: "600",
   },
 });
 
@@ -253,6 +254,8 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                       flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
+                      lineHeight: "20px",
+
                       margin: "0px",
                     }}
                   >
@@ -307,7 +310,7 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                     to={subItem.link}
                   >
                     <ListItemIcon
-                      style={{ width: "50px" }}
+                      style={{ width: "50px", display: "flex" }}
                       sx={[open ? { display: "block" } : { display: "none" }]}
                     >
                       {subItem.icon}
@@ -319,9 +322,10 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                       sx={[
                         open
                           ? {
-                              display: "block",
-                              marginLeft: "-12px",
+                              display: "flex",
+                              marginLeft: "-10px",
                               marginTop: 0,
+                              marginBottom: 0,
                             }
                           : {
                               display: "none",

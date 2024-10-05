@@ -20,13 +20,13 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      {isLoggedIn ? (
-        <SidebarProvider>
+      <SidebarProvider>
+        {isLoggedIn ? (
           <Router /> // 로그인 후 Router 화면
-        </SidebarProvider>
-      ) : (
-        <Login onLoginSuccess={handleLoginSuccess} /> // Login 컴포넌트
-      )}
+        ) : (
+          <Login onLoginSuccess={handleLoginSuccess} /> // Login 컴포넌트
+        )}
+      </SidebarProvider>
     </ThemeProvider>
   );
 }

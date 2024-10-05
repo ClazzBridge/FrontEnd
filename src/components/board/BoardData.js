@@ -5,7 +5,6 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-
 import {
   Box,
   Button,
@@ -65,6 +64,7 @@ export default function FreeBoardData() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // 수정 모드 상태 추가
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -75,6 +75,16 @@ export default function FreeBoardData() {
   const [boardId, setBoardId] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
+  const handleEditClick = () => {
+    setIsEditing(true); // 수정 모드 활성화
+  };
+
+  const handleSaveClick = async () => {
+    // API 호출하여 수정된 내용을 저장하는 로직 추가
+    // await updatePost(selectedRow.id, { title }); // 예시 API 호출
+    setIsEditing(false); // 수정 모드 비활성화
+  };
 
   const handleBoardIdChange = (event) => {
     setBoardId(event.target.value);
@@ -345,6 +355,9 @@ export default function FreeBoardData() {
             filterOperatorStartsWith: "시작함",
             filterOperatorEndsWith: "끝남",
             filterOperatorIs: "이것",
+            filterOperatorDoesNotContain: "포함하지 않음",
+            filterOperatorDoesNotEqual: "같지 않음",
+            filterOperatorIsAnyOf: "다음 중 하나",
             filterOperatorNot: "아니오",
             filterOperatorAfter: "이후",
             filterOperatorBefore: "이전",
@@ -356,6 +369,7 @@ export default function FreeBoardData() {
             filterPanelAddFilter: "필터 추가",
             filterPanelDeleteIconLabel: "삭제",
             filterPanelOperator: "연산자",
+            filterPanelColumns: "데이터 열",
             filterPanelValue: "값",
             filterPanelOperatorAnd: "그리고",
             filterPanelOperatorOr: "또는",
@@ -440,14 +454,22 @@ export default function FreeBoardData() {
                   marginBottom: "4px",
                 }}
               >
-                <Typography
-                  sx={{
-                    fontSize: "30px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {selectedRow.title}
-                </Typography>
+                {isEditing ? (
+                  <TextField
+                    value={selectedRow.title}
+                    onChange={(e) => setTitle(e.target.value)} // 제목 상태 업데이트
+                    sx={{ fontSize: "30px", fontWeight: "bold", flex: 1 }}
+                  />
+                ) : (
+                  <Typography
+                    sx={{
+                      fontSize: "30px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {selectedRow.title}
+                  </Typography>
+                )}
                 <Box sx={{ color: "gray", marginLeft: "10px", width: "116px" }}>
                   <Typography sx={{ fontSize: "12px" }}>
                     작성자: {selectedRow.authorName}
@@ -477,7 +499,6 @@ export default function FreeBoardData() {
                   {selectedRow.content}
                 </Typography>
               </Box>
-
               <Box
                 sx={{
                   display: "flex",
@@ -486,16 +507,30 @@ export default function FreeBoardData() {
                   gap: "12px",
                 }}
               >
-                <Button variant="outlined">수정</Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    setSelectedIds([selectedRow.id]);
-                    setIsDeleteModalOpen(true);
-                  }}
-                >
-                  삭제
-                </Button>
+                {isEditing ? (
+                  <Button variant="outlined" onClick={handleSaveClick}>
+                    저장
+                  </Button>
+                ) : (
+                  <Button variant="outlined" onClick={handleEditClick}>
+                    수정
+                  </Button>
+                )}
+                {isEditing ? (
+                  <Button variant="outlined" onClick={setIsEditing(false)}>
+                    취소
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setSelectedIds([selectedRow.id]);
+                      setIsDeleteModalOpen(true);
+                    }}
+                  >
+                    삭제
+                  </Button>
+                )}
               </Box>
 
               <Box
