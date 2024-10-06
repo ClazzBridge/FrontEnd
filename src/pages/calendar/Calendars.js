@@ -5,7 +5,7 @@ import { Button, Modal, Typography, TextField, Box } from '@mui/material';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import axios from 'axios';
+import apiClient from '../../shared/apiClient';
 
 const localizer = momentLocalizer(moment);
 
@@ -31,13 +31,7 @@ const Calendars = () => {
   }, []); // 빈 배열로 처음에 한 번만 실행
 
   const fetchEvents = () => {
-    const token = localStorage.getItem('accessToken'); // 1. 로컬 스토리지에서 토큰 가져오기
-
-    axios.get('http://localhost:8080/api/schedule/find', {
-      headers: {
-        Authorization: `Bearer ${token}` // 2. 토큰을 Authorization 헤더에 추가
-      }
-    })
+    apiClient.get('schedule')
       .then(response => {
         const fetchedEvents = response.data.map(event => ({
           ...event,
@@ -110,7 +104,7 @@ const Calendars = () => {
     if (editMode) {
       if (isAddingEvent) {
         // 새로운 이벤트 추가
-        axios.post('http://localhost:8080/api/schedule/add', newEvent)
+        apiClient.post('schedule', newEvent)
           .then(response => {
             const savedEvent = {
               ...newEvent,
@@ -131,7 +125,7 @@ const Calendars = () => {
           });
       } else {
         // 기존 이벤트 수정
-        axios.put('http://localhost:8080/api/schedule/update', newEvent)
+        apiClient.put('schedule', newEvent)
           .then(() => {
             const updatedEvents = events.map(event =>
               event.id === selectedEvent.id ? { ...event, ...newEvent } : event
@@ -152,7 +146,7 @@ const Calendars = () => {
   // 이벤트 삭제 핸들러
   const handleDeleteEvent = () => {
     if (selectedEvent) {
-      axios.delete(`http://localhost:8080/api/schedule/delete/${selectedEvent.id}`)
+      apiClient.delete(`schedule/${selectedEvent.id}`)
         .then(() => {
           const filteredEvents = events.filter(event => event.id !== selectedEvent.id);
           setEvents(filteredEvents);
@@ -166,7 +160,6 @@ const Calendars = () => {
     }
     handleClose();
   };
-
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <div style={{ height: '80vh' }}>
@@ -227,6 +220,8 @@ const Calendars = () => {
                   value={newEventDescription}
                   onChange={(e) => setNewEventDescription(e.target.value)}
                   style={{ marginBottom: '20px' }}
+                  multiline  // TextField를 textarea로 변경
+                  rows={4}   // 표시할 줄 수 (필요에 따라 조정 가능)
                 />
 
                 <DateTimePicker
@@ -235,6 +230,8 @@ const Calendars = () => {
                   onChange={(newValue) => setNewEventStart(moment(newValue))}
                   renderInput={(params) => <TextField {...params} fullWidth style={{ marginBottom: '20px' }} />}
                 />
+                <br></br>
+                <br></br>
                 <DateTimePicker
                   label="종료 날짜"
                   value={newEventEnd}
@@ -250,9 +247,21 @@ const Calendars = () => {
                 <Typography id="modal-eventTitle" variant="h6">
                   {selectedEvent ? selectedEvent.eventTitle : ''}
                 </Typography>
-                <Typography id="modal-description">
+                <Typography
+                  id="modal-description"
+                  style={{
+                    whiteSpace: 'pre-wrap',  // 연속된 띄어쓰기 및 줄바꿈 모두 허용
+                    overflow: 'hidden',       // 넘치는 내용 숨기기
+                    textOverflow: 'ellipsis',  // 넘치는 내용에 ... 표시
+                    display: 'block',         // 블록 요소로 설정
+                    maxHeight: '200px',      // 최대 높이 설정 (원하는 높이로 조정 가능)
+                    overflowY: 'auto',       // 세로 방향 스크롤
+                  }}
+                >
                   {selectedEvent ? selectedEvent.description : ''}
                 </Typography>
+
+
                 <Typography>
                   시작 시간: {selectedEvent ? moment(selectedEvent.start).format('YYYY.MM.DD HH:mm') : ''}
                 </Typography>

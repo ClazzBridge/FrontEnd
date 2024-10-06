@@ -49,7 +49,7 @@ const ProfileForm = () => {
         console.log("토큰 디코더", decodedToken);
         console.log("id 추출", userId);
         apiClient
-          .get(`http://localhost:8080/api/userlist/${userId}`)
+          .get(`userlist/${userId}`)
           .then((response) => {
             console.log("서버에서 받은 응답:", response.data);
             setProfile(response.data);
@@ -119,7 +119,7 @@ const ProfileForm = () => {
     const token = localStorage.getItem("token"); // 저장된 토큰 키를 확인하세요.
 
     apiClient
-      .put("http://localhost:8080/api/userlist/update", profile, {
+      .put("userlist", profile, {
         headers: {
           Authorization: `Bearer ${token}`, // Bearer 토큰 방식으로 추가
         },
