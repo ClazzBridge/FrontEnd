@@ -13,55 +13,39 @@ import {
   Box,
   TextField,
   Link,
+  Button,
 } from "@mui/material";
-import WbIncandescentIcon from "@mui/icons-material/WbIncandescent";
-import AppleIcon from "@mui/icons-material/Apple";
-import CloseIcon from "@mui/icons-material/Close";
 
 // 프로필 카드 컴포넌트
 function ProfileCard({
   seatNumber,
   name,
   imgSrc,
-  isOccupied,
-  isSelf,
+  isOnline,
+  isUnderstanding,
+  isHandRaised,
   openModal,
   email,
   github,
   phone,
-  message,
-  isUnderstand,
-  isEmpty,
+  bio,
+  isSelf, // 자신 여부
+  isEmpty, // 공석 여부
+  role, // 역할 (STUDENT 또는 TEACHER)
+  onRegisterSeat, // 좌석 등록 콜백
 }) {
-  const isOnline = isOccupied === "online";
-  const isOffline = isOccupied === "offline";
-  const seatAbsent = isOccupied === "no_seat";
-
-  const isGoodStatus = isUnderstand === "good";
-  const isBadStatus = isUnderstand === "bad";
-
-  const showisOccupied = !isSelf && !isEmpty && !seatAbsent;
+  const isGoodOnline = isOnline === true;
+  const isOffline = isOnline === false;
 
   const [hovered, setHovered] = useState(false); // 이미지 호버 상태 관리
-  const [comprehension, setComprehension] = useState(true); // 이해도 상태 (true: 이해함, false: 이해 못함)
-
-  // 이해도 토글 함수
-  const toggleComprehension = () => {
-    setComprehension((prev) => !prev); // true <-> false 토글
-  };
-
-  // 이해도에 따른 색상
-  const getComprehensionColor = () => {
-    return comprehension ? "#28a745" : "red"; // 이해함: 초록색, 이해 못함: 빨간색
-  };
 
   // 스타일 설정: 온라인 상태일 때 애니메이션 효과 적용
   const StyledBadge = styled(Badge)(({ theme }) => ({
     "& .MuiBadge-badge": {
-      backgroundColor: isOnline ? "#28a745" : "#b0b0b0", // 온라인: 초록색, 오프라인: 회색
+      backgroundColor: isGoodOnline ? "#28a745" : "#b0b0b0", // 온라인: 초록색, 오프라인: 회색
       color: "#ffffff",
       boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-      "&::after": isOnline
+      "&::after": isGoodOnline
         ? {
             position: "absolute",
             top: -1,
@@ -98,20 +82,51 @@ function ProfileCard({
         margin: "0px",
         height: "155px",
         boxShadow: isSelf
-          ? "0 4px 12px rgba(0, 0, 0, 0.2)"
-          : "0 4px 8px rgba(0, 0, 0, 0.1)", // 본인일 경우 더 강한 그림자
-        border: isUnderstand && !isOffline ? "2px solid transparent" : "none", // 상태가 있고 오프라인이 아닌 경우에만 테두리
+          ? "0 2px 4px rgba(0, 0, 0, 0.2)"
+          : "0 2px 4px rgba(0, 0, 0, 0.1)", // 본인일 경우 더 강한 그림자
+
+        // 학생일 때: 본인 이해도만 표시 (ROLE_STUDENT)
+        border:
+          role === "ROLE_STUDENT" && isSelf && isUnderstanding && !isOffline
+            ? "2px solid #28a745" // 본인이 이해한 경우 초록색 테두리
+            : role === "ROLE_STUDENT" &&
+                isSelf &&
+                !isUnderstanding &&
+                !isOffline
+              ? "2px solid transparent" // 본인이 이해하지 못한 경우 그라데이션
+              : role === "ROLE_TEACHER" && isUnderstanding && !isOffline
+                ? "2px solid #28a745" // 강사가 보는 모든 학생 이해한 경우 초록색 테두리
+                : "none", // 강사가 보는 학생 이해하지 못한 경우 테두리 없음
+
+        // 본인이 이해하지 못한 경우 그라데이션
         backgroundImage:
-          isUnderstand && !isOffline
-            ? "linear-gradient(white, white), linear-gradient(to right, #28a745, #28a745)" // 상태가 있고 오프라인이 아닌 경우 그라데이션 테두리
-            : "none",
+          role === "ROLE_STUDENT" && isSelf && !isUnderstanding && !isOffline
+            ? "linear-gradient(white, white), linear-gradient(to right, #6a0dad, #1e90ff)" // 본인인 경우에만 그라데이션
+            : "none", // 그라데이션은 본인일 경우에만 표시
+
         backgroundOrigin: "border-box",
         backgroundClip: "content-box, border-box",
         filter: isEmpty || isOffline ? "grayscale(100%)" : "none", // 공석 또는 오프라인일 경우 흑백 필터 적용
-        position: "relative", // 추가 디자인 요소를 위한 포지션 설정
+        position: "relative",
       }}
     >
       <CardContent>
+        {/* 빈 좌석일 경우 자리 등록 버튼 추가 */}
+        {isEmpty && (
+          <Button
+            variant="outlined"
+            sx={{
+              position: "absolute",
+              top: 5,
+              right: 5,
+              fontSize: "12px",
+              padding: "5px",
+            }}
+            onClick={onRegisterSeat} // 좌석 등록 콜백 함수 호출
+          >
+            자리 등록
+          </Button>
+        )}
         {/* 상단 번호 */}
         <div
           style={{
@@ -132,7 +147,7 @@ function ProfileCard({
               fontSize: "14px",
               fontWeight: "500",
               fontFamily: "",
-              color: isOnline ? "#333" : "#b0b0b0", // 온라인: 진한 색, 오프라인: 회색
+              color: isGoodOnline ? "#333" : "#b0b0b0", // 온라인: 진한 색, 오프라인: 회색
               margin: "10px",
             }}
           >
@@ -140,7 +155,7 @@ function ProfileCard({
           </Typography>
         </div>
 
-        {/* 공석일 경우 이름과 상태를 숨기고 프로필 이미지만 흐리게 표시 */}
+        {/* 프로필 이미지 */}
         <Stack
           direction="row"
           spacing={2}
@@ -148,10 +163,8 @@ function ProfileCard({
           alignItems="center"
         >
           {isEmpty ? (
-            // 공석일 때 아무 것도 표시하지 않음
             <Typography sx={{ mt: 2, color: "#aaa" }}></Typography>
           ) : (
-            // 공석이 아닐 때 아래 로직 실행
             <>
               {!isSelf ? (
                 <StyledBadge
@@ -167,7 +180,7 @@ function ProfileCard({
                   variant="dot"
                   badgeContent={
                     <Box
-                      label={isOnline ? "온라인" : "오프라인"}
+                      label={isGoodOnline ? "온라인" : "오프라인"}
                       alt="Small Avatar"
                       onMouseEnter={() => setHovered(true)}
                       onMouseLeave={() => setHovered(false)}
@@ -177,9 +190,8 @@ function ProfileCard({
                         width: "14px",
                         height: "14px",
                         color: "white",
-                        backgroundColor: isOnline ? "#28a745" : "#b0b0b0",
+                        backgroundColor: isGoodOnline ? "#28a745" : "#b0b0b0",
                         border: "2px solid",
-                        transition: "transform 0.3s ease, opacity 0.3s ease",
                         transform: hovered ? "scale(1.1)" : "scale(1)",
                       }}
                     />
@@ -191,42 +203,33 @@ function ProfileCard({
                       width: "50px",
                       height: "50px",
                       filter: isOffline ? "grayscale(100%)" : "none",
-                      transition: "transform 0.3s ease",
                       transform: hovered ? "scale(1.1)" : "scale(1)",
                       cursor: "pointer",
                       border: "1px solid #ddd",
                       boxShadow: "0 1px 3px",
-                      textAlign: "center",
                     }}
                     src={imgSrc}
                     alt={`${name}'s profile`}
-                    onMouseEnter={() => setHovered(true)}
-                    onMouseLeave={() => setHovered(false)}
                     onClick={() =>
-                      openModal(name, email, github, phone, message, imgSrc)
+                      openModal(name, email, github, phone, bio, imgSrc, isSelf)
                     }
                   />
                 </StyledBadge>
               ) : (
                 <Avatar
                   sx={{
-                    marginLeft: "0px",
                     marginTop: "5px",
                     width: "50px",
                     height: "50px",
-                    transition: "transform 0.3s ease",
                     transform: hovered ? "scale(1.1)" : "scale(1)",
                     cursor: "pointer",
                     border: "1px solid #ddd",
                     boxShadow: "0 1px 3px",
-                    textAlign: "center",
                   }}
                   src={imgSrc}
                   alt={`${name}'s profile`}
-                  onMouseEnter={() => setHovered(true)}
-                  onMouseLeave={() => setHovered(false)}
                   onClick={() =>
-                    openModal(name, email, github, phone, message, imgSrc)
+                    openModal(name, email, github, phone, bio, imgSrc)
                   }
                 />
               )}
@@ -234,14 +237,14 @@ function ProfileCard({
           )}
         </Stack>
 
-        {/* 이름 (공석일 경우 표시 안함) */}
+        {/* 이름 표시 */}
         {!isEmpty && (
           <Typography
             sx={{
               marginTop: "8px",
               fontSize: "16px",
               fontWeight: "600",
-              color: isOnline ? "#333" : "#b0b0b0", // 온라인: 진한 색, 오프라인: 회색
+              color: isGoodOnline ? "#333" : "#b0b0b0",
             }}
           >
             {name}
@@ -257,39 +260,46 @@ export default function StudentRoom() {
   const [open, setOpen] = useState(false);
   const [currentProfile, setCurrentProfile] = useState({});
   const [profiles, setProfiles] = useState([]);
+  const currentMemberId = "student01"; // 로그인된 사용자 ID
+  const currentRole = "ROLE_STUDENT"; // 역할을 'STUDENT' 또는 'TEACHER'로 설정
 
   // 서버에서 좌석 데이터를 가져오는 함수
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get("http://localhost:8082/api/seat/");
-        console.log(response.data); // 브라우저 콘솔에서 데이터를 확인
-        setProfiles(response.data); // 받아온 데이터를 상태로 저장
+        setProfiles(response.data);
       } catch (error) {
         console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
       }
     };
 
-    // 비동기 함수 호출
     fetchData();
   }, []);
 
   // 모달 열기 함수
-  const openProfileModal = (name, email, github, phone, message, imgSrc) => {
-    setCurrentProfile({
-      name,
-      email,
-      github,
-      phone,
-      message,
-      imgSrc, // 프로필 이미지도 상태로 저장
-    });
+  const openProfileModal = (
+    name,
+    email,
+    github,
+    phone,
+    bio,
+    imgSrc,
+    isSelf
+  ) => {
+    setCurrentProfile({ name, email, github, phone, bio, imgSrc, isSelf });
     setOpen(true);
   };
 
   // 모달 닫기 함수
   const closeProfileModal = () => {
     setOpen(false);
+  };
+
+  // 자리 등록 콜백 함수
+  const handleRegisterSeat = (seatNumber) => {
+    console.log(`${seatNumber}번 좌석에 등록 요청`);
+    // 여기서 좌석 등록 API 호출을 추가할 수 있음
   };
 
   return (
@@ -304,20 +314,28 @@ export default function StudentRoom() {
         gridTemplateColumns: "repeat(5, 1fr)", // 한 줄에 5개의 칸
       }}
     >
-      {profiles.map((profile, index) => (
+      {profiles.map((profile) => (
         <ProfileCard
-          key={index}
+          key={profile.id}
           seatNumber={profile.seatNumber}
-          name={profile.member ? profile.member.name : "Empty Seat"}
-          imgSrc={profile.member ? profile.member.profileImage.pictureUrl : ""}
-          email={profile.member ? profile.member.email : ""}
-          github={profile.member ? profile.member.gitUrl : ""}
-          phone={profile.member ? profile.member.phone : ""}
-          message={profile.member ? profile.member.bio : ""}
-          isOccupied={profile.occupied ? "online" : "offline"}
+          name={profile.memberDTO ? profile.memberDTO.name : "Empty Seat"}
+          imgSrc={
+            profile.memberDTO ? profile.memberDTO.profileImage.pictureUrl : ""
+          }
+          email={profile.memberDTO ? profile.memberDTO.email : ""}
+          github={profile.memberDTO ? profile.memberDTO.gitUrl : ""}
+          phone={profile.memberDTO ? profile.memberDTO.phone : ""}
+          bio={profile.memberDTO ? profile.memberDTO.bio : ""}
+          isOnline={profile.isOnline}
+          isUnderstanding={profile.isUnderstanding}
+          isHandRaised={profile.isHandRaised}
+          isSelf={
+            profile.memberDTO && profile.memberDTO.memberId === currentMemberId
+          }
+          isEmpty={!profile.memberDTO} // memberDTO가 없으면 빈 좌석으로 설정
           openModal={openProfileModal}
-          isEmpty={!profile.member}
-          isUnderstand={profile.understand}
+          role={currentRole} // 사용자 역할을 ProfileCard로 전달
+          onRegisterSeat={() => handleRegisterSeat(profile.seatNumber)} // 좌석 등록 콜백 전달
         />
       ))}
 
@@ -354,11 +372,7 @@ export default function StudentRoom() {
                 { label: "Phone Number", value: currentProfile.phone },
                 { label: "Email", value: currentProfile.email },
                 { label: "GitHub", value: currentProfile.github, isLink: true },
-                {
-                  label: "Bio",
-                  value: currentProfile.message,
-                  isMultiline: true,
-                },
+                { label: "Bio", value: currentProfile.bio, isMultiline: true },
               ].map((item, index) => (
                 <Box key={index} sx={{ mt: 1 }}>
                   <Typography
@@ -403,6 +417,17 @@ export default function StudentRoom() {
                 </Box>
               ))}
             </Box>
+            {/* 자리 해제 버튼 (자신의 좌석일 경우에만 표시) */}
+            {currentProfile.isSelf && (
+              <Button
+                variant="contained"
+                color="error"
+                sx={{ marginTop: 20 }}
+                onClick={() => console.log("자리 해제")}
+              >
+                자리 해제
+              </Button>
+            )}
           </Box>
         </DialogContent>
       </Dialog>
