@@ -140,9 +140,11 @@ export default function FloatingActionButtons() {
                 break;
             case '질문':
                 setQuestionVisible(!questionVisible);
+                setQuestion('');
                 break;
             case '손 들기':
                 handleOpenDialog(actionName);
+                setQuestionVisible(false);
                 break;
             case '채팅':
                 setChatVisible(true);
@@ -294,11 +296,11 @@ export default function FloatingActionButtons() {
                 aria-describedby="dialog-description"
             >
                 <DialogTitle id="dialog-title">
-                    {'손을 드시겠습니까?'}
+                    {'손 들기'}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="dialog-description">
-                        {'이 동작은 손을 드는 것을 의미하며, 다른 사람들이 이를 볼 수 있습니다.'}
+                        {'손을 드시겠습니까?'}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

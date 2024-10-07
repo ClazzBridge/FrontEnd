@@ -11,6 +11,7 @@ import {
   DialogTitle
 } from "@mui/material";
 import Button from "@mui/material/Button";
+import CloseIcon from '@mui/icons-material/Close';
 import axios from "axios";
 
 
@@ -48,6 +49,12 @@ export default function CustomizedInputBase({question, setQuestion, setQuestionV
           component="form"
           sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400, marginBottom: '60px', marginRight:'20px'}}
       >
+        <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={() => {
+          setQuestionVisible(false);
+          setQuestion('')}
+        }>
+          <CloseIcon />
+        </IconButton>
         <InputBase
             sx={{ ml: 1, flex: 1 }}
             value={question}

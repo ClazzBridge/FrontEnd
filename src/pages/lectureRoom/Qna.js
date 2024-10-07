@@ -1,5 +1,6 @@
 import React from "react";
+import QuestionList from "../question/QuestionList";
 
 export default function Qna() {
-  return <div>질의응답</div>;
+  return <QuestionList/>;
 }
