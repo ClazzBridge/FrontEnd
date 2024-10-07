@@ -1,11 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import { Button, Modal, Typography, TextField, Box } from '@mui/material';
+import { Button, Modal, Typography, TextField, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import apiClient from '../../shared/apiClient';
+import 'moment/locale/ko'; // 한국어 로케일 불러오기
+
+moment.locale('ko');
+
+const messages = {
+  allDay: '종일',
+  previous: '이전 달',
+  next: '다음 달',
+  today: '오늘',
+  month: '월',
+  week: '주',
+  day: '일',
+  agenda: '일정',
+  date: '날짜',
+  time: '시간',
+  event: '이벤트',
+  noEventsInRange: '해당 기간에 이벤트가 없습니다.',
+  showMore: total => `+ 더보기 (${total})`,
+};
 
 const localizer = momentLocalizer(moment);
 
@@ -24,13 +43,16 @@ const Calendars = () => {
   const [newEventEnd, setNewEventEnd] = useState(moment().add(1, 'hour'));
 
   const [events, setEvents] = useState([]);
+  const [classroomOptions, setClassroomOptions] = useState([]); // 강의실 옵션 상태
 
   useEffect(() => {
     // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
     fetchEvents();
+    fetchClassrooms();
   }, []); // 빈 배열로 처음에 한 번만 실행
 
   const fetchEvents = () => {
+
     apiClient.get('schedule')
       .then(response => {
         const fetchedEvents = response.data.map(event => ({
@@ -42,6 +64,17 @@ const Calendars = () => {
       })
       .catch(error => {
         console.error('이벤트 데이터를 불러오지 못했습니다.', error);
+      });
+  };
+
+  const fetchClassrooms = () => {
+    // 강의실 목록을 가져오는 API 호출
+    apiClient.get('classroom')
+      .then(response => {
+        setClassroomOptions(response.data); // 강의실 목록 설정
+      })
+      .catch(error => {
+        console.error('강의실 목록을 불러오지 못했습니다.', error);
       });
   };
 
@@ -120,7 +153,6 @@ const Calendars = () => {
             fetchEvents();
           })
           .catch(error => {
-            alert('강의실명이 안 맞습니다.');
             console.error('일정 추가에 실패하였습니다.', error);
           });
       } else {
@@ -136,7 +168,6 @@ const Calendars = () => {
             fetchEvents();
           })
           .catch(error => {
-            alert('강의실명이 안 맞습니다.');
             console.error('일정 수정에 실패하였습니다.', error);
           });
       }
@@ -160,6 +191,7 @@ const Calendars = () => {
     }
     handleClose();
   };
+
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <div style={{ height: '80vh' }}>
@@ -177,6 +209,7 @@ const Calendars = () => {
           endAccessor="end"
           style={{ height: '100%' }}
           onSelectEvent={handleSelectEvent}
+          messages={messages} // 여기에 메시지 객체를 추가
         />
 
         <Modal
@@ -200,13 +233,22 @@ const Calendars = () => {
                 <Typography id="modal-eventTitle" variant="h6">
                   {isAddingEvent ? '새 일정 추가' : '이벤트 수정'}
                 </Typography>
-                <TextField
-                  fullWidth
-                  label="강의실"
-                  value={newEventClassroomName}
-                  onChange={(e) => setNewEventClassroomName(e.target.value)}
-                  style={{ marginBottom: '20px' }}
-                />
+
+                {/* 강의실 드롭다운 */}
+                <FormControl fullWidth style={{ marginBottom: '20px' }}>
+                  <InputLabel>강의실</InputLabel>
+                  <Select
+                    value={newEventClassroomName}
+                    onChange={(e) => setNewEventClassroomName(e.target.value)}
+                  >
+                    {classroomOptions.map((classroom, index) => (
+                      <MenuItem key={index} value={classroom.classroomName}>
+                        {classroom.classroomName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
                 <TextField
                   fullWidth
                   label="제목"
@@ -230,8 +272,8 @@ const Calendars = () => {
                   onChange={(newValue) => setNewEventStart(moment(newValue))}
                   renderInput={(params) => <TextField {...params} fullWidth style={{ marginBottom: '20px' }} />}
                 />
-                <br></br>
-                <br></br>
+                <br />
+                <br />
                 <DateTimePicker
                   label="종료 날짜"
                   value={newEventEnd}
