@@ -1,15 +1,74 @@
 import React from "react";
-// 1. react-router-dom을 사용하기 위해서 아래 API들을 import 합니다.
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
-// 2. Router 라는 함수를 만들고 아래와 같이 작성합니다.
-//BrowserRouter를 Router로 감싸는 이유는,
-//SPA의 장점인 브라우저가 깜빡이지 않고 다른 페이지로 이동할 수 있게 만들어줍니다!
-const Router = () => {
+// 홈 페이지
+import Home from "../pages/Home";
+
+import Login from "../pages/login/Login";
+
+// 게시판 페이지
+import FreeBoard from "../pages/board/FreeBoard";
+import NoticeBoard from "../pages/board/NoticeBoard";
+import Board from "../pages/board/Board";
+
+// 레이아웃 페이지
+import LayoutWrapper from "../components/layout/layoutWrapper";
+
+// 프로필 페이지
+import Profile from "../pages/user/Profile";
+import PasswordCheck from "../pages/user/PasswordCheck";
+
+// 강의실 페이지
+import LectureRoom from "../pages/lectureRoom/LectureRoom";
+import Assignment from "../pages/lectureRoom/Assignment";
+import Qna from "../pages/lectureRoom/Qna";
+import Vote from "../pages/lectureRoom/Vote";
+
+// 채팅 페이지
+import Chat from "../pages/chat/Chat";
+import Allchat from "../pages/chat/Allchat";
+import Privatechat from "../pages/chat/Privatechat";
+
+// 캘린더 페이지
+import Calendar from "../pages/calendar/Calendars";
+
+const Router = ({ isLoggedIn }) => {
   return (
-    <BrowserRouter>
-      <Routes></Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route element={<LayoutWrapper />}>
+        {/* 홈 */}
+        <Route path="/" element={<Home />} />
+
+        {/* 로그인 폼 */}
+        <Route
+          path="login"
+          element={isLoggedIn ? <Navigate to="/" /> : <Login />} // 로그인 상태일 경우 홈으로 리다이렉트
+        />
+
+        {/* 게시판 */}
+        <Route path="board" element={<Board />} />
+        <Route path="freeboard" element={<FreeBoard />} />
+        <Route path="noticeboard" element={<NoticeBoard />} />
+
+        {/* 유저 관련 페이지 */}
+        <Route path="profile" element={<Profile />} />
+        <Route path="PasswordCheck" element={<PasswordCheck />} />
+
+        {/* 강의실 페이지 */}
+        <Route path="lectureroom" element={<LectureRoom />} />
+        <Route path="assignment" element={<Assignment />} />
+        <Route path="qna" element={<Qna />} />
+        <Route path="vote" element={<Vote />} />
+
+        {/* 채팅 페이지 */}
+        <Route path="chat" element={<Chat />} />
+        <Route path="allchat" element={<Allchat />} />
+        <Route path="privatechat" element={<Privatechat />} />
+
+        {/* 캘린더 */}
+        <Route path="calendar" element={<Calendar />} />
+      </Route>
+    </Routes>
   );
 };
 
