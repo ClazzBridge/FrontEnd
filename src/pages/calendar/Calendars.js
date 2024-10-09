@@ -36,14 +36,14 @@ const Calendars = () => {
   const [editMode, setEditMode] = useState(false);
 
   // 폼 입력 상태 관리
-  const [newEventClassroomName, setNewEventClassroomName] = useState('');
+  const [newEventcourseName, setNewEventcourseName] = useState('');
   const [newEventEventTitle, setNewEventEventTitle] = useState('');
   const [newEventDescription, setNewEventDescription] = useState('');
   const [newEventStart, setNewEventStart] = useState(moment());
   const [newEventEnd, setNewEventEnd] = useState(moment().add(1, 'hour'));
 
   const [events, setEvents] = useState([]);
-  const [classroomOptions, setClassroomOptions] = useState([]); // 강의실 옵션 상태
+  const [classroomOptions, setClassroomOptions] = useState([]); // 강의 옵션 상태
 
   useEffect(() => {
     // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
@@ -68,13 +68,13 @@ const Calendars = () => {
   };
 
   const fetchClassrooms = () => {
-    // 강의실 목록을 가져오는 API 호출
-    apiClient.get('classroom')
+    // 강의 목록을 가져오는 API 호출
+    apiClient.get('course')
       .then(response => {
-        setClassroomOptions(response.data); // 강의실 목록 설정
+        setClassroomOptions(response.data); // 강의 목록 설정
       })
       .catch(error => {
-        console.error('강의실 목록을 불러오지 못했습니다.', error);
+        console.error('강의 목록을 불러오지 못했습니다.', error);
       });
   };
 
@@ -85,7 +85,7 @@ const Calendars = () => {
     setSelectedEvent(null);
     setOpen(true);
     setEditMode(true);
-    setNewEventClassroomName('');
+    setNewEventcourseName('');
     setNewEventEventTitle('');
     setNewEventDescription('');
     setNewEventStart(moment());
@@ -98,7 +98,7 @@ const Calendars = () => {
     setSelectedEvent(null);
     setIsAddingEvent(false);
     setEditMode(false);
-    setNewEventClassroomName('');
+    setNewEventcourseName('');
     setNewEventEventTitle('');
     setNewEventDescription('');
     setNewEventStart(moment());
@@ -108,7 +108,7 @@ const Calendars = () => {
   // 이벤트 클릭 시 이벤트 처리
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
-    setNewEventClassroomName(event.classroomName);
+    setNewEventcourseName(event.courseName);
     setNewEventEventTitle(event.eventTitle);
     setNewEventDescription(event.description);
     setNewEventStart(moment(event.startDate));
@@ -127,7 +127,7 @@ const Calendars = () => {
   const handleSaveEvent = () => {
     const newEvent = {
       id: selectedEvent ? selectedEvent.id : null,
-      classroomName: newEventClassroomName,
+      courseName: newEventcourseName,
       eventTitle: newEventEventTitle,
       description: newEventDescription,
       startDate: newEventStart.format("YYYY-MM-DD HH:mm"), // 포맷된 문자열로 변환
@@ -215,7 +215,7 @@ const Calendars = () => {
         <Modal
           open={open}
           onClose={handleClose}
-          aria-label="model-classroomName"
+          aria-label="model-courseName"
           aria-labelledby="modal-eventTitle"
           aria-describedby="modal-description"
         >
@@ -234,16 +234,16 @@ const Calendars = () => {
                   {isAddingEvent ? '새 일정 추가' : '이벤트 수정'}
                 </Typography>
 
-                {/* 강의실 드롭다운 */}
+                {/* 강의 드롭다운 */}
                 <FormControl fullWidth style={{ marginBottom: '20px' }}>
-                  <InputLabel>강의실</InputLabel>
+                  <InputLabel>강의</InputLabel>
                   <Select
-                    value={newEventClassroomName}
-                    onChange={(e) => setNewEventClassroomName(e.target.value)}
+                    value={newEventcourseName}
+                    onChange={(e) => setNewEventcourseName(e.target.value)}
                   >
                     {classroomOptions.map((classroom, index) => (
-                      <MenuItem key={index} value={classroom.classroomName}>
-                        {classroom.classroomName}
+                      <MenuItem key={index} value={classroom.courseName}>
+                        {classroom.courseName}
                       </MenuItem>
                     ))}
                   </Select>
@@ -283,8 +283,8 @@ const Calendars = () => {
               </>
             ) : (
               <>
-                <Typography id="modal-classroomName" variant="h6">
-                  {selectedEvent ? selectedEvent.classroomName : ''}
+                <Typography id="modal-courseName" variant="h6">
+                  {selectedEvent ? selectedEvent.courseName : ''}
                 </Typography>
                 <Typography id="modal-eventTitle" variant="h6">
                   {selectedEvent ? selectedEvent.eventTitle : ''}

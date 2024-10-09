@@ -99,12 +99,13 @@ const menuItems = [
     ],
   },
   {
+    title: "캘린더",
+    icon: <CalendarMonthOutlinedIcon />,
+    link: "/calendar"
+  },
+  {
+    title: "관리",
     subItems: [
-      {
-        title: "캘린더",
-        icon: <CalendarMonthOutlinedIcon />,
-        link: "/calendar",
-      },
       {
         title: "회원관리",
         notifications: 4,
