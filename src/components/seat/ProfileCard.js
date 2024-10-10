@@ -36,6 +36,8 @@ function ProfileCard({
   isEmpty,
   role,
   onRegisterSeatClick,
+  userHasSeat,
+  isTeacher,
 }) {
   const isGoodOnline = isOnline === true;
   const isOffline = isOnline === false;
@@ -45,7 +47,7 @@ function ProfileCard({
     "& .MuiBadge-badge": {
       backgroundColor: isGoodOnline ? "#28a745" : "#b0b0b0",
       color: "#ffffff",
-      boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+      boxShadow: `0 0 0 1px ${theme.palette.background.paper}`,
       "&::after": isGoodOnline
         ? {
             position: "absolute",
@@ -75,21 +77,21 @@ function ProfileCard({
   return (
     <Card
       sx={{
-        backgroundColor: "#ffffff",
-        borderRadius: "12px",
-        width: "200px",
+        backgroundColor: isTeacher ? "#f0f8ff" : "#ffffff",
+        borderRadius: "6px",
+        width: "120px",
         textAlign: "center",
-        height: "155px",
+        height: "90px",
         boxShadow: isSelf
           ? "0 1px 0px rgba(0, 0, 0, 0.2)"
           : "0 1px 0px rgba(0, 0, 0, 0.1)",
         border:
           !isOffline && isSelf && isUnderstanding
-            ? "2px solid #28a745"
+            ? "1px solid #28a745"
             : !isOffline && isSelf && !isUnderstanding
-              ? "2px solid transparent"
+              ? "1px solid transparent"
               : !isOffline && role === "ROLE_TEACHER" && isUnderstanding
-                ? "2px solid #28a745"
+                ? "1px solid #28a745"
                 : "none",
         backgroundImage:
           !isOffline && isSelf && !isUnderstanding
@@ -98,16 +100,37 @@ function ProfileCard({
         backgroundOrigin: "border-box",
         backgroundClip: "content-box, border-box",
         filter: isEmpty || isOffline ? "grayscale(100%)" : "none",
-        cursor: isEmpty ? "pointer" : "default",
+        cursor: isTeacher
+          ? "default"
+          : isEmpty && !userHasSeat
+            ? "pointer"
+            : "default",
+        pointerEvents: isTeacher
+          ? "auto"
+          : isEmpty && userHasSeat
+            ? "none"
+            : "auto",
       }}
       onClick={
-        isEmpty
-          ? onRegisterSeatClick
-          : () =>
+        isTeacher
+          ? () =>
               openModal(seatId, name, email, github, phone, bio, imgSrc, isSelf)
+          : isEmpty && !userHasSeat
+            ? onRegisterSeatClick
+            : () =>
+                openModal(
+                  seatId,
+                  name,
+                  email,
+                  github,
+                  phone,
+                  bio,
+                  imgSrc,
+                  isSelf
+                )
       }
     >
-      <CardContent>
+      <CardContent sx={{ padding: "6px" }}>
         <div
           style={{
             display: "flex",
@@ -116,27 +139,26 @@ function ProfileCard({
             alignItems: "center",
             position: "relative",
             padding: "0px",
-            marginLeft: "-16px",
-            marginRight: "-16px",
-            top: "-16px",
-            height: "35px",
+            marginLeft: "-9px",
+            marginRight: "-9px",
+            top: "-9px",
+            height: "20px",
           }}
         >
           <Typography
             sx={{
-              fontSize: "14px",
+              fontSize: "10px",
               fontWeight: "500",
               color: isGoodOnline ? "#333" : "#b0b0b0",
-              margin: "10px",
+              margin: "4px",
             }}
           >
-            No. {seatId}
+            {isTeacher ? "강사" : `No. ${seatId}`}
           </Typography>
         </div>
-
         <Stack
           direction="row"
-          spacing={2}
+          spacing={1}
           justifyContent="center"
           alignItems="center"
         >
@@ -148,17 +170,17 @@ function ProfileCard({
               alignItems: "center",
             }}
           >
-            {isEmpty ? (
+            {isEmpty && !userHasSeat && !isTeacher ? (
               <AddIcon
                 sx={{
                   position: "absolute",
-                  height: "35px",
-                  width: "35px",
+                  height: "20px",
+                  width: "20px",
                   color: "darkGray",
-                  marginTop: "75px",
+                  marginTop: "50px",
                 }}
               />
-            ) : (
+            ) : !isEmpty || isTeacher ? (
               <StyledBadge
                 overlap="circular"
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
@@ -166,12 +188,12 @@ function ProfileCard({
                 badgeContent={
                   <Box
                     sx={{
-                      marginLeft: "11px",
+                      marginLeft: "6px",
                       borderRadius: "50%",
-                      width: "14px",
-                      height: "14px",
+                      width: "8px",
+                      height: "8px",
                       backgroundColor: isGoodOnline ? "#28a745" : "#b0b0b0",
-                      border: "2px solid",
+                      border: "1px solid",
                       transform: hovered ? "scale(1.1)" : "scale(1)",
                     }}
                   />
@@ -179,28 +201,26 @@ function ProfileCard({
               >
                 <Avatar
                   sx={{
-                    marginTop: "5px",
-                    width: "50px",
-                    height: "50px",
+                    width: "30px",
+                    height: "30px",
                     filter: isOffline ? "grayscale(100%)" : "none",
                     transform: hovered ? "scale(1.1)" : "scale(1)",
                     cursor: "pointer",
                     border: "1px solid #ddd",
-                    boxShadow: "0 1px 3px",
+                    boxShadow: "0 1px 2px",
                   }}
                   src={imgSrc}
                   alt={`${name}'s profile`}
                 />
               </StyledBadge>
-            )}
+            ) : null}
           </Box>
         </Stack>
-
-        {!isEmpty && (
+        {(!isEmpty || isTeacher) && (
           <Typography
             sx={{
-              marginTop: "8px",
-              fontSize: "16px",
+              marginTop: "4px",
+              fontSize: "12px",
               fontWeight: "600",
               color: isGoodOnline ? "#333" : "#b0b0b0",
             }}
@@ -221,13 +241,32 @@ export default function StudentRoom() {
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [currentProfile, setCurrentProfile] = useState({});
   const [profiles, setProfiles] = useState([]);
+  const [userSeat, setUserSeat] = useState(null);
+  const [teacherProfile, setTeacherProfile] = useState(null);
   const currentMemberId = "student02";
   const currentRole = "ROLE_STUDENT";
 
   const fetchData = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/seat/");
-      setProfiles(response.data);
+      const allProfiles = response.data;
+
+      const teacherProfile = allProfiles.find(
+        (profile) =>
+          profile.memberDTO && profile.memberDTO.memberType === "ROLE_TEACHER"
+      );
+      setTeacherProfile(teacherProfile);
+
+      const studentProfiles = allProfiles.filter(
+        (profile) =>
+          !profile.memberDTO || profile.memberDTO.memberType !== "ROLE_TEACHER"
+      );
+      setProfiles(studentProfiles);
+
+      const userSeatData = studentProfiles.find(
+        (seat) => seat.memberDTO && seat.memberDTO.memberId === currentMemberId
+      );
+      setUserSeat(userSeatData ? userSeatData.id : null);
     } catch (error) {
       console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
     }
@@ -305,45 +344,85 @@ export default function StudentRoom() {
   };
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gap: "20px",
-        marginLeft: "auto",
-        marginRight: "auto",
-        padding: "0px",
-        maxWidth: "1200px",
-        gridTemplateColumns: "repeat(5, 1fr)",
-      }}
-    >
-      {profiles.map((profile) => (
-        <ProfileCard
-          key={profile.id}
-          seatId={profile.id}
-          name={profile.memberDTO ? profile.memberDTO.name : "Empty Seat"}
-          imgSrc={
-            profile.memberDTO ? profile.memberDTO.profileImage.pictureUrl : ""
-          }
-          email={profile.memberDTO ? profile.memberDTO.email : ""}
-          github={profile.memberDTO ? profile.memberDTO.gitUrl : ""}
-          phone={profile.memberDTO ? profile.memberDTO.phone : ""}
-          bio={profile.memberDTO ? profile.memberDTO.bio : ""}
-          isOnline={profile.isOnline}
-          isUnderstanding={
-            profile.memberDTO?.studentStatusDTO?.isUnderstanding ?? false
-          }
-          isHandRaised={
-            profile.memberDTO?.studentStatusDTO?.isHandRaised ?? false
-          }
-          isSelf={
-            profile.memberDTO && profile.memberDTO.memberId === currentMemberId
-          }
-          isEmpty={!profile.memberDTO}
-          openModal={openProfileModal}
-          role={currentRole}
-          onRegisterSeatClick={() => handleRegisterSeatClick(profile.id)}
-        />
-      ))}
+    <div>
+      {/* 강사 카드 */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "20px",
+        }}
+      >
+        {teacherProfile && teacherProfile.memberDTO && (
+          <ProfileCard
+            seatId={teacherProfile.id}
+            name={teacherProfile.memberDTO.name}
+            imgSrc={teacherProfile.memberDTO.profileImage.pictureUrl}
+            email={teacherProfile.memberDTO.email}
+            github={teacherProfile.memberDTO.gitUrl}
+            phone={teacherProfile.memberDTO.phone}
+            bio={teacherProfile.memberDTO.bio}
+            isOnline={teacherProfile.isOnline}
+            isUnderstanding={false}
+            isHandRaised={false}
+            isSelf={false}
+            isEmpty={false}
+            openModal={openProfileModal}
+            role="ROLE_TEACHER"
+            isTeacher={true}
+            userHasSeat={true}
+          />
+        )}
+      </div>
+
+      {/* 학생 카드 그리드 */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: "8px 16px", // 세로 간격 8px, 가로 간격 16px
+          padding: "16px",
+          maxWidth: "1200px", // 최대 너비를 늘려 6개의 카드가 잘 들어가도록 함
+          margin: "0 auto",
+        }}
+      >
+        {profiles.map((profile, index) => (
+          <React.Fragment key={profile.id}>
+            <ProfileCard
+              seatId={profile.id}
+              name={profile.memberDTO ? profile.memberDTO.name : ""}
+              imgSrc={
+                profile.memberDTO
+                  ? profile.memberDTO.profileImage.pictureUrl
+                  : ""
+              }
+              email={profile.memberDTO ? profile.memberDTO.email : ""}
+              github={profile.memberDTO ? profile.memberDTO.gitUrl : ""}
+              phone={profile.memberDTO ? profile.memberDTO.phone : ""}
+              bio={profile.memberDTO ? profile.memberDTO.bio : ""}
+              isOnline={profile.isOnline}
+              isUnderstanding={
+                profile.memberDTO?.studentStatusDTO?.isUnderstanding ?? false
+              }
+              isHandRaised={
+                profile.memberDTO?.studentStatusDTO?.isHandRaised ?? false
+              }
+              isSelf={
+                profile.memberDTO &&
+                profile.memberDTO.memberId === currentMemberId
+              }
+              isEmpty={!profile.memberDTO}
+              openModal={openProfileModal}
+              role={currentRole}
+              onRegisterSeatClick={() => handleRegisterSeatClick(profile.id)}
+              userHasSeat={userSeat !== null}
+            />
+            {(index + 1) % 3 === 0 && (index + 1) % 6 !== 0 && (
+              <div style={{ width: "32px" }} /> // 3번째 카드 뒤에 더 넓은 간격 추가
+            )}
+          </React.Fragment>
+        ))}
+      </div>
 
       {/* 프로필 모달 */}
       <Dialog open={open} onClose={closeProfileModal}>
