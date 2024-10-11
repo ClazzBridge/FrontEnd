@@ -36,19 +36,21 @@ const Calendars = () => {
   const [editMode, setEditMode] = useState(false);
 
   // 폼 입력 상태 관리
-  const [newEventcourseName, setNewEventcourseName] = useState('');
+  const [newEventcourseTitle, setNewEventcourseTitle] = useState('');
   const [newEventEventTitle, setNewEventEventTitle] = useState('');
   const [newEventDescription, setNewEventDescription] = useState('');
   const [newEventStart, setNewEventStart] = useState(moment());
   const [newEventEnd, setNewEventEnd] = useState(moment().add(1, 'hour'));
 
+  const [error, setError] = useState("");
+
   const [events, setEvents] = useState([]);
-  const [classroomOptions, setClassroomOptions] = useState([]); // 강의 옵션 상태
+  const [courseOptions, setcourseOptions] = useState([]); // 강의 옵션 상태
 
   useEffect(() => {
     // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
     fetchEvents();
-    fetchClassrooms();
+    fetchcourses();
   }, []); // 빈 배열로 처음에 한 번만 실행
 
   const fetchEvents = () => {
@@ -67,11 +69,11 @@ const Calendars = () => {
       });
   };
 
-  const fetchClassrooms = () => {
+  const fetchcourses = () => {
     // 강의 목록을 가져오는 API 호출
-    apiClient.get('course')
+    apiClient.get('course/title')
       .then(response => {
-        setClassroomOptions(response.data); // 강의 목록 설정
+        setcourseOptions(response.data); // 강의 목록 설정
       })
       .catch(error => {
         console.error('강의 목록을 불러오지 못했습니다.', error);
@@ -85,7 +87,7 @@ const Calendars = () => {
     setSelectedEvent(null);
     setOpen(true);
     setEditMode(true);
-    setNewEventcourseName('');
+    setNewEventcourseTitle('');
     setNewEventEventTitle('');
     setNewEventDescription('');
     setNewEventStart(moment());
@@ -98,7 +100,7 @@ const Calendars = () => {
     setSelectedEvent(null);
     setIsAddingEvent(false);
     setEditMode(false);
-    setNewEventcourseName('');
+    setNewEventcourseTitle('');
     setNewEventEventTitle('');
     setNewEventDescription('');
     setNewEventStart(moment());
@@ -108,7 +110,7 @@ const Calendars = () => {
   // 이벤트 클릭 시 이벤트 처리
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
-    setNewEventcourseName(event.courseName);
+    setNewEventcourseTitle(event.courseTitle);
     setNewEventEventTitle(event.eventTitle);
     setNewEventDescription(event.description);
     setNewEventStart(moment(event.startDate));
@@ -125,9 +127,17 @@ const Calendars = () => {
 
   // 이벤트 저장 핸들러
   const handleSaveEvent = () => {
+    // 날짜 에러 메시지 띄우기
+    if (newEventStart.isAfter(newEventEnd)) {
+      setError("종료 날짜는 시작 날짜 이후여야 합니다.");
+      return;
+    }
+
+    setError("");
+
     const newEvent = {
       id: selectedEvent ? selectedEvent.id : null,
-      courseName: newEventcourseName,
+      courseTitle: newEventcourseTitle,
       eventTitle: newEventEventTitle,
       description: newEventDescription,
       startDate: newEventStart.format("YYYY-MM-DD HH:mm"), // 포맷된 문자열로 변환
@@ -215,7 +225,7 @@ const Calendars = () => {
         <Modal
           open={open}
           onClose={handleClose}
-          aria-label="model-courseName"
+          aria-label="model-courseTitle"
           aria-labelledby="modal-eventTitle"
           aria-describedby="modal-description"
         >
@@ -230,20 +240,21 @@ const Calendars = () => {
           }}>
             {editMode ? (
               <>
-                <Typography id="modal-eventTitle" variant="h6">
+                <Typography id="modal-eventTitle" variant="h6" style={{ marginBottom: "14px" }}>
                   {isAddingEvent ? '새 일정 추가' : '이벤트 수정'}
                 </Typography>
 
                 {/* 강의 드롭다운 */}
-                <FormControl fullWidth style={{ marginBottom: '20px' }}>
+                <FormControl fullWidth style={{ marginBottom: '20px' }} variant="outlined">
                   <InputLabel>강의</InputLabel>
                   <Select
-                    value={newEventcourseName}
-                    onChange={(e) => setNewEventcourseName(e.target.value)}
+                    label="강의"
+                    value={newEventcourseTitle}
+                    onChange={(e) => setNewEventcourseTitle(e.target.value)}
                   >
-                    {classroomOptions.map((classroom, index) => (
-                      <MenuItem key={index} value={classroom.courseName}>
-                        {classroom.courseName}
+                    {courseOptions.map((course, index) => (
+                      <MenuItem key={index} value={course.courseTitle}>
+                        {course.courseTitle}
                       </MenuItem>
                     ))}
                   </Select>
@@ -280,11 +291,16 @@ const Calendars = () => {
                   onChange={(newValue) => setNewEventEnd(moment(newValue))}
                   renderInput={(params) => <TextField {...params} fullWidth style={{ marginBottom: '20px' }} />}
                 />
+                {error && (
+                  <Typography color="error" variant="body2" style={{ marginBottom: '20px', marginTop: '12px', marginLeft: '4px' }}>
+                    {error}
+                  </Typography>
+                )}
               </>
             ) : (
               <>
-                <Typography id="modal-courseName" variant="h6">
-                  {selectedEvent ? selectedEvent.courseName : ''}
+                <Typography id="modal-courseTitle" variant="h6">
+                  {selectedEvent ? selectedEvent.courseTitle : ''}
                 </Typography>
                 <Typography id="modal-eventTitle" variant="h6">
                   {selectedEvent ? selectedEvent.eventTitle : ''}

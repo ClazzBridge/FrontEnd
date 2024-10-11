@@ -31,7 +31,6 @@ const PasswordCheck = () => {
                 apiClient.get(`userlist/${userId}`)
                     .then(response => {
 
-
                     })
                     .catch(error => {
                         console.error('Error fetching profile', error);

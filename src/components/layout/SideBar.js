@@ -22,8 +22,10 @@ import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import PollOutlinedIcon from "@mui/icons-material/PollOutlined";
 import ContactSupportOutlinedIcon from "@mui/icons-material/ContactSupportOutlined";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
-import PeopleIcon from '@mui/icons-material/People';
-import SchoolIcon from '@mui/icons-material/School';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import EventSeatOutlinedIcon from '@mui/icons-material/EventSeatOutlined';
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 
 export const drawerWidth = 240;
 const closedDrawerWidth = 64;
@@ -105,17 +107,25 @@ const menuItems = [
   },
   {
     title: "관리",
+    icon: <AccountTreeOutlinedIcon />,
+
     subItems: [
       {
         title: "회원관리",
         notifications: 4,
-        icon: <PeopleIcon />,
+        icon: <PeopleAltOutlinedIcon />,
         link: "/memberManager",
       },
       {
         title: "강의관리",
         notifications: 4,
-        icon: <SchoolIcon />,
+        icon: <SchoolOutlinedIcon />,
+        link: "/memberManager",
+      },
+      {
+        title: "강의실관리",
+        notifications: 4,
+        icon: <EventSeatOutlinedIcon />,
         link: "/memberManager",
       },
     ],

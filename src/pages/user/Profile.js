@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode"; // named export로 임포트
-import { MuiTelInput } from "mui-tel-input";
 import apiClient from "../../shared/apiClient";
 
 import {
@@ -31,7 +30,7 @@ const ProfileForm = () => {
     phone: "",
     gitUrl: "",
     bio: "",
-    profileImage: "", // 프로필 이미지 ID 초기값
+    avatarImage: "", // 프로필 이미지 ID 초기값
     privacy: "private", // 공개/비공개 기본값 설정
   });
 
@@ -65,8 +64,8 @@ const ProfileForm = () => {
     }
   }, []);
 
-  const selectedAvatar = profile.profileImage.id
-    ? profile.profileImage.pictureUrl
+  const selectedAvatar = profile.avatarImage.id
+    ? profile.avatarImage.avatarImageUrl
     : avatar1; // 기본 아바타 설정
 
   if (loading) {
@@ -74,6 +73,7 @@ const ProfileForm = () => {
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phonePattern = /^(01[016789])-?([0-9]{3,4})-?([0-9]{4})$/;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,15 +87,12 @@ const ProfileForm = () => {
         newError = "비밀번호가 일치하지 않습니다.";
       } else if (name === "email" && !emailPattern.test(value)) {
         newError = "올바른 이메일 형식이 아닙니다.";
+      } else if (name === "phone" && !phonePattern.test(value)) {
+        newError = "올바른 전화번호 형식이 아닙니다.";
       }
       setError(newError);
       return updatedProfile;
     });
-  };
-
-  const handlePhoneChange = (newValue) => {
-    // 전화번호 값을 업데이트
-    setProfile((prevState) => ({ ...prevState, phone: newValue }));
   };
 
   const handlePrivacyChange = (e) => {
@@ -115,15 +112,9 @@ const ProfileForm = () => {
       return;
     }
 
-    // 로컬 스토리지에서 JWT 토큰을 가져옵니다.
-    const token = localStorage.getItem("token"); // 저장된 토큰 키를 확인하세요.
 
     apiClient
-      .put("userlist", profile, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Bearer 토큰 방식으로 추가
-        },
-      })
+      .put("userlist", profile)
       .then((response) => {
         alert("변경되었습니다.");
       })
@@ -238,11 +229,13 @@ const ProfileForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <MuiTelInput
+                <TextField
+                  variant="outlined"
                   value={profile.phone || ""}
-                  onChange={handlePhoneChange}
+                  onChange={handleChange}
                   label="전화번호"
-                  defaultCountry="KR"
+                  name="phone"
+                  error={!!error && error === "올바른 전화번호 형식이 아닙니다."}
                   fullWidth
                 />
               </Grid>
