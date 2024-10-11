@@ -73,7 +73,7 @@ const ProfileForm = () => {
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phonePattern = /^(01[016789])-?([0-9]{3,4})-?([0-9]{4})$/;
+  const phonePattern = /^(01[016789])-\d{3,4}-\d{4}$/;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -236,6 +236,9 @@ const ProfileForm = () => {
                   label="전화번호"
                   name="phone"
                   error={!!error && error === "올바른 전화번호 형식이 아닙니다."}
+                  helperText={
+                    error === "올바른 전화번호 형식이 아닙니다." ? error : ""
+                  }
                   fullWidth
                 />
               </Grid>
