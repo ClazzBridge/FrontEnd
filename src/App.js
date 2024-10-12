@@ -1,9 +1,9 @@
 import "./App.css";
-import React, { useState } from "react";
-import { SidebarProvider } from "./context/SidebarContext";
+import React, {useState} from "react";
+import {SidebarProvider} from "./context/SidebarContext";
 import Login from "./pages/login/Login";
 import Router from "./shared/Router";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import {createTheme, ThemeProvider} from "@mui/material/styles";
 
 const theme = createTheme({
   typography: {
@@ -19,15 +19,15 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <SidebarProvider>
-        {isLoggedIn ? (
-          <Router /> // 로그인 후 Router 화면
-        ) : (
-          <Login onLoginSuccess={handleLoginSuccess} /> // Login 컴포넌트
-        )}
-      </SidebarProvider>
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <SidebarProvider>
+          {isLoggedIn ? (
+              <Router/> // 로그인 후 Router 화면
+          ) : (
+              <Login onLoginSuccess={handleLoginSuccess}/> // Login 컴포넌트
+          )}
+        </SidebarProvider>
+      </ThemeProvider>
   );
 }
 
