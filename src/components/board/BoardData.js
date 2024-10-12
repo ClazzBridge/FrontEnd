@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { getAllPosts } from "../../services/apis/post/get";
 import InputLabel from "@mui/material/InputLabel";
@@ -18,6 +18,7 @@ import CustomModal from "../common/CustomModal";
 import { savePost } from "../../services/apis/post/post";
 import { deletePost as deletePostApi } from "../../services/apis/post/delete";
 import { updatePost } from "../../services/apis/post/put";
+import { UserContext } from "../../context/UserContext";
 
 const columns = [
   { field: "id", headerName: "No", flex: 0.5, resizable: false },
@@ -54,6 +55,7 @@ export default function FreeBoardData() {
   const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar 열기 상태
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [originalRow, setOriginalRow] = useState(null); // 원래 �� 데이터 저장
+  const { userInfo } = useContext(UserContext);
 
   const fetchData = useCallback(async () => {
     const data = await getAllPosts(); // API 호출
@@ -115,11 +117,11 @@ export default function FreeBoardData() {
     setContent(event.target.value);
   };
 
-  // 로그인된 유저 데이터 넣어줘야 함!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   const postForm = {
     title,
     content,
     boardId,
+    memberId: userInfo?.member?.id,
   };
 
   const postSave = async () => {

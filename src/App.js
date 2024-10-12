@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { SidebarProvider } from "./context/SidebarContext";
 import Login from "./pages/login/Login";
 import Router from "./shared/Router";
+import { UserProvider } from "./context/UserContext";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
@@ -20,13 +21,15 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <SidebarProvider>
-        {isLoggedIn ? (
-          <Router /> // 로그인 후 Router 화면
-        ) : (
-          <Login onLoginSuccess={handleLoginSuccess} /> // Login 컴포넌트
-        )}
-      </SidebarProvider>
+      <UserProvider>
+        <SidebarProvider>
+          {isLoggedIn ? (
+            <Router /> // 로그인 후 Router 화면
+          ) : (
+            <Login onLoginSuccess={handleLoginSuccess} /> // Login 컴포넌트
+          )}
+        </SidebarProvider>
+      </UserProvider>
     </ThemeProvider>
   );
 }

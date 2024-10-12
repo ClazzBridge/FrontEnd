@@ -10,7 +10,7 @@ export const updatePost = async (updateDTO) => {
   };
 
   try {
-    const response = await axios.put(`post`, updatePost);
+    const response = await axios.put(`posts`, updatePost);
     return response.data;
   } catch (error) {
     console.error("Error fetching post:", error);
