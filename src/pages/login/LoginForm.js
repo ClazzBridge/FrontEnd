@@ -33,7 +33,7 @@ function LoginForm({ onLoginSuccess }) {
 
         try {
             console.log("1111=============>");
-            const response = await axios.post("http://127.0.0.1:8080/api/user/sign", {
+            const response = await axios.post("http://127.0.0.1:8080/api/login", {
                 memberId,
                 password,
             });

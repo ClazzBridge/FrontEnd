@@ -22,6 +22,10 @@ import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import PollOutlinedIcon from "@mui/icons-material/PollOutlined";
 import ContactSupportOutlinedIcon from "@mui/icons-material/ContactSupportOutlined";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import EventSeatOutlinedIcon from '@mui/icons-material/EventSeatOutlined';
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 
 export const drawerWidth = 240;
 const closedDrawerWidth = 64;
@@ -99,8 +103,32 @@ const menuItems = [
   {
     title: "캘린더",
     icon: <CalendarMonthOutlinedIcon />,
-    subItems: [],
-    link: "/calendar",
+    link: "/calendar"
+  },
+  {
+    title: "관리",
+    icon: <AccountTreeOutlinedIcon />,
+
+    subItems: [
+      {
+        title: "회원관리",
+        notifications: 4,
+        icon: <PeopleAltOutlinedIcon />,
+        link: "/memberManager",
+      },
+      {
+        title: "강의관리",
+        notifications: 4,
+        icon: <SchoolOutlinedIcon />,
+        link: "/memberManager",
+      },
+      {
+        title: "강의실관리",
+        notifications: 4,
+        icon: <EventSeatOutlinedIcon />,
+        link: "/memberManager",
+      },
+    ],
   },
 ];
 
@@ -225,11 +253,11 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                   },
                   open
                     ? {
-                        justifyContent: "initial",
-                      }
+                      justifyContent: "initial",
+                    }
                     : {
-                        justifyContent: "center",
-                      },
+                      justifyContent: "center",
+                    },
                 ]}
               >
                 <ListItemIcon
@@ -240,12 +268,12 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                     },
                     open
                       ? {
-                          mr: 3,
-                          display: "none",
-                        }
+                        mr: 3,
+                        display: "none",
+                      }
                       : {
-                          mr: "auto",
-                        },
+                        mr: "auto",
+                      },
                   ]}
                 >
                   <Box
@@ -282,11 +310,11 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                   sx={[
                     open
                       ? {
-                          opacity: 1,
-                        }
+                        opacity: 1,
+                      }
                       : {
-                          opacity: 0,
-                        },
+                        opacity: 0,
+                      },
                   ]}
                 />
               </StyledListItemButton>
@@ -322,14 +350,14 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                       sx={[
                         open
                           ? {
-                              display: "flex",
-                              marginLeft: "-10px",
-                              marginTop: 0,
-                              marginBottom: 0,
-                            }
+                            display: "flex",
+                            marginLeft: "-10px",
+                            marginTop: 0,
+                            marginBottom: 0,
+                          }
                           : {
-                              display: "none",
-                            },
+                            display: "none",
+                          },
                       ]}
                     />
                   </StyledListItemButton>

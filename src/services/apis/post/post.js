@@ -12,7 +12,7 @@ export const savePost = async (testData) => {
   };
 
   try {
-    const response = await axios.post(`post`, savedPost);
+    const response = await axios.post(`posts`, savedPost);
     return response.data;
   } catch (error) {
     console.error("Error fetching post:", error);

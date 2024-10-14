@@ -1,11 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import { Button, Modal, Typography, TextField, Box } from '@mui/material';
+import { Button, Modal, Typography, TextField, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import axios from 'axios';
+import apiClient from '../../shared/apiClient';
+import 'moment/locale/ko'; // 한국어 로케일 불러오기
+
+moment.locale('ko');
+
+const messages = {
+  allDay: '종일',
+  previous: '이전 달',
+  next: '다음 달',
+  today: '오늘',
+  month: '월',
+  week: '주',
+  day: '일',
+  agenda: '일정',
+  date: '날짜',
+  time: '시간',
+  event: '이벤트',
+  noEventsInRange: '해당 기간에 이벤트가 없습니다.',
+  showMore: total => `+ 더보기 (${total})`,
+};
 
 const localizer = momentLocalizer(moment);
 
@@ -17,27 +36,26 @@ const Calendars = () => {
   const [editMode, setEditMode] = useState(false);
 
   // 폼 입력 상태 관리
-  const [newEventClassroomName, setNewEventClassroomName] = useState('');
+  const [newEventcourseTitle, setNewEventcourseTitle] = useState('');
   const [newEventEventTitle, setNewEventEventTitle] = useState('');
   const [newEventDescription, setNewEventDescription] = useState('');
   const [newEventStart, setNewEventStart] = useState(moment());
   const [newEventEnd, setNewEventEnd] = useState(moment().add(1, 'hour'));
 
+  const [error, setError] = useState("");
+
   const [events, setEvents] = useState([]);
+  const [courseOptions, setcourseOptions] = useState([]); // 강의 옵션 상태
 
   useEffect(() => {
     // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
     fetchEvents();
+    fetchcourses();
   }, []); // 빈 배열로 처음에 한 번만 실행
 
   const fetchEvents = () => {
-    const token = localStorage.getItem('accessToken'); // 1. 로컬 스토리지에서 토큰 가져오기
 
-    axios.get('http://localhost:8080/api/schedule/find', {
-      headers: {
-        Authorization: `Bearer ${token}` // 2. 토큰을 Authorization 헤더에 추가
-      }
-    })
+    apiClient.get('schedule')
       .then(response => {
         const fetchedEvents = response.data.map(event => ({
           ...event,
@@ -51,6 +69,17 @@ const Calendars = () => {
       });
   };
 
+  const fetchcourses = () => {
+    // 강의 목록을 가져오는 API 호출
+    apiClient.get('course/title')
+      .then(response => {
+        setcourseOptions(response.data); // 강의 목록 설정
+      })
+      .catch(error => {
+        console.error('강의 목록을 불러오지 못했습니다.', error);
+      });
+  };
+
 
   // 일정 추가 핸들러
   const handleAddEvent = () => {
@@ -58,7 +87,7 @@ const Calendars = () => {
     setSelectedEvent(null);
     setOpen(true);
     setEditMode(true);
-    setNewEventClassroomName('');
+    setNewEventcourseTitle('');
     setNewEventEventTitle('');
     setNewEventDescription('');
     setNewEventStart(moment());
@@ -71,7 +100,7 @@ const Calendars = () => {
     setSelectedEvent(null);
     setIsAddingEvent(false);
     setEditMode(false);
-    setNewEventClassroomName('');
+    setNewEventcourseTitle('');
     setNewEventEventTitle('');
     setNewEventDescription('');
     setNewEventStart(moment());
@@ -81,7 +110,7 @@ const Calendars = () => {
   // 이벤트 클릭 시 이벤트 처리
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
-    setNewEventClassroomName(event.classroomName);
+    setNewEventcourseTitle(event.courseTitle);
     setNewEventEventTitle(event.eventTitle);
     setNewEventDescription(event.description);
     setNewEventStart(moment(event.startDate));
@@ -98,9 +127,17 @@ const Calendars = () => {
 
   // 이벤트 저장 핸들러
   const handleSaveEvent = () => {
+    // 날짜 에러 메시지 띄우기
+    if (newEventStart.isAfter(newEventEnd)) {
+      setError("종료 날짜는 시작 날짜 이후여야 합니다.");
+      return;
+    }
+
+    setError("");
+
     const newEvent = {
       id: selectedEvent ? selectedEvent.id : null,
-      classroomName: newEventClassroomName,
+      courseTitle: newEventcourseTitle,
       eventTitle: newEventEventTitle,
       description: newEventDescription,
       startDate: newEventStart.format("YYYY-MM-DD HH:mm"), // 포맷된 문자열로 변환
@@ -110,7 +147,7 @@ const Calendars = () => {
     if (editMode) {
       if (isAddingEvent) {
         // 새로운 이벤트 추가
-        axios.post('http://localhost:8080/api/schedule/add', newEvent)
+        apiClient.post('schedule', newEvent)
           .then(response => {
             const savedEvent = {
               ...newEvent,
@@ -126,12 +163,11 @@ const Calendars = () => {
             fetchEvents();
           })
           .catch(error => {
-            alert('강의실명이 안 맞습니다.');
             console.error('일정 추가에 실패하였습니다.', error);
           });
       } else {
         // 기존 이벤트 수정
-        axios.put('http://localhost:8080/api/schedule/update', newEvent)
+        apiClient.put('schedule', newEvent)
           .then(() => {
             const updatedEvents = events.map(event =>
               event.id === selectedEvent.id ? { ...event, ...newEvent } : event
@@ -142,7 +178,6 @@ const Calendars = () => {
             fetchEvents();
           })
           .catch(error => {
-            alert('강의실명이 안 맞습니다.');
             console.error('일정 수정에 실패하였습니다.', error);
           });
       }
@@ -152,7 +187,7 @@ const Calendars = () => {
   // 이벤트 삭제 핸들러
   const handleDeleteEvent = () => {
     if (selectedEvent) {
-      axios.delete(`http://localhost:8080/api/schedule/delete/${selectedEvent.id}`)
+      apiClient.delete(`schedule/${selectedEvent.id}`)
         .then(() => {
           const filteredEvents = events.filter(event => event.id !== selectedEvent.id);
           setEvents(filteredEvents);
@@ -184,12 +219,13 @@ const Calendars = () => {
           endAccessor="end"
           style={{ height: '100%' }}
           onSelectEvent={handleSelectEvent}
+          messages={messages} // 여기에 메시지 객체를 추가
         />
 
         <Modal
           open={open}
           onClose={handleClose}
-          aria-label="model-classroomName"
+          aria-label="model-courseTitle"
           aria-labelledby="modal-eventTitle"
           aria-describedby="modal-description"
         >
@@ -204,16 +240,26 @@ const Calendars = () => {
           }}>
             {editMode ? (
               <>
-                <Typography id="modal-eventTitle" variant="h6">
+                <Typography id="modal-eventTitle" variant="h6" style={{ marginBottom: "14px" }}>
                   {isAddingEvent ? '새 일정 추가' : '이벤트 수정'}
                 </Typography>
-                <TextField
-                  fullWidth
-                  label="강의실"
-                  value={newEventClassroomName}
-                  onChange={(e) => setNewEventClassroomName(e.target.value)}
-                  style={{ marginBottom: '20px' }}
-                />
+
+                {/* 강의 드롭다운 */}
+                <FormControl fullWidth style={{ marginBottom: '20px' }} variant="outlined">
+                  <InputLabel>강의</InputLabel>
+                  <Select
+                    label="강의"
+                    value={newEventcourseTitle}
+                    onChange={(e) => setNewEventcourseTitle(e.target.value)}
+                  >
+                    {courseOptions.map((course, index) => (
+                      <MenuItem key={index} value={course.courseTitle}>
+                        {course.courseTitle}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
                 <TextField
                   fullWidth
                   label="제목"
@@ -227,6 +273,8 @@ const Calendars = () => {
                   value={newEventDescription}
                   onChange={(e) => setNewEventDescription(e.target.value)}
                   style={{ marginBottom: '20px' }}
+                  multiline  // TextField를 textarea로 변경
+                  rows={4}   // 표시할 줄 수 (필요에 따라 조정 가능)
                 />
 
                 <DateTimePicker
@@ -235,24 +283,43 @@ const Calendars = () => {
                   onChange={(newValue) => setNewEventStart(moment(newValue))}
                   renderInput={(params) => <TextField {...params} fullWidth style={{ marginBottom: '20px' }} />}
                 />
+                <br />
+                <br />
                 <DateTimePicker
                   label="종료 날짜"
                   value={newEventEnd}
                   onChange={(newValue) => setNewEventEnd(moment(newValue))}
                   renderInput={(params) => <TextField {...params} fullWidth style={{ marginBottom: '20px' }} />}
                 />
+                {error && (
+                  <Typography color="error" variant="body2" style={{ marginBottom: '20px', marginTop: '12px', marginLeft: '4px' }}>
+                    {error}
+                  </Typography>
+                )}
               </>
             ) : (
               <>
-                <Typography id="modal-classroomName" variant="h6">
-                  {selectedEvent ? selectedEvent.classroomName : ''}
+                <Typography id="modal-courseTitle" variant="h6">
+                  {selectedEvent ? selectedEvent.courseTitle : ''}
                 </Typography>
                 <Typography id="modal-eventTitle" variant="h6">
                   {selectedEvent ? selectedEvent.eventTitle : ''}
                 </Typography>
-                <Typography id="modal-description">
+                <Typography
+                  id="modal-description"
+                  style={{
+                    whiteSpace: 'pre-wrap',  // 연속된 띄어쓰기 및 줄바꿈 모두 허용
+                    overflow: 'hidden',       // 넘치는 내용 숨기기
+                    textOverflow: 'ellipsis',  // 넘치는 내용에 ... 표시
+                    display: 'block',         // 블록 요소로 설정
+                    maxHeight: '200px',      // 최대 높이 설정 (원하는 높이로 조정 가능)
+                    overflowY: 'auto',       // 세로 방향 스크롤
+                  }}
+                >
                   {selectedEvent ? selectedEvent.description : ''}
                 </Typography>
+
+
                 <Typography>
                   시작 시간: {selectedEvent ? moment(selectedEvent.start).format('YYYY.MM.DD HH:mm') : ''}
                 </Typography>

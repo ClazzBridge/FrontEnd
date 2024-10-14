@@ -12,7 +12,7 @@ export const getPost = async (postId) => {
 
 export const getAllPosts = async () => {
   try {
-    const response = await axios.get("post");
+    const response = await axios.get("posts");
     return response.data;
   } catch (error) {
     console.error("Error fetching all posts:", error);
