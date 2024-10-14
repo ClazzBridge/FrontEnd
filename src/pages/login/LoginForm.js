@@ -69,10 +69,10 @@ function LoginForm({ onLoginSuccess }) {
       <CssBaseline />
       <Box
         sx={{
-          marginTop: 16,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1 }}>

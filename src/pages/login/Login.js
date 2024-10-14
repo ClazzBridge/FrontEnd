@@ -173,11 +173,13 @@ function Login() {
                 width: "50%",
                 backgroundColor: "white",
                 borderRadius: "0 14px 14px 0",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
               }}
             >
               <Box
                 sx={{
-                  margin: "24px",
                   padding: "24px",
                   display: "flex",
                   flexDirection: "column",
@@ -191,8 +193,8 @@ function Login() {
                     padding: "12px",
                     fontWeight: 800,
                     position: "relative",
-                    top: 140,
-                    fontSize: "38px",
+                    top: -20,
+                    fontSize: "60px",
                     webkitBackgroundClip: "text",
                     webkitTextFillColor: "transparent",
                     color: "#34495e",
