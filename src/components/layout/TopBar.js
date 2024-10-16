@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import MuiAppBar from "@mui/material/AppBar";
@@ -19,6 +19,7 @@ import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import Stack from "@mui/material/Stack";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { GitHub } from "@mui/icons-material";
+import { UserContext } from "../../context/UserContext";
 
 const drawerWidth = 240;
 const closedDrawerWidth = 64; // 슬라이드바가 닫혔을 때의 넓이
@@ -58,6 +59,10 @@ const CustomBadge = styled(Badge)({
 });
 
 const TopBar = ({ open }) => {
+  const { userInfo } = useContext(UserContext);
+  if (!userInfo == null) {
+    console.log(userInfo.member.name);
+  }
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -91,6 +96,9 @@ const TopBar = ({ open }) => {
         return "1:1 채팅";
       case "/allchat":
         return "전체 채팅";
+      case "/memberManager":
+        return "회원 관리";
+
       default:
         return "Clazz";
     }
@@ -132,7 +140,7 @@ const TopBar = ({ open }) => {
   };
 
   const handleGitHubClick = () => {
-    // const githubUrl = user.githubUrl; // 유저 데이터에서 깃허브 URL 가져오기
+    // const githubUrl = userInfo.member.githubUrl; // 유저 데이터에서 깃허브 URL 가져오기
     // window.open(githubUrl, "_blank");
     window.open("https://github.com/", "_blank");
   };

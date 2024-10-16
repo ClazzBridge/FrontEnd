@@ -33,6 +33,10 @@ import Privatechat from "../pages/chat/Privatechat";
 import Calendar from "../pages/calendar/Calendars";
 import QuestionList from "../pages/qna/QuestionListDataGrid";
 
+// 유저관리
+import MemberManager from "../pages/manager/MemberManager";
+import ClassroomManager from "../pages/manager/ClassroomManager";
+
 const Router = ({ isLoggedIn }) => {
   return (
     <Routes>
@@ -68,6 +72,11 @@ const Router = ({ isLoggedIn }) => {
 
         {/* 캘린더 */}
         <Route path="calendar" element={<Calendar />} />
+
+        {/* 관리 */}
+        <Route path="memberManager" element={<MemberManager />} />
+        <Route path="classroomManager" element={<ClassroomManager />} />
+
       </Route>
     </Routes>
   );
