@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Typography, TextField, Box, FormControl, InputLabel, Select, MenuItem, Checkbox, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Radio, RadioGroup, FormControlLabel } from "@mui/material";
+import { Button, Modal, Typography, TextField, Box, FormControl, Checkbox, Table, TableBody, TableCell, TableHead, TableRow, Radio, RadioGroup, FormControlLabel } from "@mui/material";
 import apiClient from '../../shared/apiClient';
 
 const ClassroomManager = () => {
     const [open, setOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
-    const [selectedClassrooms, setSelectedClassrooms] = useState([]); // 선택한 회원 상태 관리
+    const [selectedClassrooms, setSelectedClassrooms] = useState([]); // 선택한 강의실 상태 관리
 
     // 폼 입력 상태 관리
     const [newEventId, setNewEventId] = useState(''); // ID 추가
@@ -29,6 +29,7 @@ const ClassroomManager = () => {
                 const fetchedEvents = response.data.map(event => ({
                     ...event,
                 }));
+                console.log("1. ==============>" , response.data);
                 setEvents(fetchedEvents); // 3. 상태 업데이트
             })
             .catch(error => {
@@ -36,20 +37,19 @@ const ClassroomManager = () => {
             });
     };
 
-    const getClassroomType = (role) => {
-        if (role === '0') return '사용 안함';
-        if (role === '1') return '사용중';
-        return role; // 다른 역할이 있을 경우 그대로 출력
+    const getClassroomType = (isOccupied) => {
+        if (isOccupied === false) return '사용 안함';
+        if (isOccupied === true) return '사용중';
     };
 
-    const validateName = (name) => {
-        if (name.length < 2 || name.includes(" ")) {
-            setNameError("2글자 이상이거나 공백이 들어가면 안됩니다.");
-            return;
-        } else {
-            setNameError('');
-        }
-    };
+    //const validateName = (name) => {
+    //    if (name.length < 2 || name.includes(" ")) {
+    //        setNameError("2글자 이상이거나 공백이 들어가면 안됩니다.");
+    //        return;
+    //    } else {
+    //        setNameError('');
+    //    }
+    //};
 
     // 폼 초기화
     const resetForm = () => {
@@ -73,22 +73,23 @@ const ClassroomManager = () => {
 
     // 신규 강의실 추가
     const addClassroom = (newClassroom) => {
-        apiClient.post('classroom', newClassroom) // ID 없이 회원 추가
+        apiClient.post('classroom', newClassroom) // ID 없이 강의실 추가
             .then(response => {
-                setEvents([...events, response.data]); // 응답으로 받은 새 회원 추가
+                setEvents([...events, response.data]); // 응답으로 받은 새 강의실 추가
                 alert('강의실이 추가되었습니다.');
                 console.log(newClassroom);
                 handleClose();
                 fetchEvents(); // 추가 후 이벤트 목록 새로 고침
             })
             .catch(error => {
+                console.log('1----->', newClassroom);
                 console.error('강의실 추가에 실패했습니다.', error);
             });
     };
 
     // 기존 강의실 수정
     const updateClassroom = (updatedClassroom) => {
-        apiClient.put('user', updatedClassroom) // ID 포함하여 수정
+        apiClient.put('classroom', updatedClassroom) // ID 포함하여 수정
             .then(response => {
                 const updatedEvents = events.map(event =>
                     event.id === selectedEvent.id ? { ...event, ...updatedClassroom } : event
@@ -128,9 +129,9 @@ const ClassroomManager = () => {
         }
     };
 
-    // 회원 삭제 핸들러
+    // 강의실 삭제 핸들러
     const deleteSelectedClassrooms = () => {
-        // 선택된 회원 수를 확인
+        // 선택된 강의실 수를 확인
         const classroomCount = selectedClassrooms.length;
 
         if (classroomCount === 0) {
@@ -150,8 +151,8 @@ const ClassroomManager = () => {
                 .then(() => {
                     const updatedEvents = events.filter(event => !selectedClassrooms.includes(event.id));
                     setEvents(updatedEvents);
-                    setSelectedClassrooms([]); // 선택한 회원 목록 초기화
-                    alert("강의실 삭제 성공");
+                    setSelectedClassrooms([]); // 선택한 강의실 목록 초기화
+                    alert(`${classroomCount}개 강의실 삭제 성공`);
                 })
                 .catch(error => {
                     console.error('강의실 정보를 삭제하지 못했습니다.', error.response.data);
@@ -163,7 +164,7 @@ const ClassroomManager = () => {
         }
     };
 
-    // 회원 수정 핸들러
+    // 강의실 수정 핸들러
     const editSelectedClassroom = () => {
         if (selectedClassrooms.length !== 1) {
             alert('수정할 강의실은 하나만 선택해야 합니다.');
@@ -193,7 +194,7 @@ const ClassroomManager = () => {
 
     return (
         <div>
-            {/* 회원 리스트 테이블 */}
+            {/* 강의실 리스트 테이블 */}
             <Table>
                 <TableHead>
                     <TableRow>
@@ -272,7 +273,7 @@ const ClassroomManager = () => {
                             value={newEventName}
                             onChange={(e) => {
                                 setNewEventName(e.target.value);
-                                validateName(e.target.value);
+                                //validateName(e.target.value);
                             }}
                             error={!!nameError}
                             helperText={nameError}
@@ -285,8 +286,8 @@ const ClassroomManager = () => {
                                 value={newEventIsOccupied}
                                 onChange={(e) => setNewEventIsOccupied(e.target.value)}
                             >
-                                <FormControlLabel value="1" control={<Radio />} label="사용중" />
-                                <FormControlLabel value="0" control={<Radio />} label="사용 안함" />
+                                <FormControlLabel value='true' control={<Radio />} label="사용중" /*disabled={!editMode}*/ />
+                                <FormControlLabel value="false" control={<Radio />} label="사용 안함" /*disabled={!editMode}*/ />
                             </RadioGroup>
                         </FormControl>
                     </Box>

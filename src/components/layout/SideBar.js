@@ -126,7 +126,7 @@ const menuItems = [
         title: "강의실관리",
         notifications: 4,
         icon: <EventSeatOutlinedIcon />,
-        link: "/memberManager",
+        link: "/classroomManager",
       },
     ],
   },

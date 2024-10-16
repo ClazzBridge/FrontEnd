@@ -52,8 +52,7 @@ const MemberManager = () => {
     };
 
     const validatePassword = (password) => {
-        console.log(password, "password");
-        if (password.length < 8 || password.includes(" ")) {
+        if (password.length < 8 || password.includes(" ") || password.length === 0) {
             setPasswordError("8글자 이상이거나 공백이 들어가면 안됩니다.");
             return;
         } else {
@@ -126,7 +125,6 @@ const MemberManager = () => {
             .then(response => {
                 setEvents([...events, response.data]); // 응답으로 받은 새 회원 추가
                 alert('회원이 추가되었습니다.');
-                console.log(newMember);
                 handleClose();
                 fetchEvents(); // 추가 후 이벤트 목록 새로 고침
             })
@@ -148,7 +146,6 @@ const MemberManager = () => {
                 fetchEvents(); // 수정 후 이벤트 목록 새로 고침
             })
             .catch(error => {
-                console.log(updatedMember);
                 console.error('회원 수정에 실패했습니다.', error);
             });
     };
@@ -196,22 +193,22 @@ const MemberManager = () => {
             alert("올바른 형식으로 입력해주세요.");
             return;
         }
-
-        if (newEventName.length === 0 || newEventId.length === 0 ||
-            newEventPassword.length === 0 || newEventPhone.length === 0 || newEventEmail.length === 0) {
-            alert("입력하지 않은 값이 있습니다.");
-        }
-
-        if (newEventPassword.length === 0) {
-            setPasswordError("비밀번호를 입력해 주세요.");
-            return;
-        }
-
+        
         if (editMode) {
             // 수정
+            if (newEventPassword.length === 0) {
+                setPasswordError("비밀번호를 입력해 주세요.");
+                return;
+            }
             updateMember(newMember); // ID를 전달
         } else {
             // 추가
+            if (newEventName.length === 0 || newEventMemberId.length === 0 || newEventPassword.length === 0 ||
+                newEventPhone.length === 0 || newEventEmail.length === 0 || newEventTitle.length === 0 ||
+                ((newEventType !== 'ROLE_TEACHER') && (newEventType !== 'ROLE_STUDENT'))) {
+                alert("입력하지 않은 값이 있습니다.");
+                return;
+            }
             addMember(newMember);
         }
     };
@@ -239,7 +236,7 @@ const MemberManager = () => {
                     const updatedEvents = events.filter(event => !selectedMembers.includes(event.id));
                     setEvents(updatedEvents);
                     setSelectedMembers([]); // 선택한 회원 목록 초기화
-                    alert("회원 삭제 성공");
+                    alert(`${memberCount}명의 회원 삭제 성공`);
                 })
                 .catch(error => {
                     console.error('회원 정보를 삭제하지 못했습니다.', error.response.data);

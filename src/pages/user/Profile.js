@@ -295,7 +295,7 @@ const ProfileForm = () => {
               color="primary"
               sx={{ mt: 3, mb: 2 }}
             >
-              Save
+              수정
             </Button>
           </Box>
         </Box>
