@@ -17,6 +17,9 @@ import {
 import CustomModal from "../common/CustomModal";
 import { savePost } from "../../services/apis/post/post";
 import { deletePost as deletePostApi } from "../../services/apis/post/delete";
+import { updatePost } from "../../services/apis/post/put";
+import { getBoardType } from "../../services/apis/boardType/get";
+import { getCourseId } from "../../services/apis/studentCourse/get";
 
 const columns = [
   { field: "id", headerName: "No", flex: 0.5, resizable: false },
@@ -52,18 +55,34 @@ export default function FreeBoardData() {
   const [selectedRow, setSelectedRow] = useState(null); // 선택된 행 데이터
   const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar 열기 상태
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [originalRow, setOriginalRow] = useState(null);
+  const [boardTypes, setBoardTypes] = useState([]); // 카테고리 상태
+  const [boardId, setBoardId] = useState(""); // 선택된 카테고리 ID 상태
 
   const fetchData = useCallback(async () => {
     const data = await getAllPosts(); // API 호출
     setRows(data); // 상태 업데이트
   }, []);
 
+  const fetchBoardTypes = useCallback(async () => {
+    try {
+      const data = await getBoardType(); // API 호출
+      setBoardTypes(data); // 카테고리 데이터 상태에 저장
+      console.log(data);
+    } catch (error) {
+      console.error("Failed to fetch board types:", error);
+    }
+  }, []);
+
   useEffect(() => {
+    fetchBoardTypes();
     fetchData();
   }, [fetchData]); // 컴포넌트 마운트 시 호출
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isupdateModalOpen, setIsUpdateModalOpen] = useState(false);
+
   const [isEditing, setIsEditing] = useState(false); // 수정 모드 상태 추가
 
   const openModal = () => setIsModalOpen(true);
@@ -72,22 +91,36 @@ export default function FreeBoardData() {
   const openDeleteModal = () => setIsDeleteModalOpen(true);
   const closeDeleteModal = () => setIsDeleteModalOpen(false);
 
-  const [boardId, setBoardId] = useState("");
+  const openUpdateModal = () => setIsUpdateModalOpen(true);
+  const closeUpdateModal = () => setIsUpdateModalOpen(false);
+
+  const [boardTypeId, setBoardTypeId] = useState("");
+  const [courseId, setCourseId] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  const handleEditClick = () => {
+  const handleEditClick = (row) => {
+    setOriginalRow(row); // 원래 행 데이터 저장
+    setSelectedRow(row); // 선택된 행 데이터 설정
     setIsEditing(true); // 수정 모드 활성화
   };
 
-  const handleSaveClick = async () => {
-    // API 호출하여 수정된 내용을 저장하는 로직 추가
-    // await updatePost(selectedRow.id, { title }); // 예시 API 호출
+  const handleCancel = () => {
+    setSelectedRow(originalRow); // 원래 값으로 되돌리기
+    setIsEditing(false); // 편집 모드 해제
+  };
+
+  const handleSaveClick = async (updateDTO) => {
+    await updatePost(updateDTO);
+    await fetchData(); // 데이터 새로 고침
     setIsEditing(false); // 수정 모드 비활성화
+    setIsUpdateModalOpen(false);
+    setSnackbarMessage("게시물이 성공적으로 수정되었습니다."); // 메시지 설정
+    setOpenSnackbar(true); // Snackbar 열기
   };
 
   const handleBoardIdChange = (event) => {
-    setBoardId(event.target.value);
+    setBoardId(event.target.value); // 선택된 카테고리 ID
   };
 
   const handleTitleChange = (event) => {
@@ -98,21 +131,24 @@ export default function FreeBoardData() {
     setContent(event.target.value);
   };
 
-  // 로그인된 유저 데이터 넣어줘야 함!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   const postForm = {
     title,
     content,
     boardId,
+    courseId,
   };
 
   const postSave = async () => {
     try {
+      const id = await getCourseId();
+      setCourseId(id);
       await savePost(postForm);
+      console.log(postForm, "=======================================");
       setSnackbarMessage("게시물이 성공적으로 저장되었습니다."); // 메시지 설정
       setOpenSnackbar(true); // Snackbar 열기
       await fetchData(); // 데이터 새로 고침
       closeModal();
-      setBoardId("");
+      setBoardTypeId("");
       setTitle("");
       setContent("");
     } catch (error) {
@@ -144,15 +180,21 @@ export default function FreeBoardData() {
   };
 
   const handleRowClick = (params) => {
-    // console.log("Clicked row data:", params.row); // 클릭된 행의 데이터 출력
     setSelectedRow(params.row); // 클릭된 행 데이터 저장
     setOpenDrawer(true); // Drawer 열기
-    // 추가 작업 수행 (예: 상세 보기, 편집 등)
   };
 
   const handleCloseDrawer = () => {
     setOpenDrawer(false); // Drawer 닫기
+    setIsEditing(false); // 수정 모드 비활성화
     setSelectedRow(null); // 선택된 행 데이터 초기화
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Escape") {
+      // ESC 키 확인
+      handleCloseDrawer(); // Drawer 닫기 함수 호출
+    }
   };
 
   return (
@@ -181,6 +223,7 @@ export default function FreeBoardData() {
           -
         </Button>
       </Box>
+      {/* ========== 삭제 ========= */}
       <CustomModal isOpen={isDeleteModalOpen} closeModal={closeDeleteModal}>
         <Box
           sx={{
@@ -231,6 +274,61 @@ export default function FreeBoardData() {
           </Box>
         </Box>
       </CustomModal>
+
+      {/* ========== 수정 ========= */}
+      <CustomModal isOpen={isupdateModalOpen} closeModal={closeUpdateModal}>
+        <Box
+          sx={{
+            display: "flex",
+            margin: "auto",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            gap: "10px",
+          }}
+        >
+          <h3>게시글 수정하기</h3>
+          <p>해당 게시글을 수정하시겠습니까?</p>
+
+          <Box
+            sx={{
+              display: "flex",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "row",
+              gap: "24px",
+              margin: "16px 0",
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={closeUpdateModal}
+              sx={{ width: "120px", height: "40px" }}
+            >
+              취소
+            </Button>
+            <Button
+              variant="contained"
+              color="info"
+              onClick={() => {
+                const updateDTO = {
+                  id: selectedRow.id,
+                  title: title,
+                  content: content,
+                };
+                handleSaveClick(updateDTO);
+              }}
+              sx={{ width: "120px", height: "40px" }}
+            >
+              수정하기
+            </Button>
+          </Box>
+        </Box>
+      </CustomModal>
+
+      {/* ========== 작성 ========= */}
       <CustomModal isOpen={isModalOpen} closeModal={closeModal}>
         <Box
           sx={{
@@ -254,8 +352,11 @@ export default function FreeBoardData() {
               onChange={handleBoardIdChange}
               value={boardId}
             >
-              <MenuItem value={2}>공지사항</MenuItem>
-              <MenuItem value={1}>자유게시판</MenuItem>
+              {boardTypes.map((boardType) => (
+                <MenuItem key={boardType.id} value={boardType.id}>
+                  {boardType.type}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
 
@@ -302,9 +403,15 @@ export default function FreeBoardData() {
             </Button>
             <Button
               variant="contained"
-              color="info"
               onClick={postSave}
-              sx={{ width: "120px", height: "40px" }}
+              style={{
+                backgroundColor: "#34495e",
+              }}
+              sx={{
+                width: "120px",
+                height: "40px",
+                fontWeight: 600,
+              }}
             >
               등록하기
             </Button>
@@ -433,7 +540,7 @@ export default function FreeBoardData() {
           sx={{ width: 800, padding: 2 }} // Drawer의 너비 및 패딩 설정
           role="presentation"
           // onClick={handleCloseDrawer} // Drawer 클릭 시 닫기
-          onKeyDown={handleCloseDrawer}
+          onKeyDown={handleKeyDown}
         >
           {selectedRow ? (
             <Box sx={{ padding: "28px" }}>
@@ -457,7 +564,14 @@ export default function FreeBoardData() {
                 {isEditing ? (
                   <TextField
                     value={selectedRow.title}
-                    onChange={(e) => setTitle(e.target.value)} // 제목 상태 업데이트
+                    onChange={(e) => {
+                      const newTitle = e.target.value; // 입력된 값
+                      setTitle(newTitle); // 제목 상태 업데이트
+                      setSelectedRow((prevRow) => ({
+                        ...prevRow,
+                        title: newTitle,
+                      })); // 선택된 행의 제목 업데이트} // 제목 상태 업데이트
+                    }}
                     sx={{ fontSize: "30px", fontWeight: "bold", flex: 1 }}
                   />
                 ) : (
@@ -495,9 +609,27 @@ export default function FreeBoardData() {
                   whiteSpace: "pre-wrap",
                 }}
               >
-                <Typography sx={{ fontSize: "14px" }}>
-                  {selectedRow.content}
-                </Typography>
+                {isEditing ? (
+                  <TextField
+                    multiline
+                    focused
+                    rows={19}
+                    value={selectedRow.content}
+                    onChange={(e) => {
+                      const newContent = e.target.value; // 입력된 값
+                      setContent(newContent); // 제목 상태 업데이트
+                      setSelectedRow((prevRow) => ({
+                        ...prevRow,
+                        content: newContent,
+                      }));
+                    }}
+                    sx={{ flex: 1, width: "100%", row: 5 }}
+                  />
+                ) : (
+                  <Typography sx={{ fontSize: "14px" }}>
+                    {selectedRow.content}
+                  </Typography>
+                )}
               </Box>
               <Box
                 sx={{
@@ -508,16 +640,20 @@ export default function FreeBoardData() {
                 }}
               >
                 {isEditing ? (
-                  <Button variant="outlined" onClick={handleSaveClick}>
+                  <Button variant="outlined" onClick={openUpdateModal}>
                     저장
                   </Button>
                 ) : (
-                  <Button variant="outlined" onClick={handleEditClick}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleEditClick(selectedRow)}
+                  >
                     수정
                   </Button>
                 )}
+
                 {isEditing ? (
-                  <Button variant="outlined" onClick={setIsEditing(false)}>
+                  <Button variant="outlined" onClick={handleCancel}>
                     취소
                   </Button>
                 ) : (

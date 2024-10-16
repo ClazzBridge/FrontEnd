@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import LoginForm from "./LoginForm";
-import { Box, Typography, Container } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import Router from "../../shared/Router";
-import apiClient from "../../shared/apiClient";
+import Grid from "@mui/material/Grid2";
+import HomeImage from "../../assets/images/homeImage6.jpeg";
+import backImage from "../../assets/images/photo_01_satur_-60.jpg";
+import logo from "../../assets/images/logo.png";
+
 
 function Login() {
   const [isLoading, setIsLoading] = useState(true);
@@ -20,8 +25,9 @@ function Login() {
         setIsLoggedIn(true);
       } else if (refreshToken) {
         try {
-          const response = await apiClient.post(
-            "http://127.0.0.1:8080/api/auth/refresh",
+
+          const response = await axios.post(
+            "http://localhost:8080/api/auth/refresh",
             {
               value: refreshToken,
             },
@@ -104,18 +110,102 @@ function Login() {
           <Router></Router>
         </Box>
       ) : (
-        <Container maxWidth="xs">
-          <Typography
-            variant="h3"
-            component="h1"
-            align="center"
-            gutterBottom
-            sx={{ color: "Red", mb: 4 }}
+        <Box
+          sx={{
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+            justifyContent: "center",
+            // backgroundColor: "#34495e",
+            // backgroundColor: "#f4f4f4",
+            backgroundImage: `url(${backImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          <Box
+            sx={{
+              height: "100%",
+              white: "100%",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.3)",
+              zIndex: 1,
+            }}
+          ></Box>
+          <Box
+            container
+            spacing={0}
+            sx={{
+              borderRadius: "14px",
+              boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
+              display: "flex",
+              width: "65%",
+              height: "80%",
+              zIndex: 2,
+            }}
           >
-            ClazzBridge
-          </Typography>
-          <LoginForm onLoginSuccess={handleLoginSuccess} />
-        </Container>
+            <Grid
+              sx={{
+                width: "50%",
+                borderRight: "1px solid #f4f4f4",
+                backgroundColor: "white",
+                borderRadius: "14px 0 0 14px",
+              }}
+            >
+              <Box
+                sx={{
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "14px 0 0 14px",
+                  backgroundImage: `url(${HomeImage})`,
+                  backgroundSize: "contain", // 이미지 크기 조정
+                  backgroundPosition: "center", // 이미지 위치 조정
+                  backgroundRepeat: "no-repeat", // 이미지 반복 방지
+                }}
+              />
+            </Grid>
+            <Grid
+              sx={{
+                width: "50%",
+                backgroundColor: "white",
+                borderRadius: "0 14px 14px 0",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <Box
+                sx={{
+                  padding: "24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignContent: "center",
+                  width: "100%", // 추가: 부모 요소의 너비를 100%로 설정
+                  textAlign: "center", // 추가: 텍스트 중앙 정렬
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={logo} // 이미지 경로 설정
+                  alt="ClazzBridge Logo"
+                  style={{
+                    width: "100%", // 너비를 100%로 설정
+                    height: "auto", // 높이를 자동으로 설정하여 비율 유지
+                    maxWidth: "300px", // 원하는 최대 너비 설정 (예: 300px)
+                  }}
+                />
+              </Box>
+              <LoginForm onLoginSuccess={handleLoginSuccess} />
+            </Grid>
+          </Box>
+        </Box>
       )}
     </Box>
   );
