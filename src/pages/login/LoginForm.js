@@ -42,6 +42,15 @@ function LoginForm({ onLoginSuccess }) {
       );
       console.log("2222=============>");
       console.log(response);
+        try {
+            console.log("1111=============>");
+            const response = await axios.post("http://127.0.0.1:8080/api/login", {
+                memberId,
+                password,
+            });
+            console.log("2222=============>");
+            console.log(response);
+
 
       if (response.data) {
         localStorage.setItem("token", response.data.accessToken);

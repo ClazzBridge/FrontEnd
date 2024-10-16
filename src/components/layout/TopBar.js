@@ -91,6 +91,9 @@ const TopBar = ({ open }) => {
         return "1:1 채팅";
       case "/allchat":
         return "전체 채팅";
+      case "/memberManager":
+        return "회원 관리";
+
       default:
         return "Clazz";
     }
