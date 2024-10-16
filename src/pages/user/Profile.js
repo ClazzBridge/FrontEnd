@@ -81,7 +81,7 @@ const ProfileForm = () => {
       const updatedProfile = { ...prevState, [name]: value };
       let newError = "";
       if (
-        (name === "password" || name === "confirmPassword") &&
+        (name === "password" && name === "confirmPassword") &&
         updatedProfile.password !== updatedProfile.confirmPassword
       ) {
         newError = "비밀번호가 일치하지 않습니다.";
@@ -295,7 +295,7 @@ const ProfileForm = () => {
               color="primary"
               sx={{ mt: 3, mb: 2 }}
             >
-              Save
+              수정
             </Button>
           </Box>
         </Box>

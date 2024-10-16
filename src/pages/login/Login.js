@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import LoginForm from "./LoginForm";
 import { Box, Typography, Container } from "@mui/material";
-import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import Router from "../../shared/Router";
+import apiClient from "../../shared/apiClient";
 
 function Login() {
   const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +20,7 @@ function Login() {
         setIsLoggedIn(true);
       } else if (refreshToken) {
         try {
-          const response = await axios.post(
+          const response = await apiClient.post(
             "http://127.0.0.1:8080/api/auth/refresh",
             {
               value: refreshToken,
