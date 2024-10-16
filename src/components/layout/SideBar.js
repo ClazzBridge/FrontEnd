@@ -35,7 +35,6 @@ export const drawerWidth = 240;
 const closedDrawerWidth = 64;
 const topBarHeight = 64; // 탑바의 높이 설정
 
-
 const SideBar = ({ open, handleDrawerToggle }) => {
   const location = useLocation();
   const [type, setType] = useState(""); // role 상태 추가
@@ -159,7 +158,7 @@ const SideBar = ({ open, handleDrawerToggle }) => {
           title: "강의관리",
           notifications: 4,
           icon: <SchoolOutlinedIcon />,
-          link: "/lectureManager",
+          link: "/memberManager",
         },
         {
           title: "강의실관리",
