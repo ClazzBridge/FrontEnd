@@ -72,6 +72,11 @@ const SideBar = ({ open, handleDrawerToggle }) => {
       link: "/",
     },
     {
+      title: "캘린더",
+      icon: <CalendarMonthOutlinedIcon />,
+      link: "/calendar"
+    },
+    {
       title: "게시판",
       icon: <AssignmentOutlinedIcon />,
       link: "/board",
@@ -134,11 +139,6 @@ const SideBar = ({ open, handleDrawerToggle }) => {
         },
       ],
     },
-    {
-      title: "캘린더",
-      icon: <CalendarMonthOutlinedIcon />,
-      link: "/calendar"
-    },
   ];
 
   // ROLE_ADMIN일 경우 관리 메뉴 추가
@@ -153,6 +153,7 @@ const SideBar = ({ open, handleDrawerToggle }) => {
           notifications: 4,
           icon: <PeopleAltOutlinedIcon />,
           link: "/memberManager",
+
         },
         {
           title: "강의관리",
