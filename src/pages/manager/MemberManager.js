@@ -23,6 +23,43 @@ const MemberManager = () => {
     const [showPassword, setShowPassword] = useState(false); // 비밀번호 보이기 상태 관리
     const [courseOption, setCourseOption] = useState([]); // 강의명 목록 상태
 
+    // 에러 상태 관리
+    const [phoneError, setPhoneError] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [nameError, setNameError] = useState('');
+    const [memberIdError, setMemberIdError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^(01[016789])-\d{3,4}-\d{4}$/;
+
+    const validateName = (name) => {
+        if (name.length < 2 || name.includes(" ")) {
+            setNameError("2글자 이상이거나 공백이 들어가면 안됩니다.");
+            return;
+        } else {
+            setNameError('');
+        }
+    };
+
+    const validateMemberId = (memberId) => {
+        if (memberId.length < 5 || memberId.includes(" ")) {
+            setMemberIdError("5글자 이상이거나 공백이 들어가면 안됩니다.");
+            return;
+        } else {
+            setMemberIdError('');
+        }
+    };
+
+    const validatePassword = (password) => {
+        if (password.length < 8 || password.includes(" ") || password.length === 0) {
+            setPasswordError("8글자 이상이거나 공백이 들어가면 안됩니다.");
+            return;
+        } else {
+            setPasswordError('');
+        }
+    };
+
     useEffect(() => {
         // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
         fetchEvents();
@@ -62,6 +99,11 @@ const MemberManager = () => {
         setNewEventEmail('');
         setNewEventTitle('');
         setNewEventType('수강생');
+        setNameError('');
+        setMemberIdError('');
+        setPhoneError('');
+        setEmailError('');
+        setPasswordError('');
     };
 
     // 모달 열기 및 닫기
@@ -83,7 +125,6 @@ const MemberManager = () => {
             .then(response => {
                 setEvents([...events, response.data]); // 응답으로 받은 새 회원 추가
                 alert('회원이 추가되었습니다.');
-                console.log(newMember);
                 handleClose();
                 fetchEvents(); // 추가 후 이벤트 목록 새로 고침
             })
@@ -105,7 +146,6 @@ const MemberManager = () => {
                 fetchEvents(); // 수정 후 이벤트 목록 새로 고침
             })
             .catch(error => {
-                console.log(updatedMember);
                 console.error('회원 수정에 실패했습니다.', error);
             });
     };
@@ -123,11 +163,52 @@ const MemberManager = () => {
             memberType: newEventType,
         };
 
+        // 중복된 memberId와 email이 있는지 확인
+        const existingMemberId = events.find(event => event.memberId === newEventMemberId && (!editMode || event.id !== newEventId));
+        const existingEmail = events.find(event => event.email === newEventEmail && (!editMode || event.id !== newEventId));
+
+        if (existingMemberId) {
+            alert('이미 등록된 아이디입니다.');
+            return;
+        }
+
+        if (existingEmail) {
+            alert('이미 등록된 이메일입니다.');
+            return;
+        }
+
+        // 강사일 경우 해당 강의에 이미 강사가 배정되어 있는지 확인
+        if (newEventType === 'ROLE_TEACHER') {
+            const existingTeacherForCourse = events.find(
+                (event) => event.courseTitle === newEventTitle && event.memberType === 'ROLE_TEACHER'
+            );
+
+            if (existingTeacherForCourse && (!editMode || existingTeacherForCourse.id !== newEventId)) {
+                alert(`해당 강의(${newEventTitle})에는 이미 강사가 배정되어 있습니다.`);
+                return; // 강사가 이미 배정된 경우 저장 중단
+            }
+        }
+
+        if (nameError || phoneError || emailError || passwordError || memberIdError) {
+            alert("올바른 형식으로 입력해주세요.");
+            return;
+        }
+
         if (editMode) {
             // 수정
+            if (newEventPassword.length === 0) {
+                setPasswordError("비밀번호를 입력해 주세요.");
+                return;
+            }
             updateMember(newMember); // ID를 전달
         } else {
             // 추가
+            if (newEventName.length === 0 || newEventMemberId.length === 0 || newEventPassword.length === 0 ||
+                newEventPhone.length === 0 || newEventEmail.length === 0 || newEventTitle.length === 0 ||
+                ((newEventType !== 'ROLE_TEACHER') && (newEventType !== 'ROLE_STUDENT'))) {
+                alert("입력하지 않은 값이 있습니다.");
+                return;
+            }
             addMember(newMember);
         }
     };
@@ -155,7 +236,7 @@ const MemberManager = () => {
                     const updatedEvents = events.filter(event => !selectedMembers.includes(event.id));
                     setEvents(updatedEvents);
                     setSelectedMembers([]); // 선택한 회원 목록 초기화
-                    alert("회원 삭제 성공");
+                    alert(`${memberCount}명의 회원 삭제 성공`);
                 })
                 .catch(error => {
                     console.error('회원 정보를 삭제하지 못했습니다.', error.response.data);
@@ -180,7 +261,7 @@ const MemberManager = () => {
             setNewEventId(memberToEdit.id);
             setNewEventName(memberToEdit.name);
             setNewEventMemberId(memberToEdit.memberId);
-            setNewEventPassword(memberToEdit.password);
+            setNewEventPassword(''); // 비밀번호 필드를 비워둡니다.
             setNewEventPhone(memberToEdit.phone);
             setNewEventEmail(memberToEdit.email);
             setNewEventTitle(memberToEdit.courseTitle);
@@ -297,12 +378,22 @@ const MemberManager = () => {
                         <TextField
                             label="이름"
                             value={newEventName}
-                            onChange={(e) => setNewEventName(e.target.value)}
+                            onChange={(e) => {
+                                setNewEventName(e.target.value);
+                                validateName(e.target.value);
+                            }}
+                            error={!!nameError}
+                            helperText={nameError}
                         />
                         <TextField
                             label="아이디"
                             value={newEventMemberId}
-                            onChange={(e) => setNewEventMemberId(e.target.value)}
+                            onChange={(e) => {
+                                setNewEventMemberId(e.target.value);
+                                validateMemberId(e.target.value);
+                            }}
+                            error={!!memberIdError}
+                            helperText={memberIdError}
                         // disabled={editMode} // 수정 모드에서는 아이디 수정 불가
                         />
                         <Box sx={{ display: "grid" }}>
@@ -310,8 +401,13 @@ const MemberManager = () => {
                                 fullwidth
                                 label="비밀번호"
                                 type={showPassword ? "text" : "password"} // 상태에 따라 변경
-                                value={newEventPassword}
-                                onChange={(e) => setNewEventPassword(e.target.value)}
+                                onChange={(e) => {
+                                    setNewEventPassword(e.target.value);
+                                    validatePassword(e.target.value);
+                                }}
+
+                                error={!!passwordError}
+                                helperText={passwordError}
                                 InputProps={{
                                     endAdornment: (
                                         <IconButton
@@ -328,12 +424,38 @@ const MemberManager = () => {
                         <TextField
                             label="전화번호"
                             value={newEventPhone}
-                            onChange={(e) => setNewEventPhone(e.target.value)}
+                            onChange={(e) => {
+                                setNewEventPhone(e.target.value);
+                                if (!phonePattern.test(e.target.value) && e.target.value !== '') {
+                                    setPhoneError(
+                                        <>
+                                            올바른 전화번호 형식이 아닙니다.<br />
+                                            예) 010-xxxx-xxxx
+                                        </>);
+                                } else {
+                                    setPhoneError('');
+                                }
+                            }}
+                            error={!!phoneError}
+                            helperText={phoneError}
                         />
                         <TextField
                             label="이메일"
                             value={newEventEmail}
-                            onChange={(e) => setNewEventEmail(e.target.value)}
+                            onChange={(e) => {
+                                setNewEventEmail(e.target.value);
+                                if (!emailPattern.test(e.target.value) && e.target.value !== '') {
+                                    setEmailError(
+                                        <>
+                                            올바른 이메일 형식이 아닙니다.<br />
+                                            예) human@naver.com
+                                        </>);
+                                } else {
+                                    setEmailError('');
+                                }
+                            }}
+                            error={!!emailError}
+                            helperText={emailError}
                         />
                         <FormControl variant="outlined">
                             <InputLabel>강의명</InputLabel>

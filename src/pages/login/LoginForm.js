@@ -1,23 +1,23 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import {
   Button,
   TextField,
   Box,
-  Typography,
-  Avatar,
   Container,
   CssBaseline,
   Alert,
   CircularProgress,
+  Typography,
 } from "@mui/material";
-import LaptopIcon from "@mui/icons-material/Laptop";
+import { UserContext } from "../../context/UserContext";
 
 function LoginForm({ onLoginSuccess }) {
   const [memberId, setmemberId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { setUserInfo } = useContext(UserContext);
 
   const minLength = 8;
 
@@ -31,18 +31,22 @@ function LoginForm({ onLoginSuccess }) {
 
     setLoading(true);
 
-        try {
-            console.log("1111=============>");
-            const response = await axios.post("http://127.0.0.1:8080/api/login", {
-                memberId,
-                password,
-            });
-            console.log("2222=============>");
-            console.log(response);
-
+    try {
+      console.log("1111=============>");
+      const response = await axios.post("http://localhost:8080/api/login", {
+        memberId,
+        password,
+      });
+      console.log("2222=============>");
+      console.log(response);
 
       if (response.data) {
         localStorage.setItem("token", response.data.accessToken);
+        const { authResponseDTO: member } = response.data;
+
+        setUserInfo({ member });
+        localStorage.setItem("userInfo", JSON.stringify({ member })); // 로컬 스토리지에 저장
+
         console.log(
           "response.data.refreshToken: " + response.data.refreshTokenCookie
         );
@@ -66,25 +70,12 @@ function LoginForm({ onLoginSuccess }) {
       <CssBaseline />
       <Box
         sx={{
-          marginTop: 8,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LaptopIcon />
-        </Avatar>
-        <Typography
-          component="h1"
-          variant="h4"
-          sx={{
-            color: "black",
-            fontWeight: "bold",
-          }}
-        >
-          Login
-        </Typography>
         <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1 }}>
           <TextField
             variant="filled"
@@ -99,8 +90,9 @@ function LoginForm({ onLoginSuccess }) {
             value={memberId}
             onChange={(e) => setmemberId(e.target.value)}
             sx={{
-              backgroundColor: "white",
-              borderRadius: 1,
+              "& .css-1a7v3y2-MuiInputBase-input-MuiFilledInput-input": {
+                backgroundColor: "white",
+              },
             }}
           />
           <TextField
@@ -116,8 +108,9 @@ function LoginForm({ onLoginSuccess }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             sx={{
-              backgroundColor: "white",
-              borderRadius: 1,
+              "& .css-1a7v3y2-MuiInputBase-input-MuiFilledInput-input": {
+                backgroundColor: "white",
+              },
             }}
           />
           {error && (
@@ -134,9 +127,18 @@ function LoginForm({ onLoginSuccess }) {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{
+                mt: 3,
+                mb: 3,
+                boxShadow: "none",
+                p: "14px 10px",
+                background: "#34495e",
+                borderRadius: "4px",
+              }}
             >
-              Login
+              <Typography sx={{ fontSize: "14px", fontWeight: 600 }}>
+                로그인
+              </Typography>
             </Button>
           )}
         </Box>
