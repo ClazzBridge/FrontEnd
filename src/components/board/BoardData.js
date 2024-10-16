@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { getAllPosts } from "../../services/apis/post/get";
 import InputLabel from "@mui/material/InputLabel";
@@ -18,7 +18,8 @@ import CustomModal from "../common/CustomModal";
 import { savePost } from "../../services/apis/post/post";
 import { deletePost as deletePostApi } from "../../services/apis/post/delete";
 import { updatePost } from "../../services/apis/post/put";
-import { UserContext } from "../../context/UserContext";
+import { getBoardType } from "../../services/apis/boardType/get";
+import { getCourseId } from "../../services/apis/studentCourse/get";
 
 const columns = [
   { field: "id", headerName: "No", flex: 0.5, resizable: false },
@@ -54,15 +55,27 @@ export default function FreeBoardData() {
   const [selectedRow, setSelectedRow] = useState(null); // 선택된 행 데이터
   const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar 열기 상태
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [originalRow, setOriginalRow] = useState(null); // 원래 �� 데이터 저장
-  const { userInfo } = useContext(UserContext);
+  const [originalRow, setOriginalRow] = useState(null);
+  const [boardTypes, setBoardTypes] = useState([]); // 카테고리 상태
+  const [boardId, setBoardId] = useState(""); // 선택된 카테고리 ID 상태
 
   const fetchData = useCallback(async () => {
     const data = await getAllPosts(); // API 호출
     setRows(data); // 상태 업데이트
   }, []);
 
+  const fetchBoardTypes = useCallback(async () => {
+    try {
+      const data = await getBoardType(); // API 호출
+      setBoardTypes(data); // 카테고리 데이터 상태에 저장
+      console.log(data);
+    } catch (error) {
+      console.error("Failed to fetch board types:", error);
+    }
+  }, []);
+
   useEffect(() => {
+    fetchBoardTypes();
     fetchData();
   }, [fetchData]); // 컴포넌트 마운트 시 호출
 
@@ -81,7 +94,8 @@ export default function FreeBoardData() {
   const openUpdateModal = () => setIsUpdateModalOpen(true);
   const closeUpdateModal = () => setIsUpdateModalOpen(false);
 
-  const [boardId, setBoardId] = useState("");
+  const [boardTypeId, setBoardTypeId] = useState("");
+  const [courseId, setCourseId] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
@@ -106,7 +120,7 @@ export default function FreeBoardData() {
   };
 
   const handleBoardIdChange = (event) => {
-    setBoardId(event.target.value);
+    setBoardId(event.target.value); // 선택된 카테고리 ID
   };
 
   const handleTitleChange = (event) => {
@@ -121,17 +135,20 @@ export default function FreeBoardData() {
     title,
     content,
     boardId,
-    memberId: userInfo?.member?.id,
+    courseId,
   };
 
   const postSave = async () => {
     try {
+      const id = await getCourseId();
+      setCourseId(id);
       await savePost(postForm);
+      console.log(postForm, "=======================================");
       setSnackbarMessage("게시물이 성공적으로 저장되었습니다."); // 메시지 설정
       setOpenSnackbar(true); // Snackbar 열기
       await fetchData(); // 데이터 새로 고침
       closeModal();
-      setBoardId("");
+      setBoardTypeId("");
       setTitle("");
       setContent("");
     } catch (error) {
@@ -163,10 +180,8 @@ export default function FreeBoardData() {
   };
 
   const handleRowClick = (params) => {
-    // console.log("Clicked row data:", params.row); // 클릭된 행의 데이터 출력
     setSelectedRow(params.row); // 클릭된 행 데이터 저장
     setOpenDrawer(true); // Drawer 열기
-    // 추가 작업 수행 (예: 상세 보기, 편집 등)
   };
 
   const handleCloseDrawer = () => {
@@ -337,8 +352,11 @@ export default function FreeBoardData() {
               onChange={handleBoardIdChange}
               value={boardId}
             >
-              <MenuItem value={2}>공지사항</MenuItem>
-              <MenuItem value={1}>자유게시판</MenuItem>
+              {boardTypes.map((boardType) => (
+                <MenuItem key={boardType.id} value={boardType.id}>
+                  {boardType.type}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
 
@@ -385,9 +403,15 @@ export default function FreeBoardData() {
             </Button>
             <Button
               variant="contained"
-              color="info"
               onClick={postSave}
-              sx={{ width: "120px", height: "40px" }}
+              style={{
+                backgroundColor: "#34495e",
+              }}
+              sx={{
+                width: "120px",
+                height: "40px",
+                fontWeight: 600,
+              }}
             >
               등록하기
             </Button>

@@ -6,10 +6,10 @@ export default function Home() {
 
   return (
     <div>
-      {userInfo ? ( // userInfo가 있는 경우
+      {userInfo && userInfo.member ? ( // userInfo와 member가 있는 경우
         <h1>환영합니다, {userInfo.member.name}님!</h1>
       ) : (
-        <p>Home</p> // userInfo가 없으면 home
+        <p>Home</p> // userInfo나 member가 없으면 Home
       )}
     </div>
   );

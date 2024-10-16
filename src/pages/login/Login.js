@@ -8,6 +8,7 @@ import Router from "../../shared/Router";
 import Grid from "@mui/material/Grid2";
 import HomeImage from "../../assets/images/homeImage6.jpeg";
 import backImage from "../../assets/images/photo_01_satur_-60.jpg";
+import logo from "../../assets/images/logo.png";
 
 function Login() {
   const [isLoading, setIsLoading] = useState(true);
@@ -184,24 +185,20 @@ function Login() {
                   display: "flex",
                   flexDirection: "column",
                   alignContent: "center",
-                  borderRadius: "0 14px 14px 0",
+                  width: "100%", // 추가: 부모 요소의 너비를 100%로 설정
+                  textAlign: "center", // 추가: 텍스트 중앙 정렬
+                  alignItems: "center",
                 }}
               >
-                <Typography
-                  align="center"
-                  sx={{
-                    padding: "12px",
-                    fontWeight: 800,
-                    position: "relative",
-                    top: -20,
-                    fontSize: "60px",
-                    webkitBackgroundClip: "text",
-                    webkitTextFillColor: "transparent",
-                    color: "#34495e",
+                <img
+                  src={logo} // 이미지 경로 설정
+                  alt="ClazzBridge Logo"
+                  style={{
+                    width: "100%", // 너비를 100%로 설정
+                    height: "auto", // 높이를 자동으로 설정하여 비율 유지
+                    maxWidth: "300px", // 원하는 최대 너비 설정 (예: 300px)
                   }}
-                >
-                  ClazzBridge
-                </Typography>
+                />
               </Box>
               <LoginForm onLoginSuccess={handleLoginSuccess} />
             </Grid>
