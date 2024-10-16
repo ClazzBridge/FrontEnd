@@ -286,8 +286,8 @@ const ClassroomManager = () => {
                                 value={newEventIsOccupied}
                                 onChange={(e) => setNewEventIsOccupied(e.target.value)}
                             >
-                                <FormControlLabel value='true' control={<Radio />} label="사용중" /*disabled={!editMode}*/ />
-                                <FormControlLabel value="false" control={<Radio />} label="사용 안함" /*disabled={!editMode}*/ />
+                                <FormControlLabel value='true' control={<Radio />} label="사용중" disabled={!editMode} />
+                                <FormControlLabel value="false" control={<Radio />} label="사용 안함" disabled={!editMode} />
                             </RadioGroup>
                         </FormControl>
                     </Box>
