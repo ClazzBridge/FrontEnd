@@ -243,28 +243,11 @@ export default function StudentRoom() {
   const [currentProfile, setCurrentProfile] = useState({});
   const [profiles, setProfiles] = useState([]);
   const [userSeat, setUserSeat] = useState(null);
-  const [teacherProfile, setTeacherProfile] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [showSeatManagementDialog, setShowSeatManagementDialog] = useState(false);
   const [seatManagementMode, setSeatManagementMode] = useState("register"); // "register" 또는 "modify"
   const [seatCount, setSeatCount] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-
-  const assignTeacherSeat = useCallback(async () => {
-    if (!currentUser) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8080/api/seat/assignTeacher/${currentUser.memberId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log("강사가 고정 좌석에 배정되었습니다.");
-    } catch (error) {
-      console.error("강사 좌석 배정 중 오류가 발생했습니다:", error);
-    }
-  }, [currentUser]);
 
   const fetchData = useCallback(async () => {
     if (!currentUser) return;
@@ -275,12 +258,6 @@ export default function StudentRoom() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const allProfiles = response.data;
-
-      const teacherProfile = allProfiles.find(
-        (profile) =>
-          profile.memberDTO && profile.memberDTO.memberType === "ROLE_TEACHER"
-      );
-      setTeacherProfile(teacherProfile);
 
       const studentProfiles = allProfiles.filter(
         (profile) =>
@@ -293,14 +270,10 @@ export default function StudentRoom() {
           seat.memberDTO && seat.memberDTO.memberId === currentUser.memberId
       );
       setUserSeat(userSeatData ? userSeatData.id : null);
-
-      if (currentUser.memberType === "ROLE_TEACHER" && !teacherProfile) {
-        await assignTeacherSeat();
-      }
     } catch (error) {
       console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
     }
-  }, [currentUser, assignTeacherSeat]);
+  }, [currentUser]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -425,8 +398,7 @@ export default function StudentRoom() {
 
   return (
     <div>
-
-{currentUser.memberType === "ROLE_ADMIN" && (
+      {currentUser.memberType === "ROLE_ADMIN" && (
         <Box sx={{ position: "fixed", top: 16, right: 16, zIndex: 1000 }}>
           <Fab
             color="primary"
@@ -445,34 +417,6 @@ export default function StudentRoom() {
           </Fab>
         </Box>
       )}
-
-      {/* 강사 카드 */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <ProfileCard
-          seatId="T"
-          name={teacherProfile?.memberDTO?.name || "강사석"}
-          imgSrc={teacherProfile?.memberDTO?.profileImage?.pictureUrl || ""}
-          email={teacherProfile?.memberDTO?.email || ""}
-          github={teacherProfile?.memberDTO?.gitUrl || ""}
-          phone={teacherProfile?.memberDTO?.phone || ""}
-          bio={teacherProfile?.memberDTO?.bio || ""}
-          isOnline={teacherProfile?.isOnline || false}
-          isUnderstanding={false}
-          isHandRaised={false}
-          isSelf={currentUser.memberType === "ROLE_TEACHER"}
-          isEmpty={!teacherProfile}
-          openModal={openProfileModal}
-          role="ROLE_TEACHER"
-          isTeacher={true}
-          userHasSeat={currentUser.memberType === "ROLE_TEACHER"}
-        />
-      </div>
 
       {/* 학생 카드 그리드 */}
       <div
@@ -626,7 +570,7 @@ export default function StudentRoom() {
         </DialogActions>
       </Dialog>
 
-          {/* 좌석 관리 다이얼로그 */}
+      {/* 좌석 관리 다이얼로그 */}
       <Dialog open={showSeatManagementDialog} onClose={() => setShowSeatManagementDialog(false)}>
         <DialogTitle>
           {seatManagementMode === "register" ? "좌석 등록" : "좌석 수정"}
