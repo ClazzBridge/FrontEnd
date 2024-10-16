@@ -2,7 +2,7 @@ import axios from "../../../shared/apiClient";
 
 export const getPost = async (postId) => {
   try {
-    const response = await axios.get(`post/${postId}`);
+    const response = await axios.get(`posts/${postId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching post:", error);
