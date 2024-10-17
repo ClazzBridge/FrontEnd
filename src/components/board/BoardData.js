@@ -19,7 +19,7 @@ import { savePost } from "../../services/apis/post/post";
 import { deletePost as deletePostApi } from "../../services/apis/post/delete";
 import { updatePost } from "../../services/apis/post/put";
 import { getBoardType } from "../../services/apis/boardType/get";
-import { getCourseId } from "../../services/apis/studentCourse/get";
+import PostComment from "../comment/PostComment";
 
 const columns = [
   { field: "id", headerName: "No", flex: 0.5, resizable: false },
@@ -50,11 +50,15 @@ const columns = [
 ];
 
 export default function FreeBoardData() {
+  const [currentUser, setCurrentUser] = useState(null);
   const [rows, setRows] = useState([]); // 상태 추가
   const [openDrawer, setOpenDrawer] = useState(false); // Drawer 열기 상태
   const [selectedRow, setSelectedRow] = useState(null); // 선택된 행 데이터
-  const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar 열기 상태
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false); // Snackbar 열기 상태
+  const [successMessage, setSuccessMessage] = useState("");
+  const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false); // Snackbar 열기 상태
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [originalRow, setOriginalRow] = useState(null);
   const [boardTypes, setBoardTypes] = useState([]); // 카테고리 상태
   const [boardId, setBoardId] = useState(""); // 선택된 카테고리 ID 상태
@@ -71,6 +75,14 @@ export default function FreeBoardData() {
       console.log(data);
     } catch (error) {
       console.error("Failed to fetch board types:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const userInfoString = localStorage.getItem("userInfo");
+    if (userInfoString) {
+      const userInfo = JSON.parse(userInfoString);
+      setCurrentUser(userInfo);
     }
   }, []);
 
@@ -94,8 +106,6 @@ export default function FreeBoardData() {
   const openUpdateModal = () => setIsUpdateModalOpen(true);
   const closeUpdateModal = () => setIsUpdateModalOpen(false);
 
-  const [boardTypeId, setBoardTypeId] = useState("");
-  const [courseId, setCourseId] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
@@ -111,12 +121,29 @@ export default function FreeBoardData() {
   };
 
   const handleSaveClick = async (updateDTO) => {
-    await updatePost(updateDTO);
-    await fetchData(); // 데이터 새로 고침
-    setIsEditing(false); // 수정 모드 비활성화
-    setIsUpdateModalOpen(false);
-    setSnackbarMessage("게시물이 성공적으로 수정되었습니다."); // 메시지 설정
-    setOpenSnackbar(true); // Snackbar 열기
+    try {
+      await updatePost(updateDTO);
+      await fetchData(); // 데이터 새로 고침
+      setIsEditing(false); // 수정 모드 비활성화
+      setIsUpdateModalOpen(false);
+      setSuccessMessage("게시물이 성공적으로 수정되었습니다."); // 메시지 설정
+      setOpenSuccessSnackbar(true); // Snackbar 열기
+    } catch (error) {
+      console.log(error, "updateError");
+      switch (error.response.status) {
+        case 400:
+          setErrorMessage("게시글의 제목은 필수 입력 사항입니다.");
+          break;
+        case 401:
+          setErrorMessage("수정 권한이 없습니다.");
+          break;
+        default:
+          setErrorMessage("게시글 수정 실패.");
+          break;
+      }
+      closeUpdateModal();
+      setOpenErrorSnackbar(true);
+    }
   };
 
   const handleBoardIdChange = (event) => {
@@ -135,31 +162,37 @@ export default function FreeBoardData() {
     title,
     content,
     boardId,
-    courseId,
   };
 
   const postSave = async () => {
     try {
-      const id = await getCourseId();
-      setCourseId(id);
       await savePost(postForm);
       console.log(postForm, "=======================================");
-      setSnackbarMessage("게시물이 성공적으로 저장되었습니다."); // 메시지 설정
-      setOpenSnackbar(true); // Snackbar 열기
+      setSuccessMessage("게시물이 성공적으로 저장되었습니다."); // 메시지 설정
+      setOpenSuccessSnackbar(true); // Snackbar 열기
       await fetchData(); // 데이터 새로 고침
       closeModal();
-      setBoardTypeId("");
       setTitle("");
+      setBoardId("");
       setContent("");
     } catch (error) {
       console.error("게시물 등록 실패 ");
-      setSnackbarMessage("게시물 저장에 실패했습니다."); // 실패 메시지 설정
-      setOpenSnackbar(true); // Snackbar 열기
+      setSuccessMessage("게시물 저장에 실패했습니다."); // 실패 메시지 설정
+      setTitle("");
+      setBoardId("");
+      setContent("");
+      setOpenSuccessSnackbar(true); // Snackbar 열기
     }
   };
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false); // Snackbar 닫기
+
+  const handleCloseSuccessSnackbar = () => {
+    setOpenSuccessSnackbar(false);
   };
+
+  const handleCloseErrorSnackbar = () => {
+    setOpenErrorSnackbar(false);
+  };
+
   // 체크박스 리스트 받아오기
   const [selectedIds, setSelectedIds] = useState([]); // 선택된 행 ID 상태 추가
   const handleSelectionChange = (newSelection) => {
@@ -169,19 +202,32 @@ export default function FreeBoardData() {
   const deletePost = async (selectedIds) => {
     try {
       await deletePostApi(selectedIds);
-      setSnackbarMessage("게시물이 성공적으로 삭제되었습니다."); // 메시지 설정
-      setOpenSnackbar(true); // Snackbar 열기
+      setSuccessMessage("게시물이 성공적으로 삭제되었습니다."); // 메시지 설정
+      setOpenSuccessSnackbar(true); // Snackbar 열기
       await fetchData(); // 데이터 새로 고침
       closeDeleteModal();
       setOpenDrawer(false);
     } catch (error) {
-      alert(error.response.data);
+      console.log(error, "deleteError");
+      switch (error.response.status) {
+        case 401:
+          setErrorMessage("삭제 권한이 없습니다.");
+          break;
+        default:
+          setErrorMessage("게시글 삭제 실패.");
+          break;
+      }
+      closeDeleteModal();
+      setOpenErrorSnackbar(true);
     }
   };
 
   const handleRowClick = (params) => {
     setSelectedRow(params.row); // 클릭된 행 데이터 저장
     setOpenDrawer(true); // Drawer 열기
+
+    console.log(currentUser.member.id, "currentUserId");
+    console.log(params.row, "selectdRow");
   };
 
   const handleCloseDrawer = () => {
@@ -267,7 +313,12 @@ export default function FreeBoardData() {
               onClick={() => {
                 deletePost(selectedIds);
               }}
-              sx={{ width: "120px", height: "40px" }}
+              sx={{
+                width: "120px",
+                height: "40px",
+                backgroundColor: "#34495e",
+                fontWeight: 600,
+              }}
             >
               삭제하기
             </Button>
@@ -315,12 +366,17 @@ export default function FreeBoardData() {
               onClick={() => {
                 const updateDTO = {
                   id: selectedRow.id,
-                  title: title,
-                  content: content,
+                  title: title || selectedRow.title,
+                  content: content || selectedRow.content,
                 };
                 handleSaveClick(updateDTO);
               }}
-              sx={{ width: "120px", height: "40px" }}
+              sx={{
+                width: "120px",
+                height: "40px",
+                backgroundColor: "#34495e",
+                fontWeight: 600,
+              }}
             >
               수정하기
             </Button>
@@ -513,20 +569,35 @@ export default function FreeBoardData() {
         />
       </Box>
 
-      {/* Snackbar 컴포넌트 */}
+      {/* 성공 Snackbar */}
       <Snackbar
-        open={openSnackbar}
-        autoHideDuration={2500}
-        onClose={handleCloseSnackbar}
+        open={openSuccessSnackbar}
+        autoHideDuration={2200}
+        onClose={handleCloseSuccessSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert
-          onClose={handleCloseSnackbar}
+          onClose={handleCloseSuccessSnackbar}
           severity="success"
-          // variant="outlined"
           sx={{ width: "100%" }}
         >
-          {snackbarMessage}
+          {successMessage}
+        </Alert>
+      </Snackbar>
+
+      {/* 에러 Snackbar */}
+      <Snackbar
+        open={openErrorSnackbar}
+        autoHideDuration={2200}
+        onClose={handleCloseErrorSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseErrorSnackbar}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {errorMessage}
         </Alert>
       </Snackbar>
 
@@ -639,36 +710,41 @@ export default function FreeBoardData() {
                   gap: "12px",
                 }}
               >
-                {isEditing ? (
-                  <Button variant="outlined" onClick={openUpdateModal}>
-                    저장
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleEditClick(selectedRow)}
-                  >
-                    수정
-                  </Button>
-                )}
+                {currentUser &&
+                  currentUser.member &&
+                  currentUser.member.id === selectedRow.authorId && (
+                    <>
+                      {isEditing ? (
+                        <Button variant="outlined" onClick={openUpdateModal}>
+                          저장
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          onClick={() => handleEditClick(selectedRow)}
+                        >
+                          수정
+                        </Button>
+                      )}
 
-                {isEditing ? (
-                  <Button variant="outlined" onClick={handleCancel}>
-                    취소
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outlined"
-                    onClick={() => {
-                      setSelectedIds([selectedRow.id]);
-                      setIsDeleteModalOpen(true);
-                    }}
-                  >
-                    삭제
-                  </Button>
-                )}
+                      {isEditing ? (
+                        <Button variant="outlined" onClick={handleCancel}>
+                          취소
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          onClick={() => {
+                            setSelectedIds([selectedRow.id]);
+                            setIsDeleteModalOpen(true);
+                          }}
+                        >
+                          삭제
+                        </Button>
+                      )}
+                    </>
+                  )}
               </Box>
-
               <Box
                 sx={{
                   borderBottom: "1px solid #d4d4d4",
@@ -678,14 +754,7 @@ export default function FreeBoardData() {
                 }}
               />
 
-              <Typography
-                sx={{
-                  fontSize: "18px",
-                  fontWeight: "600",
-                }}
-              >
-                댓글 0개
-              </Typography>
+              <PostComment postId={selectedRow.id} />
             </Box>
           ) : (
             <Typography>선택된 게시글이 없습니다.</Typography>
