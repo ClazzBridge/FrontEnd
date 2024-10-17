@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Typography, TextField, Box, FormControl, Checkbox, Table, TableBody, TableCell, TableHead, TableRow, Radio, RadioGroup, FormControlLabel } from "@mui/material";
+import { Button, Modal, Typography, TextField, Box, Checkbox, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import apiClient from '../../shared/apiClient';
 
 const ClassroomManager = () => {
@@ -249,7 +249,7 @@ const ClassroomManager = () => {
                         p: 4,
                         backgroundColor: "white",
                         borderRadius: "8px",
-                        maxWidth: "600px",
+                        maxWidth: "400px",
                         margin: "auto",
                         top: "20%",
                         position: "relative",
@@ -263,7 +263,7 @@ const ClassroomManager = () => {
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns: "1fr 1fr",
+                            gridTemplateColumns: "1fr",
                             gap: 2,
                             mt: 2,
                         }}
@@ -278,18 +278,6 @@ const ClassroomManager = () => {
                             error={!!nameError}
                             helperText={nameError}
                         />
-                        {/* 라디오 버튼: 점유여부 선택 */}
-                        <FormControl component="fieldset">
-                            <Typography>점유 여부</Typography>
-                            <RadioGroup
-                                row
-                                value={newEventIsOccupied}
-                                onChange={(e) => setNewEventIsOccupied(e.target.value)}
-                            >
-                                <FormControlLabel value='true' control={<Radio />} label="사용중" /*disabled={!editMode}*/ />
-                                <FormControlLabel value="false" control={<Radio />} label="사용 안함" /*disabled={!editMode}*/ />
-                            </RadioGroup>
-                        </FormControl>
                     </Box>
 
                     {/* 저장 및 취소 버튼 */}

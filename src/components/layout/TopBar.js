@@ -152,6 +152,7 @@ const TopBar = ({ open }) => {
 
   const handleLogoutClick = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
     Cookies.remove("refreshToken");
     console.log("토큰 제거 ", localStorage.getItem("token"));
     window.location.reload();

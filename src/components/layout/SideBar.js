@@ -27,7 +27,6 @@ import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import EventSeatOutlinedIcon from '@mui/icons-material/EventSeatOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import apiClient from "../../shared/apiClient";
-import { jwtDecode } from "jwt-decode";
 import { useState } from "react";
 
 
@@ -43,13 +42,13 @@ const SideBar = ({ open, handleDrawerToggle }) => {
     const fetchRole = async () => {
       try {
         const token = localStorage.getItem('token'); // localStorage에서 token 가져오기
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         if (!token) {
           console.log('No token found in localStorage');
           return;
         }
 
-        const decodedToken = jwtDecode(token); // jwtDecode로 토큰 디코딩
-        const id = decodedToken.id;
+        const id = userInfo.member.id;
 
         // API 요청 보내기
         const response = await apiClient.get(`user/check/${id}`);

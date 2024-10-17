@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode"; // named export로 임포트
 import apiClient from "../../shared/apiClient";
 
 import {
@@ -40,13 +39,12 @@ const ProfileForm = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     console.log("=================> 프로필 확인", token);
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     if (token) {
       try {
-        const decodedToken = jwtDecode(token); // jwtDecode 사용
-        const userId = decodedToken.id; // userId 추출
 
-        console.log("토큰 디코더", decodedToken);
-        console.log("id 추출", userId);
+        const userId = userInfo.member.id; // userId 추출
+
         apiClient
           .get(`userlist/${userId}`)
           .then((response) => {

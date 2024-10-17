@@ -47,10 +47,37 @@ const Calendars = () => {
   const [events, setEvents] = useState([]);
   const [courseOptions, setcourseOptions] = useState([]); // 강의 옵션 상태
 
+  // role 상태
+  const [role, setType] = useState("");
+
+
+
   useEffect(() => {
     // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
     fetchEvents();
     fetchcourses();
+    const fetchRole = async () => {
+      try {
+        const token = localStorage.getItem('token'); // localStorage에서 token 가져오기
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        if (!token) {
+          console.log('No token found in localStorage');
+          return;
+        }
+
+        const id = userInfo.member.id;
+
+        // API 요청 보내기
+        const response = await apiClient.get(`user/check/${id}`);
+        console.log("Fetched role:", response.data); // 받은 role 확인
+
+        setType(response.data); // 받은 role을 상태로 저장
+      } catch (error) {
+        console.error('Error fetching role:', error);
+      }
+    };
+
+    fetchRole();
   }, []); // 빈 배열로 처음에 한 번만 실행
 
   const fetchEvents = () => {
@@ -204,11 +231,13 @@ const Calendars = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
-      <div style={{ height: '80vh' }}>
-        <Button variant="outlined" color="secondary" onClick={handleAddEvent} style={{ marginBottom: '10px' }}>
-          일정 추가
-        </Button>
 
+      <div style={{ height: '80vh' }}>
+        {role === "ROLE_ADMIN" ?
+          <Button variant="outlined" color="secondary" onClick={handleAddEvent} style={{ marginBottom: '10px' }}>
+            일정 추가
+          </Button>
+          : ""}
         <Calendar
           localizer={localizer}
           events={events.map(event => ({
@@ -327,23 +356,25 @@ const Calendars = () => {
                   종료 시간: {selectedEvent ? moment(selectedEvent.end).format('YYYY.MM.DD HH:mm') : ''}
                 </Typography>
 
-                <div style={{ marginTop: '20px' }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleEditEvent}
-                    style={{ marginRight: '10px' }}
-                  >
-                    변경
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleDeleteEvent}
-                  >
-                    삭제
-                  </Button>
-                </div>
+                {role === "ROLE_ADMIN" ?
+                  <div style={{ marginTop: '20px' }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleEditEvent}
+                      style={{ marginRight: '10px' }}
+                    >
+                      변경
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={handleDeleteEvent}
+                    >
+                      삭제
+                    </Button>
+                  </div>
+                  : ""}
               </>
             )}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
@@ -356,6 +387,7 @@ const Calendars = () => {
                 닫기
               </Button>
             </Box>
+
           </div>
         </Modal>
       </div>
