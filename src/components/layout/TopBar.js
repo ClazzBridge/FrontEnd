@@ -140,9 +140,11 @@ const TopBar = ({ open }) => {
   };
 
   const handleGitHubClick = () => {
-    // const githubUrl = userInfo.member.githubUrl; // 유저 데이터에서 깃허브 URL 가져오기
+    localStorage.getItem('userInfo');
+    const githubUrl = userInfo.member.gitUrl; // 유저 데이터에서 깃허브 URL 가져오기
     // window.open(githubUrl, "_blank");
-    window.open("https://github.com/", "_blank");
+    console.log(githubUrl)
+    window.open(githubUrl);
   };
 
   const handleProfileClick = () => {
