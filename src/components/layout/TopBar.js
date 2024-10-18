@@ -13,7 +13,6 @@ import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNone
 import { Box, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
-import profileImage4 from "../../assets/images/image4.jpeg";
 import Cookies from "js-cookie";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import Stack from "@mui/material/Stack";
@@ -140,9 +139,11 @@ const TopBar = ({ open }) => {
   };
 
   const handleGitHubClick = () => {
-    // const githubUrl = userInfo.member.githubUrl; // 유저 데이터에서 깃허브 URL 가져오기
+    localStorage.getItem("userInfo");
+    const githubUrl = userInfo.member.gitUrl; // 유저 데이터에서 깃허브 URL 가져오기
     // window.open(githubUrl, "_blank");
-    window.open("https://github.com/", "_blank");
+    console.log(githubUrl);
+    window.open(githubUrl);
   };
 
   const handleProfileClick = () => {
@@ -152,6 +153,7 @@ const TopBar = ({ open }) => {
 
   const handleLogoutClick = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
     Cookies.remove("refreshToken");
     console.log("토큰 제거 ", localStorage.getItem("token"));
     window.location.reload();
@@ -306,7 +308,7 @@ const TopBar = ({ open }) => {
             >
               <LightTooltip title="내 정보">
                 <Avatar
-                  src={profileImage4}
+                  src={userInfo.member.profileImageUrl}
                   sx={{ width: "40px", height: "40px", marginLeft: "8px" }}
                 />
               </LightTooltip>

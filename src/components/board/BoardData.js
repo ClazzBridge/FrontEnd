@@ -303,13 +303,17 @@ export default function FreeBoardData() {
             <Button
               variant="outlined"
               onClick={closeDeleteModal}
-              sx={{ width: "120px", height: "40px" }}
+              sx={{
+                width: "120px",
+                height: "40px",
+                borderColor: "#34495e",
+                color: "#34495e",
+              }}
             >
               취소
             </Button>
             <Button
               variant="contained"
-              color="info"
               onClick={() => {
                 deletePost(selectedIds);
               }}
@@ -712,7 +716,8 @@ export default function FreeBoardData() {
               >
                 {currentUser &&
                   currentUser.member &&
-                  currentUser.member.id === selectedRow.authorId && (
+                  (currentUser.member.id === selectedRow.authorId ||
+                    currentUser.member.memberType === "ROLE_ADMIN") && (
                     <>
                       {isEditing ? (
                         <Button variant="outlined" onClick={openUpdateModal}>
