@@ -359,16 +359,14 @@ const Calendars = () => {
                 {role === "ROLE_ADMIN" ?
                   <div style={{ marginTop: '20px' }}>
                     <Button
-                      variant="contained"
-                      color="primary"
+                      variant="outlined"
                       onClick={handleEditEvent}
                       style={{ marginRight: '10px' }}
                     >
                       변경
                     </Button>
                     <Button
-                      variant="contained"
-                      color="secondary"
+                      variant="outlined"
                       onClick={handleDeleteEvent}
                     >
                       삭제
@@ -379,11 +377,11 @@ const Calendars = () => {
             )}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               {editMode && (
-                <Button onClick={handleSaveEvent} color="primary" variant="contained" sx={{ mr: 1 }}>
+                <Button onClick={handleSaveEvent} variant="outlined" sx={{ mr: 1 }}>
                   저장
                 </Button>
               )}
-              <Button onClick={handleClose} color="secondary" variant="contained">
+              <Button onClick={handleClose} variant="outlined">
                 닫기
               </Button>
             </Box>

@@ -26,7 +26,6 @@ import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import EventSeatOutlinedIcon from '@mui/icons-material/EventSeatOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
-import apiClient from "../../shared/apiClient";
 import { useState } from "react";
 
 
@@ -41,20 +40,9 @@ const SideBar = ({ open, handleDrawerToggle }) => {
   useEffect(() => {
     const fetchRole = async () => {
       try {
-        const token = localStorage.getItem('token'); // localStorage에서 token 가져오기
-        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        if (!token) {
-          console.log('No token found in localStorage');
-          return;
-        }
+        const role = localStorage.getItem("membertype");
+        setType(role)
 
-        const id = userInfo.member.id;
-
-        // API 요청 보내기
-        const response = await apiClient.get(`user/check/${id}`);
-        console.log("Fetched role:", response.data); // 받은 role 확인
-
-        setType(response.data); // 받은 role을 상태로 저장
       } catch (error) {
         console.error('Error fetching role:', error);
       }

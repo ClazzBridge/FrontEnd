@@ -136,7 +136,8 @@ const ProfileForm = () => {
         const { authResponseDTO: member } = response.data;
         setUserInfo({ member });
         localStorage.setItem("userInfo", JSON.stringify({ member })); // 로컬 스토리지에 저장
-        console.log("reponse=====>", response.data)
+        localStorage.setItem("userId", member.id); // 로컬 스토리지에 저장
+        localStorage.setItem("membertype", member.memberType); // 로컬 스토리지에 저장
 
       })
       .catch((error) => {
