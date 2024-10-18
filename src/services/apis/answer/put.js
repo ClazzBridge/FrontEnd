@@ -1,4 +1,4 @@
-import axios from "../../../shared/apiClient";
+import apiClient from "../../../shared/apiClient";
 
 export const updateAnswerApi = async (data) => {
   const { content, questionId } = data;
@@ -9,7 +9,7 @@ export const updateAnswerApi = async (data) => {
   };
 
   try {
-    const response = await axios.put(`answers`, updatedAnswer);
+    const response = await apiClient.put(`qnas/answers`, updatedAnswer);
     return response.data;
   } catch (error) {
     console.error("Error fetching answer:", error);

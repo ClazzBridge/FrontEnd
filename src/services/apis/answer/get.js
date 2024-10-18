@@ -1,8 +1,8 @@
-import axios from "../../../shared/apiClient";
+import apiClient from "../../../shared/apiClient";
 
 export const getAnswersByQuestionIdApi = async (questionId) => {
   try {
-    const response = await axios.get(`answers/${questionId}`);
+    const response = await apiClient.get(`qnas/answers/${questionId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching answers:", error);

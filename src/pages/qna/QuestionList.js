@@ -9,23 +9,20 @@ import {
   Paper,
   Button,
 } from "@mui/material"; // MUI 컴포넌트 import
-import axios from "axios"; // 데이터 통신용 Axios import
 import Pagination from "@mui/material/Pagination"; // 페이지네이션 컴포넌트 import
 import { Routes, Route, Link } from "react-router-dom";
 import QuestionDetail from "./QuestionDetail";
+import apiClient from "../../shared/apiClient";
 
 function QuestionList() {
   const [questions, setQuestions] = useState([]); // 질문 목록 상태
   const [page, setPage] = useState(1); // 현재 페이지 상태
   const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수 상태
 
-  axios.defaults.baseURL = "http://localhost:8080";
-
-
-  // 서버로부터 질문 목록을 가져오는 함수 (Axios 사용)
+  // 서버로부터 질문 목록을 가져오는 함수 (apiClient 사용)
   const fetchQuestions = async (page) => {
     try {
-      const response = await axios.get(`api/questions?page=${page}`);
+      const response = await apiClient.get(`qnas/questions`);
       setQuestions(response.data.questions);
       setTotalPages(response.data.totalPages);
     } catch (error) {
