@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import apiClient from "../../shared/apiClient";
 import { jwtDecode } from "jwt-decode";
 import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
@@ -41,6 +41,8 @@ function ProfileCard({
   onRegisterSeatClick,
   userHasSeat,
   isTeacher,
+  isStudent,
+  isAdmin,
 }) {
   const isGoodOnline = isOnline === true;
   const isOffline = isOnline === false;
@@ -92,7 +94,7 @@ function ProfileCard({
             ? "1px solid #28a745"
             : !isOffline && isSelf && !isUnderstanding
               ? "1px solid transparent"
-              : !isOffline && role === "ROLE_TEACHER" && isUnderstanding
+              : !isOffline && isTeacher && isUnderstanding
                 ? "1px solid #28a745"
                 : "none",
         backgroundImage:
@@ -102,22 +104,24 @@ function ProfileCard({
         backgroundOrigin: "border-box",
         backgroundClip: "content-box, border-box",
         filter: isEmpty || isOffline ? "grayscale(100%)" : "none",
-        cursor: isTeacher
-          ? "default"
-          : isEmpty && !userHasSeat
-            ? "pointer"
-            : "default",
-        pointerEvents: isTeacher
-          ? "auto"
-          : isEmpty && userHasSeat
+        cursor:
+          isTeacher || isAdmin || userHasSeat
+            ? "default"
+            : isEmpty && !userHasSeat
+              ? "pointer"
+              : "default",
+        pointerEvents:
+          isEmpty && (isTeacher || isAdmin || userHasSeat)
             ? "none"
-            : "auto",
+            : isTeacher || isAdmin || isStudent
+              ? "auto"
+              : "none",
       }}
       onClick={
         isTeacher
           ? () =>
               openModal(seatId, name, email, github, phone, bio, imgSrc, isSelf)
-          : isEmpty && !userHasSeat
+          : isEmpty && !userHasSeat && !isTeacher && !isAdmin
             ? onRegisterSeatClick
             : () =>
                 openModal(
@@ -172,7 +176,7 @@ function ProfileCard({
               alignItems: "center",
             }}
           >
-            {isEmpty && !userHasSeat && !isTeacher ? (
+            {isEmpty && isSelf && (!userHasSeat || !isTeacher || !isAdmin) ? (
               <AddIcon
                 sx={{
                   position: "absolute",
@@ -182,7 +186,7 @@ function ProfileCard({
                   marginTop: "50px",
                 }}
               />
-            ) : !isEmpty || isTeacher ? (
+            ) : !isEmpty ? (
               <StyledBadge
                 overlap="circular"
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
@@ -216,7 +220,7 @@ function ProfileCard({
             ) : null}
           </Box>
         </Stack>
-        {(!isEmpty || isTeacher) && (
+        {(!isEmpty || isTeacher || isAdmin) && (
           <Typography
             sx={{
               marginTop: "4px",
@@ -244,7 +248,8 @@ export default function StudentRoom() {
   const [profiles, setProfiles] = useState([]);
   const [userSeat, setUserSeat] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
-  const [showSeatManagementDialog, setShowSeatManagementDialog] = useState(false);
+  const [showSeatManagementDialog, setShowSeatManagementDialog] =
+    useState(false);
   const [seatManagementMode, setSeatManagementMode] = useState("register"); // "register" 또는 "modify"
   const [seatCount, setSeatCount] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -253,10 +258,7 @@ export default function StudentRoom() {
     if (!currentUser) return;
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8080/api/seat/", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await apiClient.get("seat/");
       const allProfiles = response.data;
 
       const studentProfiles = allProfiles.filter(
@@ -279,10 +281,16 @@ export default function StudentRoom() {
     const token = localStorage.getItem("token");
     if (token) {
       const decodedToken = jwtDecode(token);
+
+      console.log("decodedToken:", decodedToken); // 전체 토큰 정보 확인용
+      const memberType = decodedToken.role; // role을 memberType으로 사용
+
       setCurrentUser({
-        memberId: decodedToken.sub,
-        memberType: decodedToken.memberType,
+        memberId: decodedToken.id, // id를 memberId로 설정
+        memberType: memberType, // "ROLE_STUDENT"과 같은 역할 설정
       });
+
+      console.log("memberType:", memberType); // 확인용 로그
     }
   }, []);
 
@@ -311,17 +319,17 @@ export default function StudentRoom() {
       bio,
       imgSrc,
       isSelf,
+      memberId: currentUser.memberId,
     });
+
+    console.log("isSelf in openProfileModal:", isSelf);
+
     setOpen(true);
   };
 
   const handleReleaseSeat = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(
-        `http://localhost:8080/api/seat/${currentProfile.seatId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await apiClient.delete(`seat/${currentProfile.seatId}`);
       console.log(`${currentProfile.seatId}번 좌석이 해제되었습니다.`);
       fetchData();
       setOpen(false);
@@ -341,13 +349,29 @@ export default function StudentRoom() {
   };
 
   const handleConfirmRegisterSeat = async () => {
+    console.log("Current User:", currentUser);
+
+    if (!currentUser || !currentUser.memberId) {
+      console.error("currentUser 또는 memberId가 설정되지 않았습니다.");
+      return;
+    }
+
+    if (currentUser.memberType !== "ROLE_STUDENT") {
+      console.error("학생만 좌석에 등록할 수 있습니다.");
+      return;
+    }
+
+    const seatUpdateDTO = {
+      id: selectedSeat,
+      seatNumber: selectedSeat,
+      memberId: currentUser.memberId,
+    };
+
+    console.log("Sending request data:", seatUpdateDTO);
+    console.log("selectedSeat:", selectedSeat);
+
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8080/api/seat/${selectedSeat}/${currentUser.memberId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await apiClient.put("seat/assign", seatUpdateDTO);
       console.log(
         `${selectedSeat}번 좌석에 ${currentUser.memberId} 등록되었습니다.`
       );
@@ -370,16 +394,15 @@ export default function StudentRoom() {
 
   const handleSeatManagement = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const endpoint = seatManagementMode === "register" 
-        ? "http://localhost:8080/api/seat/register"
-        : "http://localhost:8080/api/seat/modify";
-      
-      await axios.post(endpoint, { seatCount }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      console.log(`${seatCount}개의 좌석이 ${seatManagementMode === "register" ? "등록" : "수정"}되었습니다.`);
+      const endpoint =
+        seatManagementMode === "register" ? "seat/register" : "seat/modify";
+
+      await apiClient.post(endpoint, { seatCount });
+      console.log(
+        `${seatCount}개의 좌석이 ${
+          seatManagementMode === "register" ? "등록" : "수정"
+        }되었습니다.`
+      );
       setShowSeatManagementDialog(false);
       fetchData();
     } catch (error) {
@@ -422,50 +445,51 @@ export default function StudentRoom() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
-          gap: "8px 16px",
+          gridTemplateColumns: "repeat(auto-fit, 200px)", // 각 카드 너비를 200px로 고정
+          gap: "12px", // 카드 간격을 좁게 설정
           padding: "16px",
-          maxWidth: "1200px",
+          justifyContent: "center", // 가운데 정렬로 간격 유지
+          maxWidth: "1400px", // 화면에 맞게 조정
           margin: "0 auto",
         }}
       >
         {profiles.map((profile, index) => (
-          <React.Fragment key={profile.id}>
-            <ProfileCard
-              seatId={profile.id}
-              name={profile.memberDTO ? profile.memberDTO.name : ""}
-              imgSrc={
-                profile.memberDTO
-                  ? profile.memberDTO.pictureUrl
-                  : ""
-              }
-              email={profile.memberDTO ? profile.memberDTO.email : ""}
-              github={profile.memberDTO ? profile.memberDTO.gitUrl : ""}
-              phone={profile.memberDTO ? profile.memberDTO.phone : ""}
-              bio={profile.memberDTO ? profile.memberDTO.bio : ""}
-              isOnline={profile.isOnline}
-              isUnderstanding={
-                profile.memberDTO?.studentStatusDTO?.isUnderstanding ?? false
-              }
-              isHandRaised={
-                profile.memberDTO?.studentStatusDTO?.isHandRaised ?? false
-              }
-              isSelf={
-                profile.memberDTO &&
-                profile.memberDTO.memberId === currentUser.memberId
-              }
-              isEmpty={!profile.memberDTO}
-              openModal={openProfileModal}
-              role={currentUser.memberType}
-              onRegisterSeatClick={() => handleRegisterSeatClick(profile.id)}
-              userHasSeat={
-                userSeat !== null || currentUser.memberType === "ROLE_TEACHER"
-              }
-            />
-            {(index + 1) % 3 === 0 && (index + 1) % 6 !== 0 && (
-              <div style={{ width: "32px" }} />
+          <ProfileCard
+            key={profile.id}
+            seatId={profile.id}
+            name={profile.member ? profile.member.name : ""}
+            imgSrc={profile.member ? profile.member.pictureUrl : ""}
+            email={profile.member ? profile.member.email : ""}
+            github={profile.member ? profile.member.gitUrl : ""}
+            phone={profile.member ? profile.member.phone : ""}
+            bio={profile.member ? profile.member.bio : ""}
+            isOnline={profile.isOnline}
+            isUnderstanding={
+              profile.member?.studentStatusDTO?.isUnderstanding ?? false
+            }
+            isHandRaised={
+              profile.member?.studentStatusDTO?.isHandRaised ?? false
+            }
+            isSelf={
+              profile.member && profile.member.id === currentUser.memberId
+            }
+            onLoad={console.log(
+              "profile" +
+                profile.member +
+                "\n currentUser" +
+                currentUser.memberId
             )}
-          </React.Fragment>
+            isEmpty={!profile.member}
+            openModal={openProfileModal}
+            role={currentUser.memberType}
+            onRegisterSeatClick={() => handleRegisterSeatClick(profile.id)}
+            userHasSeat={
+              userSeat !== null && currentUser.memberType === "ROLE_STUDENT"
+            }
+            isAdmin={currentUser.memberType === "ROLE_ADMIN"}
+            isTeacher={currentUser.memberType === "ROLE_TEACHER"}
+            isStudent={currentUser.memberType === "ROLE_STUDENT"}
+          />
         ))}
       </div>
 
@@ -571,14 +595,15 @@ export default function StudentRoom() {
       </Dialog>
 
       {/* 좌석 관리 다이얼로그 */}
-      <Dialog open={showSeatManagementDialog} onClose={() => setShowSeatManagementDialog(false)}>
+      <Dialog
+        open={showSeatManagementDialog}
+        onClose={() => setShowSeatManagementDialog(false)}
+      >
         <DialogTitle>
           {seatManagementMode === "register" ? "좌석 등록" : "좌석 수정"}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            등록할 좌석 수를 입력하세요:
-          </DialogContentText>
+          <DialogContentText>등록할 좌석 수를 입력하세요:</DialogContentText>
           <TextField
             autoFocus
             margin="dense"
@@ -591,32 +616,14 @@ export default function StudentRoom() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowSeatManagementDialog(false)} color="secondary">
+          <Button
+            onClick={() => setShowSeatManagementDialog(false)}
+            color="secondary"
+          >
             취소
           </Button>
           <Button onClick={handleSeatManagement} color="primary">
             {seatManagementMode === "register" ? "등록" : "수정"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* 재등록 확인 다이얼로그 */}
-      <Dialog open={showConfirmDialog} onClose={() => setShowConfirmDialog(false)}>
-        <DialogTitle>좌석 재등록</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            이미 좌석이 등록되어 있습니다. 재등록 하시겠습니까?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowConfirmDialog(false)} color="secondary">
-            취소
-          </Button>
-          <Button onClick={() => {
-            setShowConfirmDialog(false);
-            setShowSeatManagementDialog(true);
-          }} color="primary">
-            예
           </Button>
         </DialogActions>
       </Dialog>
