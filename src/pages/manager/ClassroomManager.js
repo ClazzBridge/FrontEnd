@@ -109,6 +109,10 @@ const ClassroomManager = () => {
             alert("이미 등록된 강의실입니다.");
             return;
         }
+        if (newClassroom.name.length < 2) {
+            alert("두 글자 이상 입력해주세요.")
+            return;
+        }
 
         if (editMode) {
             updateClassroom(newClassroom);
@@ -248,10 +252,9 @@ const ClassroomManager = () => {
                     }}
                     rows={events} // 데이터
                     columns={[
-                        { width: 30 },
-                        { field: 'id', headerName: '번호', width: 100 },
-                        { field: 'name', headerName: '강의실명', width: 250 },
-                        { field: 'isOccupied', headerName: '점유여부', width: 200 },
+                        { field: 'id', headerName: '번호', flex: 1 },
+                        { field: 'name', headerName: '강의실명', flex: 5 },
+                        { field: 'isOccupied', headerName: '점유여부', flex: 1 },
                     ]}
                     initialState={{
                         pagination: {
