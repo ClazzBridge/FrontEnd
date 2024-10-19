@@ -158,7 +158,7 @@ const SideBar = ({ open, handleDrawerToggle }) => {
           title: "강의관리",
           notifications: 4,
           icon: <SchoolOutlinedIcon />,
-          link: "/memberManager",
+          link: "/courseManager",
         },
         {
           title: "강의실관리",
