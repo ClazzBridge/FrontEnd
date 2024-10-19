@@ -74,6 +74,7 @@ const Router = ({ isLoggedIn }) => {
 
         {/* 유저관리 */}
         <Route path="memberManager" element={<MemberManager />} />
+        <Route path="memberManager" element={<MemberManager />} />
         <Route path="classroomManager" element={<ClassroomManager />} />
 
       </Route>
