@@ -19,3 +19,23 @@ export const getAllPosts = async () => {
     throw error;
   }
 };
+
+export const getUserCourseFreePosts = async () => {
+  try {
+    const response = await axios.get(`posts/users/me/courses/freePosts`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching post:", error);
+    throw error;
+  }
+};
+
+export const getUserCourseNotifications = async () => {
+  try {
+    const response = await axios.get(`posts/users/me/courses/notification`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching post:", error);
+    throw error;
+  }
+};
