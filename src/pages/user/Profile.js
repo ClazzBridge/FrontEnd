@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode"; // named export로 임포트
-import { MuiTelInput } from "mui-tel-input";
 import apiClient from "../../shared/apiClient";
 
 import {
@@ -31,7 +30,7 @@ const ProfileForm = () => {
     phone: "",
     gitUrl: "",
     bio: "",
-    profileImage: "", // 프로필 이미지 ID 초기값
+    avatarImage: "", // 프로필 이미지 ID 초기값
     privacy: "private", // 공개/비공개 기본값 설정
   });
 
@@ -49,7 +48,7 @@ const ProfileForm = () => {
         console.log("토큰 디코더", decodedToken);
         console.log("id 추출", userId);
         apiClient
-          .get(`http://localhost:8080/api/userlist/${userId}`)
+          .get(`userlist/${userId}`)
           .then((response) => {
             console.log("서버에서 받은 응답:", response.data);
             setProfile(response.data);
@@ -65,8 +64,8 @@ const ProfileForm = () => {
     }
   }, []);
 
-  const selectedAvatar = profile.profileImage.id
-    ? profile.profileImage.pictureUrl
+  const selectedAvatar = profile.avatarImage.id
+    ? profile.avatarImage.avatarImageUrl
     : avatar1; // 기본 아바타 설정
 
   if (loading) {
@@ -74,6 +73,7 @@ const ProfileForm = () => {
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phonePattern = /^(01[016789])-\d{3,4}-\d{4}$/;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,21 +81,18 @@ const ProfileForm = () => {
       const updatedProfile = { ...prevState, [name]: value };
       let newError = "";
       if (
-        (name === "password" || name === "confirmPassword") &&
+        (name === "password" && name === "confirmPassword") &&
         updatedProfile.password !== updatedProfile.confirmPassword
       ) {
         newError = "비밀번호가 일치하지 않습니다.";
       } else if (name === "email" && !emailPattern.test(value)) {
         newError = "올바른 이메일 형식이 아닙니다.";
+      } else if (name === "phone" && !phonePattern.test(value)) {
+        newError = "올바른 전화번호 형식이 아닙니다.";
       }
       setError(newError);
       return updatedProfile;
     });
-  };
-
-  const handlePhoneChange = (newValue) => {
-    // 전화번호 값을 업데이트
-    setProfile((prevState) => ({ ...prevState, phone: newValue }));
   };
 
   const handlePrivacyChange = (e) => {
@@ -115,15 +112,9 @@ const ProfileForm = () => {
       return;
     }
 
-    // 로컬 스토리지에서 JWT 토큰을 가져옵니다.
-    const token = localStorage.getItem("token"); // 저장된 토큰 키를 확인하세요.
 
     apiClient
-      .put("http://localhost:8080/api/userlist/update", profile, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Bearer 토큰 방식으로 추가
-        },
-      })
+      .put("userlist", profile)
       .then((response) => {
         alert("변경되었습니다.");
       })
@@ -238,11 +229,16 @@ const ProfileForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <MuiTelInput
+                <TextField
+                  variant="outlined"
                   value={profile.phone || ""}
-                  onChange={handlePhoneChange}
+                  onChange={handleChange}
                   label="전화번호"
-                  defaultCountry="KR"
+                  name="phone"
+                  error={!!error && error === "올바른 전화번호 형식이 아닙니다."}
+                  helperText={
+                    error === "올바른 전화번호 형식이 아닙니다." ? error : ""
+                  }
                   fullWidth
                 />
               </Grid>
@@ -299,7 +295,7 @@ const ProfileForm = () => {
               color="primary"
               sx={{ mt: 3, mb: 2 }}
             >
-              Save
+              수정
             </Button>
           </Box>
         </Box>

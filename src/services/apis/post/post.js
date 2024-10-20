@@ -1,18 +1,18 @@
 import axios from "../../../shared/apiClient";
 
-export const savePost = async (testData) => {
-  const { title, content, boardId } = testData;
-  console.log(testData, "입력 데이터 ");
+export const savePost = async (data) => {
+  const { title, content, boardId, courseId } = data;
   const savedPost = {
     title,
     content,
-    memberId: 13,
     boardId,
-    classroomId: 2,
+    courseId,
   };
 
+  console.log(savePost);
+
   try {
-    const response = await axios.post(`post`, savedPost);
+    const response = await axios.post(`posts`, savedPost);
     return response.data;
   } catch (error) {
     console.error("Error fetching post:", error);
