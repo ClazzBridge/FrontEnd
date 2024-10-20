@@ -1,16 +1,23 @@
-const {createServer} = require("http");
-const chat = require("./chat");
-const {Server} = require("socket.io")
-require("dotenv").config();
+const express = require('express');
+const { createServer } = require('node:http');
+const { join } = require('node:path');
+const { Server } = require('socket.io');
 
-const httpServer = createServer(chat);
-const io = new Server(httpServer, {
-  cors: {
-    origin: "http://localhost:3000"
-  },
+const app = express();
+const server = createServer(app);
+const io = new Server(server);
+
+app.get('/chat', (req, res) => {
+  res.sendFile(join(__dirname, 'index.html'));
+});
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+    console.log('a user disconnected');
+  })
 })
 
-require("../../utils/io")(io);
-httpServer.listen(process.env.PORT, () => {
-  console.log("Listening on port ", process.env.PORT)
-})
+server.listen(3000, () => {
+  console.log('server running at http://localhost:3000');
+});

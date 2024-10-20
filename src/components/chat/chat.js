@@ -1,19 +1,35 @@
-const express = require("express")
-const mongoose = require("mongoose");
-require('dotenv').config()
-const cors = require("cors")
-const chat = express();
-chat.use(cors())
+import React, { useState } from 'react';
+import { TextField, Button, List, ListItem, ListItemText, Box } from '@mui/material';
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  // 연결 성공 시 실행되는 콜백
-  console.log("MongoDB 연결 성공");
-}).catch((err) => {
-  // 연결 실패 시 실행되는 콜백
-  console.error("MongoDB 연결 실패: ", err);
-});
+const ChatComponent = ({handleSubmit, messages}) => {
+  const [inputValue, setInputValue] = useState('');
 
-module.exports = chat
+  return (
+      <Box sx={{ p: 2 }}>
+        <List sx={{ maxHeight: '300px', overflowY: 'auto', backgroundColor: '#f0f0f0', borderRadius: '4px', mb: 2 }}>
+          {messages.map((msg, index) => (
+              <ListItem key={index}>
+                <ListItemText primary={msg} />
+              </ListItem>
+          ))}
+        </List>
+        <form onSubmit={handleSubmit}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <TextField
+                label="Type a message"
+                variant="outlined"
+                fullWidth
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                sx={{ mr: 2 }}
+            />
+            <Button variant="contained" color="primary" type="submit">
+              Send
+            </Button>
+          </Box>
+        </form>
+      </Box>
+  );
+};
+
+export default ChatComponent;
