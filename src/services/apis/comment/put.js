@@ -1,19 +1,13 @@
 import axios from "../../../shared/apiClient";
 
-export const updatePost = async (updateDTO) => {
-  console.log(updateDTO, "입력 데이터 ");
-  const { id, title, content } = updateDTO;
-  const updatePost = {
-    id,
-    title,
-    content,
-  };
+export const updateComment = async (updateDTO) => {
+  console.log(updateDTO, "수정 데이터 ");
 
   try {
-    const response = await axios.put(`posts`, updatePost);
+    const response = await axios.put(`comments`, updateDTO);
     return response.data;
   } catch (error) {
-    console.error("Error fetching post:", error);
+    console.error("Error fetching comments:", error);
     throw error;
   }
 };

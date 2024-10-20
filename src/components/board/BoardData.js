@@ -412,11 +412,17 @@ export default function FreeBoardData() {
               onChange={handleBoardIdChange}
               value={boardId}
             >
-              {boardTypes.map((boardType) => (
-                <MenuItem key={boardType.id} value={boardType.id}>
-                  {boardType.type}
-                </MenuItem>
-              ))}
+              {boardTypes
+                .filter(
+                  (boardType) =>
+                    currentUser?.member?.memberType === "ROLE_ADMIN" ||
+                    boardType.type !== "공지사항"
+                ) // 관리자가 아니면 "공지사항" 제외
+                .map((boardType) => (
+                  <MenuItem key={boardType.id} value={boardType.id}>
+                    {boardType.type}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
 

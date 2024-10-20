@@ -4,19 +4,21 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CustomModal from "./CustomModal";
-import { Box, Button, Alert, Snackbar } from "@mui/material";
-import { deleteComment } from "../../services/apis/comment/delete";
-
-const options = ["수정", "삭제"];
+import { Box, Button } from "@mui/material";
 
 const ITEM_HEIGHT = 48;
 
-export default function LongMenu({ commentId, fetchComments }) {
+export default function LongMenu({
+  commentId,
+  commentContent,
+  onEdit,
+  onDelete,
+  isAdmin, // 관리자인지 여부를 나타내는 prop 추가
+}) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(false); // 모달 상태 추가
   const [selectedCommentId, setSelectedCommentId] = useState(null); // 선택된 댓글 ID 상태 추가
-  const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false); // Snackbar 열기 상태
-  const [successMessage, setSuccessMessage] = useState("");
+
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
@@ -39,21 +41,13 @@ export default function LongMenu({ commentId, fetchComments }) {
   };
 
   const deleteComments = async () => {
-    try {
-      await deleteComment(selectedCommentId);
-      handleModalClose();
-      setSuccessMessage("댓글이 성공적으로 삭제되었습니다."); // 메시지 설정
-      setOpenSuccessSnackbar(true); // Snackbar 열기
-
-      await fetchComments();
-    } catch (error) {
-      alert("삭제실패");
+    if (selectedCommentId) {
+      await onDelete(selectedCommentId); // 댓글 삭제 호출
+      handleModalClose(); // 모달 닫기
     }
   };
 
-  const handleCloseSuccessSnackbar = () => {
-    setOpenSuccessSnackbar(false);
-  };
+  const options = isAdmin ? ["삭제"] : ["수정", "삭제"]; // 관리자는 삭제만, 일반 사용자는 수정과 삭제
 
   return (
     <div>
@@ -90,8 +84,11 @@ export default function LongMenu({ commentId, fetchComments }) {
             onClick={
               option === "삭제"
                 ? () => handleDeleteClick(commentId)
-                : handleClose
-            } // 삭제 클릭 시 commentId 전달
+                : () => {
+                    onEdit(commentId, commentContent); // 수정 클릭 시 onEdit 호출
+                    handleClose();
+                  }
+            }
           >
             {option}
           </MenuItem>
@@ -139,9 +136,7 @@ export default function LongMenu({ commentId, fetchComments }) {
             </Button>
             <Button
               variant="contained"
-              onClick={() => {
-                deleteComments();
-              }}
+              onClick={deleteComments}
               sx={{
                 width: "120px",
                 height: "40px",
@@ -154,21 +149,6 @@ export default function LongMenu({ commentId, fetchComments }) {
           </Box>
         </Box>
       </CustomModal>
-
-      <Snackbar
-        open={openSuccessSnackbar}
-        autoHideDuration={2200}
-        onClose={handleCloseSuccessSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSuccessSnackbar}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }
