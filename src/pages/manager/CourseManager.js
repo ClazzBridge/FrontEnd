@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Typography, TextField, Box, FormControl, InputLabel, Select, MenuItem, Checkbox, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Radio, RadioGroup, FormControlLabel } from "@mui/material";
 import moment from 'moment';
-import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import apiClient from '../../shared/apiClient';
 
@@ -9,11 +9,9 @@ const CourseManager = () => {
     const [open, setOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
-    const [selectedCourses, setSelectedCourses] = useState([]); // ¼±ÅÃÇÑ °­ÀÇ »óÅÂ °ü¸®
+    const [selectedCourses, setSelectedCourses] = useState([]); // ì„ íƒí•œ ê°•ì˜ ìƒíƒœ ê´€ë¦¬
 
-    // Æû ÀÔ·Â »óÅÂ °ü¸®
-    const [newEventId, setNewEventId] = useState(''); // ID Ãß°¡
-    const [newEventInstructor, setNewEventInstructor] = useState('');
+    // í¼ ì…ë ¥ ìƒíƒœ ê´€ë¦¬
     const [newEventClassroom, setNewEventClassroom] = useState('');
     const [newEventTitle, setNewEventTitle] = useState('');
     const [newEventDescription, setNewEventDescription] = useState('');
@@ -22,25 +20,15 @@ const CourseManager = () => {
     const [newEventLayoutImageUrl, setNewEventLayoutImageUrl] = useState('');
 
     const [events, setEvents] = useState([]);
-    const [courseOption, setCourseOption] = useState([]); // °­ÀÇ¸í ¸ñ·Ï »óÅÂ
+    const [classroomOption, setClassroomOption] = useState([]); // ê°•ì˜ì‹¤ ëª©ë¡ ìƒíƒœ
 
-    // ¿¡·¯ »óÅÂ °ü¸®
-    const [nameError, setNameError] = useState('');
-
-    //const validateName = (name) => {
-    //    if (name.length < 2 || name.includes(" ")) {
-    //        setNameError("2±ÛÀÚ ÀÌ»óÀÌ°Å³ª °ø¹éÀÌ µé¾î°¡¸é ¾ÈµË´Ï´Ù.");
-    //        return;
-    //    } else {
-    //        setNameError('');
-    //    }
-    //};
+    // ì—ëŸ¬ ìƒíƒœ ê´€ë¦¬
 
     useEffect(() => {
-        // ÆäÀÌÁö°¡ Ã³À½ ·ÎµåµÉ ¶§ API¿¡¼­ µ¥ÀÌÅÍ¸¦ °¡Á®¿É´Ï´Ù.
+        // í˜ì´ì§€ê°€ ì²˜ìŒ ë¡œë“œë  ë•Œ APIì—ì„œ ë°ì´í„°ë¥¼ ê°€ì ¸ì˜µë‹ˆë‹¤.
         fetchEvents();
-        fetchCourse();
-    }, []); // ºó ¹è¿­·Î Ã³À½¿¡ ÇÑ ¹ø¸¸ ½ÇÇà
+        fetchClassroom();
+    }, []); // ë¹ˆ ë°°ì—´ë¡œ ì²˜ìŒì— í•œ ë²ˆë§Œ ì‹¤í–‰
 
     const fetchEvents = () => {
         apiClient.get('course')
@@ -48,37 +36,36 @@ const CourseManager = () => {
                 const fetchedEvents = response.data.map(event => ({
                     ...event,
                 }));
-                setEvents(fetchedEvents); // 3. »óÅÂ ¾÷µ¥ÀÌÆ®
+                setEvents(fetchedEvents); // 3. ìƒíƒœ ì—…ë°ì´íŠ¸
             })
             .catch(error => {
-                console.error('ÀÌº¥Æ® µ¥ÀÌÅÍ¸¦ ºÒ·¯¿ÀÁö ¸øÇß½À´Ï´Ù.', error);
+                console.error('ì´ë²¤íŠ¸ ë°ì´í„°ë¥¼ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.', error);
             });
     };
 
-    const fetchCourse = () => {
-        // °­ÀÇ¸í ¸ñ·ÏÀ» °¡Á®¿À´Â API È£Ãâ
-        apiClient.get('course/title')
+    const fetchClassroom = () => {
+        // ê°•ì˜ì‹¤ ëª©ë¡ì„ ê°€ì ¸ì˜¤ëŠ” API í˜¸ì¶œ
+        apiClient.get('classroom/name')
             .then(response => {
-                setCourseOption(response.data); // °­ÀÇ¸í ¸ñ·Ï ¼³Á¤
+                setClassroomOption(response.data); // ê°•ì˜ì‹¤ ëª©ë¡ ì„¤ì •
             })
             .catch(error => {
-                console.error('°­ÀÇ¸í ¸ñ·ÏÀ» ºÒ·¯¿ÀÁö ¸øÇß½À´Ï´Ù.', error);
+                console.log(setClassroomOption);
+                console.error('ê°•ì˜ì‹¤ ëª©ë¡ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.', error);
             });
     };
 
-    // Æû ÃÊ±âÈ­
+    // í¼ ì´ˆê¸°í™”
     const resetForm = () => {
-        setNewEventInstructor('');
         setNewEventClassroom('');
         setNewEventTitle('');
         setNewEventDescription('');
         setNewEventStart(moment());
         setNewEventEnd(moment().add(1, 'hour'));
         setNewEventLayoutImageUrl('');
-        setNameError('');
     };
 
-    // ¸ğ´Ş ¿­±â ¹× ´İ±â
+    // ëª¨ë‹¬ ì—´ê¸° ë° ë‹«ê¸°
     const handleOpen = () => {
         setEditMode(false);
         setSelectedEvent(null);
@@ -91,74 +78,73 @@ const CourseManager = () => {
         resetForm();
     };
 
-    // ½Å±Ô °­ÀÇ Ãß°¡
+    // ì‹ ê·œ ê°•ì˜ ì¶”ê°€
     const addCourse = (newCourse) => {
-        apiClient.post('course', newCourse) // ID ¾øÀÌ °­ÀÇ Ãß°¡
+        apiClient.post('course', newCourse) // ID ì—†ì´ ê°•ì˜ ì¶”ê°€
             .then(response => {
-                setEvents([...events, response.data]); // ÀÀ´äÀ¸·Î ¹ŞÀº »õ °­ÀÇ Ãß°¡
-                alert('°­ÀÇ°¡ Ãß°¡µÇ¾ú½À´Ï´Ù.');
+                setEvents([...events, response.data]); // ì‘ë‹µìœ¼ë¡œ ë°›ì€ ìƒˆ ê°•ì˜ ì¶”ê°€
+                alert('ê°•ì˜ê°€ ì¶”ê°€ë˜ì—ˆìŠµë‹ˆë‹¤');
                 handleClose();
-                fetchEvents(); // Ãß°¡ ÈÄ ÀÌº¥Æ® ¸ñ·Ï »õ·Î °íÄ§
+                fetchEvents(); // ì¶”ê°€ í›„ ì´ë²¤íŠ¸ ëª©ë¡ ìƒˆë¡œ ê³ ì¹¨
             })
             .catch(error => {
-                console.error('°­ÀÇ Ãß°¡¿¡ ½ÇÆĞÇß½À´Ï´Ù.', error);
+                console.log(newCourse);
+                console.error('ê°•ì˜ ì¶”ê°€ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤.', error);
             });
     };
 
-    // ±âÁ¸ È¸¿ø ¼öÁ¤
+    // ê¸°ì¡´ ê°•ì˜ ìˆ˜ì •
     const updateCourse = (updatedCourse) => {
-        apiClient.put('course', updatedCourse) // ID Æ÷ÇÔÇÏ¿© ¼öÁ¤
+        apiClient.put('course', updatedCourse) // ID í¬í•¨í•˜ì—¬ ìˆ˜ì •
             .then(response => {
                 const updatedEvents = events.map(event =>
                     event.id === selectedEvent.id ? { ...event, ...updatedCourse } : event
                 );
                 setEvents(updatedEvents);
-                alert('°­ÀÇ Á¤º¸°¡ ¼öÁ¤µÇ¾ú½À´Ï´Ù.');
+                alert('ê°•ì˜ ì •ë³´ê°€ ìˆ˜ì •ë˜ì—ˆìŠµë‹ˆë‹¤.');
                 handleClose();
-                fetchEvents(); // ¼öÁ¤ ÈÄ ÀÌº¥Æ® ¸ñ·Ï »õ·Î °íÄ§
+                fetchEvents(); // ìˆ˜ì • í›„ ì´ë²¤íŠ¸ ëª©ë¡ ìƒˆë¡œ ê³ ì¹¨
             })
             .catch(error => {
-                console.error('°­ÀÇ ¼öÁ¤¿¡ ½ÇÆĞÇß½À´Ï´Ù.', error);
+                console.error('ê°•ì˜ ìˆ˜ì •ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤.', error);
             });
     };
 
-    // ÀÌº¥Æ® Ãß°¡ ¶Ç´Â ¾÷µ¥ÀÌÆ® ÇÚµé·¯
+    // ì´ë²¤íŠ¸ ì¶”ê°€ ë˜ëŠ” ì—…ë°ì´íŠ¸ í•¸ë“¤ëŸ¬
     const handleSaveEvent = () => {
         const newCourse = {
-            id: newEventId,
-            instructor: newEventInstructor,
-            classroom: newEventClassroom,
+            classroomName: newEventClassroom,
             title: newEventTitle,
             description: newEventDescription,
-            startDate: newEventStart.format("YYYY-MM-DD HH:mm"),
-            endDate: newEventEnd.format("YYYY-MM-DD HH:mm"),
+            startDate: newEventStart.format("YYYY-MM-DD"),
+            endDate: newEventEnd.format("YYYY-MM-DD"),
             layoutImageUrl: newEventLayoutImageUrl,
         };
 
         if (editMode) {
-            // ¼öÁ¤
-            updateCourse(newCourse); // ID¸¦ Àü´Ş
+            // ìˆ˜ì •
+            updateCourse(newCourse); // IDì—†ì´ ê°•ì˜ ì¶”ê°€
         } else {
-            // Ãß°¡
+            // ì¶”ê°€
             addCourse(newCourse);
         }
     };
 
-    // È¸¿ø »èÁ¦ ÇÚµé·¯
+    // ê°•ì˜ ì‚­ì œ í•¸ë“¤ëŸ¬
     const deleteSelectedCourse = () => {
-        // ¼±ÅÃµÈ È¸¿ø ¼ö¸¦ È®ÀÎ
+        // ì„ íƒëœ ê°•ì˜ ìˆ˜ë¥¼ í™•ì¸
         const courseCount = selectedCourses.length;
 
         if (courseCount === 0) {
-            alert("»èÁ¦ÇÒ °­ÀÇ¸¦ ¼±ÅÃÇÏ¼¼¿ä");
+            alert("ì‚­ì œí•  ê°•ì˜ë¥¼ ì„ íƒí•˜ì„¸ìš”.");
             return;
         }
 
-        const confirmation = window.confirm(`¼±ÅÃµÈ °­ÀÇ ${courseCount}¸íÀ» »èÁ¦ÇÏ½Ã°Ú½À´Ï±î?`); // window.confirm ÆË¾÷Ã¢
+        const confirmation = window.confirm(`ì„ íƒëœ ê°•ì˜ ${courseCount}ê°œë¥¼ ì‚­ì œí•˜ì‹œê² ìŠµë‹ˆê¹Œ?`); // window.confirm íŒì—…ì°½
 
         if (confirmation) {
             const deletePromises = selectedCourses.map(id => {
-                console.log("Deleting course with ID:", id); // »èÁ¦ÇÒ courseId È®ÀÎ
+                console.log("Deleting course with ID:", id); // ì‚­ì œí•  courseId í™•ì¸
                 return apiClient.delete(`course/${id}`);
             });
 
@@ -166,32 +152,30 @@ const CourseManager = () => {
                 .then(() => {
                     const updatedEvents = events.filter(event => !selectedCourses.includes(event.id));
                     setEvents(updatedEvents);
-                    setSelectedCourses([]); // ¼±ÅÃÇÑ °­ÀÇ ¸ñ·Ï ÃÊ±âÈ­
-                    alert(`${courseCount}°³ÀÇ °­ÀÇ »èÁ¦ ¼º°ø`);
+                    setSelectedCourses([]); // ì„ íƒí•œ ê°•ì˜ ëª©ë¡ ì´ˆê¸°í™”
+                    alert(`${courseCount}ê°œì˜ ê°•ì˜ ì‚­ì œ ì„±ê³µ`);
                 })
                 .catch(error => {
-                    console.error('°­ÀÇ Á¤º¸¸¦ »èÁ¦ÇÏÁö ¸øÇß½À´Ï´Ù.', error.response.data);
-                    alert('°­ÀÇ »èÁ¦ ½ÇÆĞ: ' + error.response.data.message); // ¼­¹ö¿¡¼­ ¹ŞÀº ¿À·ù ¸Ş½ÃÁö¸¦ Ãâ·Â
+                    console.error('ê°•ì˜ ì •ë³´ë¥¼ ì‚­ì œí•˜ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.', error.response.data);
+                    alert('ê°•ì˜ ì‚­ì œ ì‹¤íŒ¨: ' + error.response.data.message); // ì„œë²„ì—ì„œ ë°›ì€ ì˜¤ë¥˜ ë©”ì‹œì§€ë¥¼ ì¶œë ¥
                 });
         } else {
-            // »ç¿ëÀÚ°¡ »èÁ¦¸¦ Ãë¼ÒÇßÀ» ¶§ÀÇ Ã³¸®
+            // ì‚¬ìš©ìê°€ ì‚­ì œë¥¼ ì·¨ì†Œí–ˆì„ ë•Œì˜ ì²˜ë¦¬
             return;
         }
     };
 
-    // È¸¿ø ¼öÁ¤ ÇÚµé·¯
+    // ê°•ì˜ ìˆ˜ì • í•¸ë“¤ëŸ¬
     const editSelectedCourse = () => {
         if (selectedCourses.length !== 1) {
-            alert('¼öÁ¤ÇÒ °­ÀÇ´Â ÇÏ³ª¸¸ ¼±ÅÃÇØ¾ß ÇÕ´Ï´Ù.');
+            alert('ìˆ˜ì •í•  ê°•ì˜ëŠ” í•˜ë‚˜ë§Œ ì„ íƒí•´ì•¼ í•©ë‹ˆë‹¤.');
             return;
         }
 
         const courseToEdit = events.find(event => event.id === selectedCourses[0]);
         if (courseToEdit) {
             setSelectedEvent(courseToEdit);
-            setNewEventId(courseToEdit.id);
-            setNewEventInstructor(courseToEdit.name);
-            setNewEventClassroom(courseToEdit.memberId);
+            setNewEventClassroom(courseToEdit.classroomName);
             setNewEventTitle(courseToEdit.courseTitle);
             setNewEventDescription(courseToEdit.description);
             setNewEventStart(courseToEdit.startDate);
@@ -202,31 +186,31 @@ const CourseManager = () => {
         }
     };
 
-    // Ã¼Å©¹Ú½º ¼±ÅÃ/ÇØÁ¦ ÇÚµé·¯
+    // ì²´í¬ë°•ìŠ¤ ì„ íƒ/í•´ì œ í•¸ë“¤ëŸ¬
     const handleSelectCourse = (courseId) => {
         setSelectedCourses((prevSelected) =>
             prevSelected.includes(courseId)
-                ? prevSelected.filter(id => id !== courseId) // ¼±ÅÃ ÇØÁ¦
-                : [...prevSelected, courseId] // ¼±ÅÃ Ãß°¡
+                ? prevSelected.filter(id => id !== courseId) // ì„ íƒ í•´ì œ
+                : [...prevSelected, courseId] // ì„ íƒ ì¶”ê°€
         );
     };
 
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <div>
-                {/* È¸¿ø ¸®½ºÆ® Å×ÀÌºí */}
+                {/* ê°•ì˜ ë¦¬ìŠ¤íŠ¸ í…Œì´ë¸” */}
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>¼±ÅÃ</TableCell>
-                            <TableCell>¹øÈ£</TableCell>
-                            <TableCell>°­»ç¸í</TableCell>
-                            <TableCell>°­ÀÇ½Ç¸í</TableCell>
-                            <TableCell>°­ÀÇ¸í</TableCell>
-                            <TableCell>¼³¸í</TableCell>
-                            <TableCell>½ÃÀÛ³¯Â¥</TableCell>
-                            <TableCell>Á¾·á³¯Â¥</TableCell>
-                            <TableCell>ÁÂ¼®¹èÄ¡µµ</TableCell>
+                            <TableCell>ì„ íƒ</TableCell>
+                            <TableCell>ë²ˆí˜¸</TableCell>
+                            <TableCell>ê°•ì‚¬ëª…</TableCell>
+                            <TableCell>ê°•ì˜ì‹¤ëª…</TableCell>
+                            <TableCell>ê°•ì˜ëª…</TableCell>
+                            <TableCell>ì„¤ëª…</TableCell>
+                            <TableCell>ì‹œì‘ ë‚ ì§œ</TableCell>
+                            <TableCell>ì¢…ë£Œ ë‚ ì§œ</TableCell>
+                            <TableCell>ì¢Œì„ ë°°ì¹˜ë„</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -241,7 +225,7 @@ const CourseManager = () => {
                                 </TableCell>
                                 <TableCell>{event.id}</TableCell>
                                 <TableCell>{event.instructor}</TableCell>
-                                <TableCell>{event.classroom}</TableCell>
+                                <TableCell>{event.classroomName}</TableCell>
                                 <TableCell>{event.title}</TableCell>
                                 <TableCell>{event.description}</TableCell>
                                 <TableCell>{event.startDate}</TableCell>
@@ -252,20 +236,20 @@ const CourseManager = () => {
                     </TableBody>
                 </Table>
 
-                {/* µî·Ï, ¼öÁ¤, »èÁ¦ ¹öÆ° */}
+                {/* ë“±ë¡, ìˆ˜ì •, ì‚­ì œ ë²„íŠ¼ */}
                 <Box mt={2} sx={{ display: "flex", justifyContent: "flex-end" }}>
                     <Button variant="contained" color="primary" onClick={handleOpen} sx={{ mr: 2 }}>
-                        °­ÀÇ µî·Ï
+                        ê°•ì˜ ë“±ë¡
                     </Button>
                     <Button variant="contained" color="secondary" onClick={editSelectedCourse} sx={{ mr: 2 }}>
-                        °­ÀÇ ¼öÁ¤
+                        ê°•ì˜ ìˆ˜ì •
                     </Button>
                     <Button variant="contained" color="error" onClick={deleteSelectedCourse}>
-                        °­ÀÇ »èÁ¦
+                        ê°•ì˜ ì‚­ì œ
                     </Button>
                 </Box>
 
-                {/* ¸ğ´Ş */}
+                {/* ëª¨ë‹¬ */}
                 <Modal
                     open={open}
                     onClose={handleClose}
@@ -286,10 +270,10 @@ const CourseManager = () => {
                         }}
                     >
                         <Typography id="modal-title" variant="h6">
-                            {editMode ? "°­ÀÇ ¼öÁ¤" : "°­ÀÇ µî·Ï"}
+                            {editMode ? "íšŒì› ìˆ˜ì •" : "íšŒì› ë“±ë¡"}
                         </Typography>
 
-                        {/* ÀÔ·Â ÇÊµå */}
+                        {/* ì…ë ¥ í•„ë“œ */}
                         <Box
                             sx={{
                                 display: "grid",
@@ -298,32 +282,26 @@ const CourseManager = () => {
                                 mt: 2,
                             }}
                         >
-                            <TextField
-                                label="°­»ç¸í"
-                                value={newEventInstructor}
-                                onChange={(e) => {
-                                    setNewEventInstructor(e.target.value);
-                                }}
-                                error={!!nameError}
-                                helperText={nameError}
-                            />
-                            <TextField
-                                label="°­ÀÇ½Ç¸í"
-                                value={newEventClassroom}
-                                onChange={(e) => {
-                                    setNewEventClassroom(e.target.value);
-                                }}
-                            />
-                            <FormControl variant="outlined">
-                                <InputLabel>°­ÀÇ¸í</InputLabel>
-                                <Select
-                                    label="°­ÀÇ¸í"
+                            <Box sx={{ display: "grid" }}>
+                                <TextField
+                                    fullwidth
+                                    label="ê°•ì˜ëª…"
                                     value={newEventTitle}
-                                    onChange={(e) => setNewEventTitle(e.target.value)}
+                                    onChange={(e) => {
+                                        setNewEventTitle(e.target.value);
+                                    }}
+                                />
+                            </Box>
+                            <FormControl variant="outlined">
+                                <InputLabel>ê°•ì˜ì‹¤ëª…</InputLabel>
+                                <Select
+                                    label="ê°•ì˜ì‹¤ëª…"
+                                    value={newEventClassroom}
+                                    onChange={(e) => setNewEventClassroom(e.target.value)}
                                 >
-                                    {courseOption.map((course, index) => (
-                                        <MenuItem key={index} value={course.courseTitle}>
-                                            {course.courseTitle}
+                                    {classroomOption.map((course, index) => (
+                                        <MenuItem key={index} value={course.classroomName}>
+                                            {course.classroomName}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -331,36 +309,46 @@ const CourseManager = () => {
                             <Box sx={{ display: "grid" }}>
                                 <TextField
                                     fullwidth
-                                    label="¼³¸í"
+                                    label="ì„¤ëª…"
                                     value={newEventDescription}
                                     onChange={(e) => {
                                         setNewEventDescription(e.target.value);
                                     }}
                                 />
                             </Box>
-                            <DateTimePicker
-                                label="½ÃÀÛ ³¯Â¥"
+                            <DatePicker
+                                label="ì‹œì‘ ë‚ ì§œ"
                                 value={newEventStart}
                                 onChange={(newValue) => setNewEventStart(moment(newValue))}
                                 renderInput={(params) => <TextField {...params} fullWidth style={{ marginBottom: '20px' }} />}
                             />
                             <br />
                             <br />
-                            <DateTimePicker
-                                label="Á¾·á ³¯Â¥"
+                            <DatePicker
+                                label="ì¢…ë£Œ ë‚ ì§œ"
                                 value={newEventEnd}
                                 onChange={(newValue) => setNewEventEnd(moment(newValue))}
                                 renderInput={(params) => <TextField {...params} fullWidth style={{ marginBottom: '20px' }} />}
                             />
                         </Box>
+                        <Box sx={{ display: "grid" }}>
+                            <TextField
+                                fullwidth
+                                label="ì¢Œì„ ë°°ì¹˜ url"
+                                value={newEventLayoutImageUrl}
+                                onChange={(e) => {
+                                    setNewEventLayoutImageUrl(e.target.value);
+                                }}
+                            />
+                        </Box>
 
-                        {/* ÀúÀå ¹× Ãë¼Ò ¹öÆ° */}
+                        {/* ì €ì¥ ë° ì·¨ì†Œ ë²„íŠ¼ */}
                         <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
                             <Button variant="contained" color="primary" onClick={handleSaveEvent}>
-                                ÀúÀå
+                                ì €ì¥
                             </Button>
                             <Button variant="contained" color="secondary" onClick={handleClose} sx={{ ml: 2 }}>
-                                Ãë¼Ò
+                                ì·¨ì†Œ
                             </Button>
                         </Box>
                     </Box>

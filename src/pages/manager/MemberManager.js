@@ -146,6 +146,7 @@ const MemberManager = () => {
                 fetchEvents(); // 수정 후 이벤트 목록 새로 고침
             })
             .catch(error => {
+                console.log(updatedMember);
                 console.error('회원 수정에 실패했습니다.', error);
             });
     };
@@ -196,10 +197,6 @@ const MemberManager = () => {
 
         if (editMode) {
             // 수정
-            if (newEventPassword.length === 0) {
-                setPasswordError("비밀번호를 입력해 주세요.");
-                return;
-            }
             updateMember(newMember); // ID를 전달
         } else {
             // 추가
@@ -399,7 +396,7 @@ const MemberManager = () => {
                         <Box sx={{ display: "grid" }}>
                             <TextField
                                 fullwidth
-                                label="비밀번호"
+                                label={editMode ? "공백 시 기존값 유지" : "비밀번호"}
                                 type={showPassword ? "text" : "password"} // 상태에 따라 변경
                                 onChange={(e) => {
                                     setNewEventPassword(e.target.value);
