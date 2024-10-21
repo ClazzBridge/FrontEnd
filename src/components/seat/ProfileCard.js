@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
+import MenuItem from "@mui/material/MenuItem";
 import {
   Avatar,
   Card,
@@ -39,11 +40,13 @@ function ProfileCard({
   isEmpty,
   role,
   onRegisterSeatClick,
-  userHasSeat,
+  userHasSeat, // 여기에 console.log 추가
   isTeacher,
   isStudent,
   isAdmin,
 }) {
+  console.log("userHasSeat in ProfileCard:", userHasSeat); // userHasSeat 로그 출력
+
   const isGoodOnline = isOnline === true;
   const isOffline = isOnline === false;
 
@@ -81,7 +84,6 @@ function ProfileCard({
   return (
     <Card
       sx={{
-        backgroundColor: isTeacher ? "#f0f8ff" : "#ffffff",
         borderRadius: "6px",
         width: "120px",
         textAlign: "center",
@@ -159,7 +161,7 @@ function ProfileCard({
               margin: "4px",
             }}
           >
-            {isTeacher ? "강사" : `No. ${seatId}`}
+            {`No. ${seatId}`}
           </Typography>
         </div>
         <Stack
@@ -176,7 +178,7 @@ function ProfileCard({
               alignItems: "center",
             }}
           >
-            {isEmpty && isSelf && (!userHasSeat || !isTeacher || !isAdmin) ? (
+            {isEmpty && !userHasSeat && isStudent ? (
               <AddIcon
                 sx={{
                   position: "absolute",
@@ -253,29 +255,35 @@ export default function StudentRoom() {
   const [seatManagementMode, setSeatManagementMode] = useState("register"); // "register" 또는 "modify"
   const [seatCount, setSeatCount] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [courses, setCourses] = useState([]);
+  const [selectedCourseId, setSelectedCourseId] = useState("");
 
   const fetchData = useCallback(async () => {
     if (!currentUser) return;
 
     try {
       const response = await apiClient.get("seat/");
+      console.log("API 응답 데이터 : ", response.data);
       const allProfiles = response.data;
 
       const studentProfiles = allProfiles.filter(
         (profile) =>
-          !profile.memberDTO || profile.memberDTO.memberType !== "ROLE_TEACHER"
+          !profile.member || profile.member.memberType !== "ROLE_TEACHER"
       );
       setProfiles(studentProfiles);
 
       const userSeatData = allProfiles.find(
-        (seat) =>
-          seat.memberDTO && seat.memberDTO.memberId === currentUser.memberId
+        (profile) =>
+          profile.member && profile.member.id === currentUser.memberId
       );
+      console.log("userSeatData:", userSeatData);
+
       setUserSeat(userSeatData ? userSeatData.id : null);
     } catch (error) {
       console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
     }
   }, [currentUser]);
+  console.log("selectedCourseId:", selectedCourseId, "seatCount:", seatCount);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -297,8 +305,22 @@ export default function StudentRoom() {
   useEffect(() => {
     if (currentUser) {
       fetchData();
+      console.log("userSeat", userSeat); // userSeat 상태 확인
     }
   }, [currentUser, fetchData]);
+
+  const fetchCourses = useCallback(async () => {
+    try {
+      const response = await apiClient.get("course/select");
+      setCourses(response.data);
+    } catch (error) {
+      console.error("강의 목록을 불러오는 중 오류가 발생했습니다:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
 
   const openProfileModal = (
     seatId,
@@ -372,9 +394,11 @@ export default function StudentRoom() {
 
     try {
       const response = await apiClient.put("seat/assign", seatUpdateDTO);
+
       console.log(
         `${selectedSeat}번 좌석에 ${currentUser.memberId} 등록되었습니다.`
       );
+
       setRegisterDialogOpen(false);
       setSelectedSeat(null);
       fetchData();
@@ -396,17 +420,18 @@ export default function StudentRoom() {
     try {
       const endpoint =
         seatManagementMode === "register" ? "seat/register" : "seat/modify";
-
-      await apiClient.post(endpoint, { seatCount });
+      const response = await apiClient.post(endpoint, {
+        seatCount: parseInt(seatCount),
+        courseId: parseInt(selectedCourseId),
+      });
       console.log(
-        `${seatCount}개의 좌석이 ${
-          seatManagementMode === "register" ? "등록" : "수정"
-        }되었습니다.`
+        `${seatCount}개의 좌석이 ${seatManagementMode === "register" ? "등록" : "수정"}되었습니다.`
       );
       setShowSeatManagementDialog(false);
       fetchData();
     } catch (error) {
       console.error("좌석 관리 중 오류가 발생했습니다:", error);
+      alert("좌석 관리 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -422,21 +447,39 @@ export default function StudentRoom() {
   return (
     <div>
       {currentUser.memberType === "ROLE_ADMIN" && (
-        <Box sx={{ position: "fixed", top: 16, right: 16, zIndex: 1000 }}>
+        <Box
+          sx={{
+            position: "fixed",
+            marginTop: 10,
+            top: "12px",
+            right: "32px", // 왼쪽으로 20px 더 이동
+            zIndex: 1000,
+          }}
+        >
           <Fab
-            color="primary"
+            color=""
             aria-label="register"
             onClick={() => handleSeatManagementClick("register")}
-            sx={{ mr: 1 }}
+            sx={{
+              mr: 1,
+              width: "43px", // 크기를 줄임 (3/2 비율)
+              height: "43px", // 동일한 높이로 설정
+              minHeight: "43px", // Fab 기본 높이를 덮어쓰기
+            }}
           >
-            <AddIcon />
+            <AddIcon sx={{ fontSize: "16px" }} /> {/* 아이콘 크기 축소 */}
           </Fab>
           <Fab
-            color="secondary"
+            color=""
             aria-label="modify"
             onClick={() => handleSeatManagementClick("modify")}
+            sx={{
+              width: "43px", // 크기를 줄임 (3/2 비율)
+              height: "43px", // 동일한 높이로 설정
+              minHeight: "43px", // Fab 기본 높이를 덮어쓰기
+            }}
           >
-            <EditIcon />
+            <EditIcon sx={{ fontSize: "16px" }} /> {/* 아이콘 크기 축소 */}
           </Fab>
         </Box>
       )}
@@ -473,12 +516,6 @@ export default function StudentRoom() {
             isSelf={
               profile.member && profile.member.id === currentUser.memberId
             }
-            onLoad={console.log(
-              "profile" +
-                profile.member +
-                "\n currentUser" +
-                currentUser.memberId
-            )}
             isEmpty={!profile.member}
             openModal={openProfileModal}
             role={currentUser.memberType}
@@ -584,6 +621,7 @@ export default function StudentRoom() {
       {/* 좌석 등록 확인 다이얼로그 */}
       <Dialog open={registerDialogOpen} onClose={handleCancelRegisterSeat}>
         <DialogTitle>{selectedSeat}번 좌석에 등록하시겠습니까?</DialogTitle>
+
         <DialogActions>
           <Button onClick={handleConfirmRegisterSeat} color="primary">
             등록
@@ -603,7 +641,24 @@ export default function StudentRoom() {
           {seatManagementMode === "register" ? "좌석 등록" : "좌석 수정"}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>등록할 좌석 수를 입력하세요:</DialogContentText>
+          <DialogContentText>
+            강의를 선택하고 좌석 수를 입력하세요:
+          </DialogContentText>
+          <TextField
+            select
+            margin="dense"
+            id="courseId"
+            label="강의 선택"
+            fullWidth
+            value={selectedCourseId}
+            onChange={(e) => setSelectedCourseId(e.target.value)}
+          >
+            {courses.map((course) => (
+              <MenuItem key={course.id} value={course.id}>
+                {course.courseTitle}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             autoFocus
             margin="dense"
@@ -627,6 +682,7 @@ export default function StudentRoom() {
           </Button>
         </DialogActions>
       </Dialog>
+      
     </div>
   );
 }
