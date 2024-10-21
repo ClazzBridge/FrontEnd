@@ -380,7 +380,6 @@ const CourseManager = () => {
                                 setnewTitle(e.target.value);
 
                             }}
-
                         />
                         <FormControl variant="outlined">
                             <InputLabel>강의실</InputLabel>
@@ -403,7 +402,6 @@ const CourseManager = () => {
                                 setnewStartDate(e.target.value);
 
                             }}
-
                         />
                         <TextField
                             type="date"
@@ -411,7 +409,6 @@ const CourseManager = () => {
                             onChange={(e) => {
                                 setnewEndDate(e.target.value);
                             }}
-
                         />
 
                         <Box sx={{ display: "grid", gridColumn: "span 2" }}>

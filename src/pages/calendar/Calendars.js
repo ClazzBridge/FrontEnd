@@ -50,7 +50,8 @@ const Calendars = () => {
   // role 상태
   const [role, setType] = useState("");
 
-
+  // course 상태
+  const [course, setCourse] = useState("");
 
   useEffect(() => {
     // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
@@ -64,14 +65,22 @@ const Calendars = () => {
           console.log('No token found in localStorage');
           return;
         }
-
-        const id = userInfo.member.id;
-
         // API 요청 보내기
-        const response = await apiClient.get(`user/check/${id}`);
-        console.log("Fetched role:", response.data); // 받은 role 확인
+        const role = localStorage.getItem('membertype');
 
-        setType(response.data); // 받은 role을 상태로 저장
+        if (role !== "ROLE_ADMIN") {
+          apiClient.get(`user/check/${userInfo.member.id}`)
+            .then(response => {
+              setCourse(response.data); // 강의 목록 설정
+              console.log(response.data);
+            })
+            .catch(error => {
+              console.error('강의 목록을 불러오지 못했습니다.', error);
+            });
+        }
+
+
+        setType(role); // 받은 role을 상태로 저장
       } catch (error) {
         console.error('Error fetching role:', error);
       }
@@ -240,10 +249,22 @@ const Calendars = () => {
           : ""}
         <Calendar
           localizer={localizer}
-          events={events.map(event => ({
-            ...event,
-            title: event.eventTitle,
-          }))}
+          events={events
+            .filter(event => {
+              // 권한에 맞는 일정을 필터링
+              // 예: 사용자 권한이 'admin'인 경우 모든 이벤트를 보여주고, 
+              // 권한이 'user'인 경우 특정 조건을 만족하는 이벤트만 보여주기
+              if (role === 'ROLE_ADMIN') {
+                return true;  // 'admin' 권한은 모든 일정 보여줌
+              } else if (role === 'ROLE_STUDENT' || role === 'ROLE_TEACHER') {
+                return event.courseTitle === course || event.courseTitle === "전체 일정";
+              }
+              return false;  // 기본적으로 권한이 없으면 이벤트를 안 보여줌
+            })
+            .map(event => ({
+              ...event,
+              title: event.eventTitle,
+            }))}
           startAccessor="start"
           endAccessor="end"
           style={{ height: '100%' }}
@@ -281,6 +302,7 @@ const Calendars = () => {
                     value={newEventcourseTitle}
                     onChange={(e) => setNewEventcourseTitle(e.target.value)}
                   >
+                    <MenuItem value="전체 일정">전체 일정</MenuItem>
                     {courseOptions.map((course, index) => (
                       <MenuItem key={index} value={course.courseTitle}>
                         {course.courseTitle}
