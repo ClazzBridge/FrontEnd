@@ -87,6 +87,8 @@ export default function QuestionList() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [courseId, setCourseId] = useState("");
+  const [newAnswer, setNewAnswer] = useState("");
+  const [editingAnswerId, setEditingAnswerId] = useState(null);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -158,16 +160,30 @@ export default function QuestionList() {
     setSelectedIds(newSelection); // 선택된 행 ID 업데이트
   };
 
+  const deleteQuestionsApi = async (selectedIds) => {
+    try {
+      const response = await apiClient.delete(`qnas/questions`, {
+        data: { ids: selectedIds }, // RequestBody로 배열 전달
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting questions:", error);
+      throw error;
+    }
+  };
+
   const deleteQuestions = async (selectedIds) => {
     try {
-      await deleteQuestionsApi(selectedIds);
+      await deleteQuestionsApi(selectedIds); // API 호출하여 질문 삭제
       setSnackbarMessage("질문이 성공적으로 삭제되었습니다."); // 메시지 설정
       setOpenSnackbar(true); // Snackbar 열기
       await fetchData(); // 데이터 새로 고침
       closeDeleteModal();
       setOpenDrawer(false);
     } catch (error) {
-      alert(error.response.data);
+      console.error("질문 삭제 중 오류 발생:", error);
+      setSnackbarMessage("질문 삭제에 실패했습니다.");
+      setOpenSnackbar(true);
     }
   };
 
@@ -191,6 +207,64 @@ export default function QuestionList() {
       setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Failed to fetch questions", error);
+    }
+  };
+
+  const handleAnswerSubmit = async () => {
+    if (!newAnswer.trim()) {
+      // 답변 내용이 비어있으면 경고 메시지
+      setSnackbarMessage("답변을 입력하세요.");
+      setOpenSnackbar(true);
+      return;
+    }
+
+    try {
+      const response = await apiClient.post("qnas/teacher-answers", {
+        content: newAnswer,
+        questionId: selectedRow.id, // 선택된 질문 ID
+        memberId, // 현재 로그인한 강사의 ID
+      });
+      const handleAnswerSubmit = async () => {
+        if (!newAnswer.trim()) {
+          // 답변 내용이 비어있으면 경고 메시지
+          setSnackbarMessage("답변을 입력하세요.");
+          setOpenSnackbar(true);
+          return;
+        }
+
+        try {
+          const response = await apiClient.post("qnas/teacher-answers", {
+            content: newAnswer,
+            questionId: selectedRow.id, // 선택된 질문 ID
+            memberId, // 현재 로그인한 강사의 ID
+          });
+
+          if (response.status === 201) {
+            // 성공적으로 등록된 경우 처리
+            setSnackbarMessage("답변이 성공적으로 등록되었습니다.");
+            setOpenSnackbar(true);
+            setNewAnswer(""); // 입력 필드 초기화
+            fetchData(); // 데이터 새로고침
+          }
+        } catch (error) {
+          // 에러 발생 시 처리
+          console.error("답변 등록 실패:", error);
+          setSnackbarMessage("답변 등록에 실패했습니다.");
+          setOpenSnackbar(true);
+        }
+      };
+      if (response.status === 201) {
+        // 성공적으로 등록된 경우 처리
+        setSnackbarMessage("답변이 성공적으로 등록되었습니다.");
+        setOpenSnackbar(true);
+        setNewAnswer(""); // 입력 필드 초기화
+        fetchData(); // 데이터 새로고침
+      }
+    } catch (error) {
+      // 에러 발생 시 처리
+      console.error("답변 등록 실패:", error);
+      setSnackbarMessage("답변 등록에 실패했습니다.");
+      setOpenSnackbar(true);
     }
   };
 
@@ -451,7 +525,7 @@ export default function QuestionList() {
           sx={{ width: 800, padding: 2 }} // Drawer의 너비 및 패딩 설정
           role="presentation"
           // onClick={handleCloseDrawer} // Drawer 클릭 시 닫기
-          onKeyDown={handleCloseDrawer}
+          // onKeyDown={handleCloseDrawer}
         >
           {selectedRow ? (
             <Box sx={{ padding: "28px" }}>
@@ -568,6 +642,25 @@ export default function QuestionList() {
               >
                 댓글 0개
               </Typography>
+              <Typography variant="h6" sx={{ mt: 4, mb: 2, textAlign: "left" }}>
+                답변 작성
+              </Typography>
+              <TextField
+                fullWidth
+                value={newAnswer}
+                onChange={(e) => setNewAnswer(e.target.value)}
+                placeholder="답변을 입력하세요"
+                multiline
+                minRows={3}
+                maxRows={6}
+              />
+              <Button
+                onClick={handleAnswerSubmit}
+                variant="outlined"
+                sx={{ mt: 2, right: "-630px" }}
+              >
+                등록하기
+              </Button>
             </Box>
           ) : (
             <Typography>선택된 게시글이 없습니다.</Typography>
