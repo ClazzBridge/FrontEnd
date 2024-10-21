@@ -283,7 +283,7 @@ export default function StudentRoom() {
       console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
     }
   }, [currentUser]);
-  console.log("selectedCourseId:", selectedCourseId, "seatCount:", seatCount);
+  
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -682,7 +682,6 @@ export default function StudentRoom() {
           </Button>
         </DialogActions>
       </Dialog>
-      
     </div>
   );
 }
