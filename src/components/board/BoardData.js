@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { DataGrid } from "@mui/x-data-grid";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import PostAddIcon from "@mui/icons-material/PostAdd";
 import { getAllPosts } from "../../services/apis/post/get";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -14,6 +16,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
 import CustomModal from "../common/CustomModal";
 import { savePost } from "../../services/apis/post/post";
 import { deletePost as deletePostApi } from "../../services/apis/post/delete";
@@ -252,22 +255,29 @@ export default function FreeBoardData() {
           width: "100%",
           height: "40px",
           gap: "12px",
+          marginBottom: 2,
         }}
       >
-        <Button
-          variant="outlined"
-          sx={{ width: "38px", height: "38px" }}
-          onClick={openModal}
-        >
-          +
-        </Button>
-        <Button
-          variant="outlined"
-          sx={{ width: "38px", height: "38px" }}
-          onClick={openDeleteModal}
-        >
-          -
-        </Button>
+        <Tooltip title="작성하기">
+          <Button
+            variant="outlined"
+            sx={{ width: "38px", height: "38px" }}
+            onClick={openModal}
+          >
+            <PostAddIcon /> {/* 아이콘만 표시 */}
+          </Button>
+        </Tooltip>
+        {currentUser?.member?.memberType === "ROLE_ADMIN" && (
+          <Tooltip title="삭제하기">
+            <Button
+              variant="outlined"
+              sx={{ width: "38px", height: "38px" }}
+              onClick={openDeleteModal}
+            >
+              <DeleteOutlineIcon />
+            </Button>
+          </Tooltip>
+        )}
       </Box>
       {/* ========== 삭제 ========= */}
       <CustomModal isOpen={isDeleteModalOpen} closeModal={closeDeleteModal}>
@@ -463,7 +473,12 @@ export default function FreeBoardData() {
             <Button
               variant="outlined"
               onClick={closeModal}
-              sx={{ width: "120px", height: "40px" }}
+              sx={{
+                width: "120px",
+                height: "40px",
+                borderColor: "#34495e",
+                color: "#34495e",
+              }}
             >
               취소
             </Button>
@@ -517,7 +532,7 @@ export default function FreeBoardData() {
             },
           }}
           rows={rows}
-          checkboxSelection
+          checkboxSelection={currentUser?.member?.memberType === "ROLE_ADMIN"}
           onRowClick={handleRowClick}
           localeText={{
             // 선택된 행 수 텍스트 변경
