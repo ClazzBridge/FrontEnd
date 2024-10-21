@@ -328,13 +328,13 @@ const MemberManager = () => {
 
             {/* 등록, 수정, 삭제 버튼 */}
             <Box mt={2} sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <Button variant="contained" color="primary" onClick={handleOpen} sx={{ mr: 2 }}>
+                <Button variant="contained" onClick={handleOpen} sx={{ mr: 2 }}>
                     회원 등록
                 </Button>
-                <Button variant="contained" color="secondary" onClick={editSelectedMember} sx={{ mr: 2 }}>
+                <Button variant="contained" onClick={editSelectedMember} sx={{ mr: 2 }}>
                     회원 수정
                 </Button>
-                <Button variant="contained" color="error" onClick={deleteSelectedMembers}>
+                <Button variant="contained" onClick={deleteSelectedMembers}>
                     회원 삭제
                 </Button>
             </Box>
@@ -485,10 +485,10 @@ const MemberManager = () => {
 
                     {/* 저장 및 취소 버튼 */}
                     <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-                        <Button variant="contained" color="primary" onClick={handleSaveEvent}>
+                        <Button variant="outlined" onClick={handleSaveEvent}>
                             저장
                         </Button>
-                        <Button variant="contained" color="secondary" onClick={handleClose} sx={{ ml: 2 }}>
+                        <Button variant="outlined" onClick={handleClose} sx={{ ml: 2 }}>
                             취소
                         </Button>
                     </Box>

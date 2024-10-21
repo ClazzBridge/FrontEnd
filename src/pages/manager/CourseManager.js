@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Typography, TextField, Box, FormControl, InputLabel, Select, MenuItem, Checkbox, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Radio, RadioGroup, FormControlLabel } from "@mui/material";
+import { Button, Modal, Typography, TextField, Box, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert } from "@mui/material";
 import moment from 'moment';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DataGrid } from '@mui/x-data-grid'; // DataGrid 임포트
+import { v4 as uuidv4 } from 'uuid'; // 고유한 ID를 생성하기 위해 uuid 패키지 사용
 import apiClient from '../../shared/apiClient';
 
 const CourseManager = () => {
@@ -24,6 +25,15 @@ const CourseManager = () => {
     const [events, setEvents] = useState([]);
     const [classroomOption, setClassroomOption] = useState([]); // 강의실 목록 상태
 
+    const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+
+    const [dateError, setDateError] = useState("");
+
+    const handleCloseSuccessSnackbar = () => {
+        setOpenSuccessSnackbar(false);
+    };
+
     // 에러 상태 관리
 
     useEffect(() => {
@@ -35,7 +45,7 @@ const CourseManager = () => {
     const fetchEvents = () => {
         apiClient.get('course')
             .then(response => {
-                const fetchedEvents = response.data.map(event => ({
+                const fetchedEvents = response.data.map((event) => ({
                     ...event,
                 }));
                 setEvents(fetchedEvents); // 3. 상태 업데이트
@@ -84,13 +94,17 @@ const CourseManager = () => {
     const addCourse = (newCourse) => {
         apiClient.post('course', newCourse) // ID 없이 강의 추가
             .then(response => {
-                setEvents([...events, response.data]); // 응답으로 받은 새 강의 추가
-                alert('강의가 추가되었습니다');
+                const addedCourse = {
+                    ...response.data,
+                    id: response.data.id || uuidv4(), // 서버가 `id`를 주지 않으면 클라이언트에서 임시로 생성
+                };
+                setEvents([...events, addedCourse]);// 응답으로 받은 새 강의 추가
+                setSuccessMessage('강의가 추가되었습니다.');
+                setOpenSuccessSnackbar(true);
                 handleClose();
                 fetchEvents(); // 추가 후 이벤트 목록 새로 고침
             })
             .catch(error => {
-                console.log(newCourse);
                 console.error('강의 추가에 실패했습니다.', error);
             });
     };
@@ -108,7 +122,6 @@ const CourseManager = () => {
                 fetchEvents(); // 수정 후 이벤트 목록 새로 고침
             })
             .catch(error => {
-                console.log(updatedCourse);
                 console.error('강의 수정에 실패했습니다.', error);
             });
     };
@@ -124,6 +137,36 @@ const CourseManager = () => {
             endDate: newEventEnd.format("YYYY-MM-DD"),
             layoutImageUrl: newEventLayoutImageUrl,
         };
+
+        // 날짜 에러 메시지 띄우기
+        if (newEventStart.isAfter(newEventEnd)) {
+            setDateError("종료 날짜는 시작 날짜 이후여야 합니다.");
+            return;
+        }
+
+        // 강의가 있을 경우 강의가 있는지 확인
+        const existingCourse = events.find(event => event.title === newEventTitle && (!editMode || event.id !== newEventId));
+
+        if (existingCourse) {
+            alert("이미 등록된 강의명입니다.");
+            return;
+        }
+
+        // 강의실이 쓰고 있을 경우 확인
+        const useClassroom = events.find(event =>
+            event.classroomName === newEventClassroom && // 같은 강의실이고
+            ((newEventStart.isBetween(event.startDate, event.endDate, null, '[)') || // 시작 날짜가 겹치거나
+                newEventEnd.isBetween(event.startDate, event.endDate, null, '(]')) || // 종료 날짜가 겹치거나
+             (newEventStart.isSameOrBefore(event.startDate) && newEventEnd.isSameOrAfter(event.endDate)) // 전체가 포함되는 경우
+            ) && (!editMode || event.id !== newEventId) // 수정 중일 경우, 현재 수정 중인 강의는 제외
+        );
+
+        if (useClassroom) {
+            alert("해당 강의실은 선택하신 기간 동안 이미 사용 중입니다.");
+            return;
+        }
+
+        setDateError("");
 
         if (editMode) {
             // 수정
@@ -193,6 +236,21 @@ const CourseManager = () => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
+            {/* 성공 Snackbar */}
+            <Snackbar
+                open={openSuccessSnackbar}
+                autoHideDuration={2200}
+                onClose={handleCloseSuccessSnackbar}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+                <Alert
+                    onClose={handleCloseSuccessSnackbar}
+                    severity="success"
+                    sx={{ width: "100%" }}
+                >
+                    {successMessage}
+                </Alert>
+            </Snackbar>
             <div>
                 {/* 강의 리스트 테이블 */}
                 <Box sx={{ height: 650, width: '100%' }}>
@@ -274,16 +332,15 @@ const CourseManager = () => {
                         }}
                         rows={events} // 데이터
 
-
                         columns={[
 
                             { field: 'id', headerName: '번호', flex: 0.5 },
-                            { field: 'instructor', headerName: '강사명', flex: 1 },
-                            { field: 'classroomName', headerName: '강의실명', flex: 1 },
-                            { field: 'title', headerName: '강의명', flex: 1.3 },
-                            { field: 'description', headerName: '설명', flex: 1.3 },
-                            { field: 'startDate', headerName: '시작 날짜', flex: 1.5, ml: 30 },
-                            { field: 'endDate', headerName: '종료 날짜', flex: 1.5, ml: 30 },
+                            { field: 'instructor', headerName: '강사', flex: 1 },
+                            { field: 'title', headerName: '강의명', flex: 1.5 },
+                            //{ field: 'description', headerName: '설명', flex: 1.3 },
+                            { field: 'startDate', headerName: '시작 날짜', flex: 1.3 },
+                            { field: 'endDate', headerName: '종료 날짜', flex: 1.3 },
+                            { field: 'classroomName', headerName: '강의실', flex: 1.5, ml: 30 },
                             {
                                 field: 'layoutImageUrl',
                                 headerName: '좌석 배치도',
@@ -320,13 +377,13 @@ const CourseManager = () => {
 
                 {/* 등록, 수정, 삭제 버튼 */}
                 <Box mt={2} sx={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button variant="contained" color="primary" onClick={handleOpen} sx={{ mr: 2 }}>
+                    <Button variant="outlined" onClick={handleOpen} sx={{ mr: 2 }}>
                         강의 등록
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={editSelectedCourse} sx={{ mr: 2 }}>
-                        강의 수정
+                    <Button variant="outlined" onClick={editSelectedCourse} sx={{ mr: 2 }}>
+                        강의 수정 및 조회
                     </Button>
-                    <Button variant="contained" color="error" onClick={deleteSelectedCourse}>
+                    <Button variant="outlined" onClick={deleteSelectedCourse}>
                         강의 삭제
                     </Button>
                 </Box>
@@ -352,7 +409,7 @@ const CourseManager = () => {
                         }}
                     >
                         <Typography id="modal-title" variant="h6">
-                            {editMode ? "회원 수정" : "회원 등록"}
+                            {editMode ? "강의 수정 및 조회" : "강의 등록"}
                         </Typography>
 
                         {/* 입력 필드 */}
@@ -375,9 +432,9 @@ const CourseManager = () => {
                                 />
                             </Box>
                             <FormControl variant="outlined">
-                                <InputLabel>강의실명</InputLabel>
+                                <InputLabel>강의실</InputLabel>
                                 <Select
-                                    label="강의실명"
+                                    label="강의실"
                                     value={newEventClassroom}
                                     onChange={(e) => setNewEventClassroom(e.target.value)}
                                 >
@@ -400,6 +457,11 @@ const CourseManager = () => {
                                 onChange={(newValue) => setNewEventEnd(moment(newValue))}
                                 renderInput={(params) => <TextField {...params} fullWidth style={{ marginBottom: '20px' }} />}
                             />
+                            {dateError && (
+                                <Typography color="error" variant="body2">
+                                    {dateError}
+                                </Typography>
+                            )}
                         </Box>
                         <Box sx={{ display: "grid" }}>
                             <TextField
@@ -428,18 +490,20 @@ const CourseManager = () => {
 
                         {/* 저장 및 취소 버튼 */}
                         <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-                            <Button variant="contained" color="primary" onClick={handleSaveEvent}>
+                            <Button variant="outlined" onClick={handleSaveEvent}>
                                 저장
                             </Button>
-                            <Button variant="contained" color="secondary" onClick={handleClose} sx={{ ml: 2 }}>
+                            <Button variant="outlined" onClick={handleClose} sx={{ ml: 2 }}>
                                 취소
                             </Button>
                         </Box>
                     </Box>
                 </Modal>
+
             </div>
         </LocalizationProvider>
     );
 };
+
 
 export default CourseManager;
