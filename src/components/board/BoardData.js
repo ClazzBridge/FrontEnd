@@ -22,6 +22,7 @@ import { savePost } from "../../services/apis/post/post";
 import { deletePost as deletePostApi } from "../../services/apis/post/delete";
 import { updatePost } from "../../services/apis/post/put";
 import { getBoardType } from "../../services/apis/boardType/get";
+import { getAllCourse } from "../../services/apis/course/get";
 import PostComment from "../comment/PostComment";
 
 const columns = [
@@ -31,6 +32,23 @@ const columns = [
     flex: 1,
     headerName: "카테고리",
     resizable: false,
+    renderCell: (params) => (
+      <Box
+        sx={{
+          backgroundColor:
+            params.row.boardType === "공지사항"
+              ? "antiquewhite"
+              : "transparent", // 공지사항일 때 배경색 지정
+          borderRadius: "25px", // 둥근 모서리
+          padding: "4px 8px", // 여백 (위아래 4px, 좌우 8px)
+          fontWeight: params.row.boardType === "공지사항" ? "600" : "normal", // 글씨체 조정
+          fontSize: "inherit", // 부모 요소의 글자 크기를 상속받음
+          display: "inline",
+        }}
+      >
+        {params.value}
+      </Box>
+    ),
   },
   {
     field: "title",
@@ -61,8 +79,11 @@ export default function FreeBoardData() {
   const [successMessage, setSuccessMessage] = useState("");
   const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false); // Snackbar 열기 상태
   const [errorMessage, setErrorMessage] = useState("");
+  const [courseId, setCourseId] = useState(""); // 강의 ID 상태 추가
+  const [courseName, setCourseName] = useState("");
 
   const [originalRow, setOriginalRow] = useState(null);
+  const [courses, setCourses] = useState([]);
   const [boardTypes, setBoardTypes] = useState([]); // 카테고리 상태
   const [boardId, setBoardId] = useState(""); // 선택된 카테고리 ID 상태
 
@@ -81,6 +102,16 @@ export default function FreeBoardData() {
     }
   }, []);
 
+  const fetchCourses = useCallback(async () => {
+    try {
+      const data = await getAllCourse();
+      setCourses([{ id: 0, title: "전체" }, ...data]);
+      console.log("강의 데이터 =", data);
+    } catch (error) {
+      console.error("강의 데이터를 가져오는 데 오류가 발생했습니다:", error);
+    }
+  }, []);
+
   useEffect(() => {
     const userInfoString = localStorage.getItem("userInfo");
     if (userInfoString) {
@@ -92,7 +123,8 @@ export default function FreeBoardData() {
   useEffect(() => {
     fetchBoardTypes();
     fetchData();
-  }, [fetchData]); // 컴포넌트 마운트 시 호출
+    fetchCourses();
+  }, [fetchData, fetchBoardTypes, fetchCourses]); // 컴포넌트 마운트 시 호출
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -151,6 +183,9 @@ export default function FreeBoardData() {
 
   const handleBoardIdChange = (event) => {
     setBoardId(event.target.value); // 선택된 카테고리 ID
+    if (event.target.value === "공지사항") {
+      setCourseName("");
+    }
   };
 
   const handleTitleChange = (event) => {
@@ -165,6 +200,7 @@ export default function FreeBoardData() {
     title,
     content,
     boardId,
+    courseId,
   };
 
   const postSave = async () => {
@@ -436,6 +472,44 @@ export default function FreeBoardData() {
             </Select>
           </FormControl>
 
+          {/* 강의명 선택 필드 조건부 렌더링 */}
+          {currentUser?.member?.memberType === "ROLE_ADMIN" &&
+            boardTypes.find((boardType) => boardType.id === boardId)?.type ===
+              "공지사항" && (
+              <FormControl fullWidth margin="normal" sx={{ margin: 0 }}>
+                <InputLabel id="course-select-label">강의명</InputLabel>
+                <Select
+                  labelId="course-select-label"
+                  id="course-select"
+                  value={courseId}
+                  onChange={(e) => setCourseId(e.target.value)}
+                  label="강의명"
+                >
+                  {courses.map((course) => (
+                    <MenuItem key={course.id} value={course.id}>
+                      <Typography
+                        sx={{
+                          display: "inline-block",
+                          fontWeight: 600,
+                          marginRight: 1,
+                        }}
+                      >
+                        {course.title}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          display: "inline-block",
+                          fontSize: "12px",
+                        }}
+                      >
+                        ({course.classroomName})
+                      </Typography>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+
           {/* 제목 */}
           <TextField
             fullWidth
@@ -585,12 +659,13 @@ export default function FreeBoardData() {
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 5,
+                pageSize: 10,
               },
             },
           }}
-          pageSizeOptions={[5]}
+          pageSizeOptions={[10]}
           disableRowSelectionOnClick
+          style={{ height: "628px" }}
         />
       </Box>
 
