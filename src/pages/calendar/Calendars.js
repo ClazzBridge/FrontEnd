@@ -69,6 +69,7 @@ const Calendars = () => {
         const role = localStorage.getItem('membertype');
 
         if (role !== "ROLE_ADMIN") {
+
           apiClient.get(`user/check/${userInfo.member.id}`)
             .then(response => {
               setCourse(response.data); // 강의 목록 설정
