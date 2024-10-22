@@ -1289,7 +1289,7 @@
     "source-map" "^0.5.7"
     "stylis" "4.2.0"
 
-"@emotion/cache@^11.13.0", "@emotion/cache@^11.13.1":
+"@emotion/cache@^11.11.0", "@emotion/cache@^11.13.0", "@emotion/cache@^11.13.1":
   "integrity" "sha512-iqouYkuEblRcXmylXIwwOodiEK5Ifl7JcX7o6V4jI3iW4mLXX3dmt5xwBtIkJiQEXFAI+pC8X0i67yiPkH9Ucw=="
   "resolved" "https://registry.npmjs.org/@emotion/cache/-/cache-11.13.1.tgz"
   "version" "11.13.1"
@@ -1457,6 +1457,33 @@
     "lodash.isnil" "^4.0.0"
     "lodash.isundefined" "^3.0.1"
     "lodash.uniq" "^4.5.0"
+
+"@floating-ui/core@^1.6.0":
+  "integrity" "sha512-7XJ9cPU+yI2QeLS+FCSlqNFZJq8arvswefkZrYI1yQBbftw6FyrZOxYSh+9S7z7TpeWlRt9zJ5IhM1WIL334jA=="
+  "resolved" "https://registry.npmjs.org/@floating-ui/core/-/core-1.6.8.tgz"
+  "version" "1.6.8"
+  dependencies:
+    "@floating-ui/utils" "^0.2.8"
+
+"@floating-ui/dom@^1.0.0":
+  "integrity" "sha512-qkMCxSR24v2vGkhYDo/UzxfJN3D4syqSjyuTFz6C7XcpU1pASPRieNI0Kj5VP3/503mOfYiGY891ugBX1GlABQ=="
+  "resolved" "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.6.11.tgz"
+  "version" "1.6.11"
+  dependencies:
+    "@floating-ui/core" "^1.6.0"
+    "@floating-ui/utils" "^0.2.8"
+
+"@floating-ui/react-dom@^2.0.8":
+  "integrity" "sha512-06okr5cgPzMNBy+Ycse2A6udMi4bqwW/zgBF/rwjcNqWkyr82Mcg8b0vjX8OJpZFy/FKjJmw6wV7t44kK6kW7A=="
+  "resolved" "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.1.2.tgz"
+  "version" "2.1.2"
+  dependencies:
+    "@floating-ui/dom" "^1.0.0"
+
+"@floating-ui/utils@^0.2.8":
+  "integrity" "sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig=="
+  "resolved" "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.8.tgz"
+  "version" "0.2.8"
 
 "@fontsource/roboto@^5.0.15":
   "integrity" "sha512-352XiID9jfwmYaHpdmS3ocGJi3PA+vOm4HzJIRfSyPEyLP6dZN8iiEKUbdAfB5YXQO3YxO2KZpR+R28q2zMiYw=="
@@ -1815,6 +1842,24 @@
   dependencies:
     "sparse-bitfield" "^3.0.3"
 
+"@mui/base@5.0.0-beta.40":
+  "integrity" "sha512-I/lGHztkCzvwlXpjD2+SNmvNQvB4227xBXhISPjEaJUXGImOQ9f3D2Yj/T3KasSI/h0MLWy74X0J6clhPmsRbQ=="
+  "resolved" "https://registry.npmjs.org/@mui/base/-/base-5.0.0-beta.40.tgz"
+  "version" "5.0.0-beta.40"
+  dependencies:
+    "@babel/runtime" "^7.23.9"
+    "@floating-ui/react-dom" "^2.0.8"
+    "@mui/types" "^7.2.14"
+    "@mui/utils" "^5.15.14"
+    "@popperjs/core" "^2.11.8"
+    "clsx" "^2.1.0"
+    "prop-types" "^15.8.1"
+
+"@mui/core-downloads-tracker@^5.16.1":
+  "integrity" "sha512-RtsCt4Geed2/v74sbihWzzRs+HsIQCfclHeORh5Ynu2fS4icIKozcSubwuG7vtzq2uW3fOR1zITSP84TNt2GoQ=="
+  "resolved" "https://registry.npmjs.org/@mui/core-downloads-tracker/-/core-downloads-tracker-5.16.7.tgz"
+  "version" "5.16.7"
+
 "@mui/core-downloads-tracker@^6.1.1":
   "integrity" "sha512-VdQC1tPIIcZAnf62L2M1eQif0x2vlKg3YK4kGYbtijSH4niEgI21GnstykW1vQIs+Bc6L+Hua2GATYVjilJ22A=="
   "resolved" "https://registry.npmjs.org/@mui/core-downloads-tracker/-/core-downloads-tracker-6.1.1.tgz"
@@ -1826,6 +1871,20 @@
   "version" "6.0.2"
   dependencies:
     "@babel/runtime" "^7.25.0"
+
+"@mui/joy@^5.0.0-beta.48":
+  "integrity" "sha512-OhTvjuGl9I5IvpBr0BQyDehIW/xb2yteW6YglHJMdOb/279nItn76X1NBtPV9ImldNlBjReGwvpOXmBTTGER9w=="
+  "resolved" "https://registry.npmjs.org/@mui/joy/-/joy-5.0.0-beta.48.tgz"
+  "version" "5.0.0-beta.48"
+  dependencies:
+    "@babel/runtime" "^7.23.9"
+    "@mui/base" "5.0.0-beta.40"
+    "@mui/core-downloads-tracker" "^5.16.1"
+    "@mui/system" "^5.16.1"
+    "@mui/types" "^7.2.15"
+    "@mui/utils" "^5.16.1"
+    "clsx" "^2.1.0"
+    "prop-types" "^15.8.1"
 
 "@mui/material@^5.0.0 || ^6.0.0", "@mui/material@^5.15.14 || ^6.0.0", "@mui/material@^6.0.2", "@mui/material@^6.1.1":
   "integrity" "sha512-b+eULldTqtqTCbN++2BtBWCir/1LwEYw+2mIlOt2GiEUh1EBBw4/wIukGKKNt3xrCZqRA80yLLkV6tF61Lq3cA=="
@@ -1845,6 +1904,15 @@
     "react-is" "^18.3.1"
     "react-transition-group" "^4.4.5"
 
+"@mui/private-theming@^5.16.6":
+  "integrity" "sha512-rAk+Rh8Clg7Cd7shZhyt2HGTTE5wYKNSJ5sspf28Fqm/PZ69Er9o6KX25g03/FG2dfpg5GCwZh/xOojiTfm3hw=="
+  "resolved" "https://registry.npmjs.org/@mui/private-theming/-/private-theming-5.16.6.tgz"
+  "version" "5.16.6"
+  dependencies:
+    "@babel/runtime" "^7.23.9"
+    "@mui/utils" "^5.16.6"
+    "prop-types" "^15.8.1"
+
 "@mui/private-theming@^6.1.1":
   "integrity" "sha512-JlrjIdhyZUtewtdAuUsvi3ZnO0YS49IW4Mfz19ZWTlQ0sDGga6LNPVwHClWr2/zJK2we2BQx9/i8M32rgKuzrg=="
   "resolved" "https://registry.npmjs.org/@mui/private-theming/-/private-theming-6.1.1.tgz"
@@ -1862,6 +1930,16 @@
     "@babel/runtime" "^7.25.0"
     "csstype" "^3.1.3"
     "hoist-non-react-statics" "^3.3.2"
+    "prop-types" "^15.8.1"
+
+"@mui/styled-engine@^5.16.6":
+  "integrity" "sha512-zaThmS67ZmtHSWToTiHslbI8jwrmITcN93LQaR2lKArbvS7Z3iLkwRoiikNWutx9MBs8Q6okKvbZq1RQYB3v7g=="
+  "resolved" "https://registry.npmjs.org/@mui/styled-engine/-/styled-engine-5.16.6.tgz"
+  "version" "5.16.6"
+  dependencies:
+    "@babel/runtime" "^7.23.9"
+    "@emotion/cache" "^11.11.0"
+    "csstype" "^3.1.3"
     "prop-types" "^15.8.1"
 
 "@mui/styled-engine@^6.1.1":
@@ -1889,12 +1967,38 @@
     "csstype" "^3.1.3"
     "prop-types" "^15.8.1"
 
-"@mui/types@^7.2.15", "@mui/types@^7.2.17":
+"@mui/system@^5.16.1":
+  "integrity" "sha512-Jncvs/r/d/itkxh7O7opOunTqbbSSzMTHzZkNLM+FjAOg+cYAZHrPDlYe1ZGKUYORwwb2XexlWnpZp0kZ4AHuA=="
+  "resolved" "https://registry.npmjs.org/@mui/system/-/system-5.16.7.tgz"
+  "version" "5.16.7"
+  dependencies:
+    "@babel/runtime" "^7.23.9"
+    "@mui/private-theming" "^5.16.6"
+    "@mui/styled-engine" "^5.16.6"
+    "@mui/types" "^7.2.15"
+    "@mui/utils" "^5.16.6"
+    "clsx" "^2.1.0"
+    "csstype" "^3.1.3"
+    "prop-types" "^15.8.1"
+
+"@mui/types@^7.2.14", "@mui/types@^7.2.15", "@mui/types@^7.2.17":
   "integrity" "sha512-oyumoJgB6jDV8JFzRqjBo2daUuHpzDjoO/e3IrRhhHo/FxJlaVhET6mcNrKHUq2E+R+q3ql0qAtvQ4rfWHhAeQ=="
   "resolved" "https://registry.npmjs.org/@mui/types/-/types-7.2.17.tgz"
   "version" "7.2.17"
 
-"@mui/utils@^5.16.6":
+"@mui/utils@^5.15.14":
+  "integrity" "sha512-tWiQqlhxAt3KENNiSRL+DIn9H5xNVK6Jjf70x3PnfQPz1MPBdh7yyIcAyVBT9xiw7hP3SomRhPR7hzBMBCjqEA=="
+  "resolved" "https://registry.npmjs.org/@mui/utils/-/utils-5.16.6.tgz"
+  "version" "5.16.6"
+  dependencies:
+    "@babel/runtime" "^7.23.9"
+    "@mui/types" "^7.2.15"
+    "@types/prop-types" "^15.7.12"
+    "clsx" "^2.1.1"
+    "prop-types" "^15.8.1"
+    "react-is" "^18.3.1"
+
+"@mui/utils@^5.16.1", "@mui/utils@^5.16.6":
   "integrity" "sha512-tWiQqlhxAt3KENNiSRL+DIn9H5xNVK6Jjf70x3PnfQPz1MPBdh7yyIcAyVBT9xiw7hP3SomRhPR7hzBMBCjqEA=="
   "resolved" "https://registry.npmjs.org/@mui/utils/-/utils-5.16.6.tgz"
   "version" "5.16.6"
@@ -3923,7 +4027,7 @@
   "resolved" "https://registry.npmjs.org/clsx/-/clsx-1.2.1.tgz"
   "version" "1.2.1"
 
-"clsx@^2.0.0", "clsx@^2.1.1":
+"clsx@^2.0.0", "clsx@^2.1.0", "clsx@^2.1.1":
   "integrity" "sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA=="
   "resolved" "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz"
   "version" "2.1.1"
@@ -9165,7 +9269,7 @@
     "strip-ansi" "^6.0.1"
     "text-table" "^0.2.0"
 
-"react-dom@^16.14.0 || ^17 || ^18", "react-dom@^16.7.0 || ^17 || ^18 || ^19", "react-dom@^17.0.0 || ^18.0.0", "react-dom@^17.0.0 || ^18.0.0 || ^19.0.0", "react-dom@^18.0.0", "react-dom@^18.3.1", "react-dom@>= 16.3.0", "react-dom@>= 16.8.0", "react-dom@>=16.3.0", "react-dom@>=16.6.0", "react-dom@>=16.8":
+"react-dom@^16.14.0 || ^17 || ^18", "react-dom@^16.7.0 || ^17 || ^18 || ^19", "react-dom@^17.0.0 || ^18.0.0", "react-dom@^17.0.0 || ^18.0.0 || ^19.0.0", "react-dom@^18.0.0", "react-dom@^18.3.1", "react-dom@>= 16.3.0", "react-dom@>= 16.8.0", "react-dom@>=16.3.0", "react-dom@>=16.6.0", "react-dom@>=16.8", "react-dom@>=16.8.0":
   "integrity" "sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw=="
   "resolved" "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz"
   "version" "18.3.1"

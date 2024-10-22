@@ -33,7 +33,8 @@ function Chat() {
     e.preventDefault();
     if (inputValue.trim()) {
       // 서버에 메시지 전송
-      socket.emit('chat message', inputValue);
+      const token = localStorage.getItem('token');
+      socket.emit('chat message', inputValue, token);
       setInputValue(''); // 입력창 초기화
     }
   };
