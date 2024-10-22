@@ -62,7 +62,6 @@ const CourseManager = () => {
                 setClassroomOption(response.data); // 강의실 목록 설정
             })
             .catch(error => {
-                console.log(setClassroomOption);
                 console.error('강의실 목록을 불러오지 못했습니다.', error);
             });
     };
@@ -117,7 +116,8 @@ const CourseManager = () => {
                     event.id === selectedEvent.id ? { ...event, ...updatedCourse } : event
                 );
                 setEvents(updatedEvents);
-                alert('강의 정보가 수정되었습니다.');
+                setSuccessMessage('강의 정보가 수정되었습니다.');
+                setOpenSuccessSnackbar(true);
                 handleClose();
                 fetchEvents(); // 수정 후 이벤트 목록 새로 고침
             })
@@ -148,7 +148,8 @@ const CourseManager = () => {
         const existingCourse = events.find(event => event.title === newEventTitle && (!editMode || event.id !== newEventId));
 
         if (existingCourse) {
-            alert("이미 등록된 강의명입니다.");
+            setSuccessMessage("이미 등록된 강의명입니다.");
+            setOpenSuccessSnackbar(true);
             return;
         }
 
@@ -162,7 +163,8 @@ const CourseManager = () => {
         );
 
         if (useClassroom) {
-            alert("해당 강의실은 선택하신 기간 동안 이미 사용 중입니다.");
+            setSuccessMessage("해당 강의실은 선택하신 기간 동안 이미 사용 중입니다.");
+            setOpenSuccessSnackbar(true);
             return;
         }
 
@@ -173,6 +175,11 @@ const CourseManager = () => {
             updateCourse(newCourse); // ID없이 강의 추가
         } else {
             // 추가
+            if (newEventClassroom.length === 0 || newEventTitle.length === 0) {
+                setSuccessMessage("입력하지 않은 값이 있습니다.");
+                setOpenSuccessSnackbar(true);
+                return;
+            }
             addCourse(newCourse);
         }
     };
@@ -183,7 +190,8 @@ const CourseManager = () => {
         const courseCount = selectedCourses.length;
 
         if (courseCount === 0) {
-            alert("삭제할 강의를 선택하세요.");
+            setSuccessMessage("삭제할 강의를 선택하세요.");
+            setOpenSuccessSnackbar(true);
             return;
         }
 
@@ -200,7 +208,8 @@ const CourseManager = () => {
                     const updatedEvents = events.filter(event => !selectedCourses.includes(event.id));
                     setEvents(updatedEvents);
                     setSelectedCourses([]); // 선택한 강의 목록 초기화
-                    alert(`${courseCount}개의 강의 삭제 성공`);
+                    setSuccessMessage(`${courseCount}개의 강의 삭제 성공`);
+                    setOpenSuccessSnackbar(true);
                 })
                 .catch(error => {
                     console.error('강의 정보를 삭제하지 못했습니다.', error.response.data);
@@ -215,7 +224,8 @@ const CourseManager = () => {
     // 강의 수정 핸들러
     const editSelectedCourse = () => {
         if (selectedCourses.length !== 1) {
-            alert('수정할 강의는 하나만 선택해야 합니다.');
+            setSuccessMessage('수정 및 조회할 강의는 하나 선택해야 합니다.');
+            setOpenSuccessSnackbar(true);
             return;
         }
 
