@@ -26,8 +26,6 @@ import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import EventSeatOutlinedIcon from '@mui/icons-material/EventSeatOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
-import apiClient from "../../shared/apiClient";
-import { jwtDecode } from "jwt-decode";
 import { useState } from "react";
 
 
@@ -42,20 +40,9 @@ const SideBar = ({ open, handleDrawerToggle }) => {
   useEffect(() => {
     const fetchRole = async () => {
       try {
-        const token = localStorage.getItem('token'); // localStorage에서 token 가져오기
-        if (!token) {
-          console.log('No token found in localStorage');
-          return;
-        }
+        const role = localStorage.getItem("membertype");
+        setType(role)
 
-        const decodedToken = jwtDecode(token); // jwtDecode로 토큰 디코딩
-        const id = decodedToken.id;
-
-        // API 요청 보내기
-        const response = await apiClient.get(`user/check/${id}`);
-        console.log("Fetched role:", response.data); // 받은 role 확인
-
-        setType(response.data); // 받은 role을 상태로 저장
       } catch (error) {
         console.error('Error fetching role:', error);
       }
@@ -158,7 +145,7 @@ const SideBar = ({ open, handleDrawerToggle }) => {
           title: "강의관리",
           notifications: 4,
           icon: <SchoolOutlinedIcon />,
-          link: "/memberManager",
+          link: "/courseManager",
         },
         {
           title: "강의실관리",
