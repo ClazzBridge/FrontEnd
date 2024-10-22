@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import apiClient from "../../shared/apiClient";
 import { UserContext } from "../../context/UserContext";
+import CustomSnackbar from "../../components/common/CustomSnackbar"; // 커스텀 스낵바
 
 import {
   Button,
@@ -37,6 +38,13 @@ const ProfileForm = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { setUserInfo } = useContext(UserContext);
+
+  const [openSnackbar, setOpenSnackbar] = useState(false); // 스낵바 열기 상태
+  const [snackbarMessage, setSnackbarMessage] = useState(""); // 스낵바 메시지
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // 스낵바 성공/실패 유무
+  const handleCloseSnackbar = () => {
+      setOpenSnackbar(false); // 스낵바 닫기
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -112,19 +120,17 @@ const ProfileForm = () => {
       return;
     }
 
-
     apiClient
       .put("userlist", profile)
       .then((response) => {
-        alert("변경되었습니다.");
+        setSnackbarMessage("변경되었습니다.");
+        setSnackbarSeverity("success");
+        setOpenSnackbar(true);
         handleSubmit2();
       })
       .catch((error) => {
         console.error("변경에 실패하였습니다.", error);
       });
-
-
-
   };
 
   const handleSubmit2 = (e) => {
@@ -147,7 +153,14 @@ const ProfileForm = () => {
 
 
   return (
-    <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
+      <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
+          {/* 커스텀 스낵바 */}
+          <CustomSnackbar
+              open={openSnackbar}
+              message={snackbarMessage}
+              severity={snackbarSeverity}
+              onClose={handleCloseSnackbar}
+          />
       <CssBaseline />
       <Box sx={{ display: "flex", flexDirection: "row", backgroundColor: "" }}>
         {/* 좌측 프로필 이미지 */}
