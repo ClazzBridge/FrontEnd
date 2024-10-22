@@ -297,7 +297,7 @@ const Calendars = () => {
 
                 {/* 강의 드롭다운 */}
                 <FormControl fullWidth style={{ marginBottom: '20px' }} variant="outlined">
-                  <InputLabel>강의</InputLabel>
+                  <InputLabel>강의 </InputLabel>
                   <Select
                     label="강의"
                     value={newEventcourseTitle}
