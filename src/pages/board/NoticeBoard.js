@@ -585,12 +585,13 @@ export default function NoticeBoard() {
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 5,
+                pageSize: 10,
               },
             },
           }}
-          pageSizeOptions={[5]}
+          pageSizeOptions={[10]}
           disableRowSelectionOnClick
+          style={{ height: "628px" }}
         />
       </Box>
 

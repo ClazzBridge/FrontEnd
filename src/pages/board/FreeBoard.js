@@ -574,6 +574,7 @@ export default function FreeBoard() {
             // 페이지 관련 텍스트 변경
             page: "페이지",
             noRowsLabel: "자유게시판 게시글이 없습니다.",
+
             noResultsOverlayLabel: "결과가 없습니다.",
             errorOverlayDefaultLabel: "오류가 발생했습니다.",
             // 페이지네이션 관련 텍스트
@@ -585,12 +586,13 @@ export default function FreeBoard() {
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 5,
+                pageSize: 10,
               },
             },
           }}
-          pageSizeOptions={[5]}
+          pageSizeOptions={[10]}
           disableRowSelectionOnClick
+          style={{ height: "628px" }}
         />
       </Box>
 

@@ -25,7 +25,7 @@ export default function Home() {
   // 학원 일정 데이터
   const courseName = "웹 개발 과정";
   const startDate = new Date("2024-05-24"); // 시작 날짜 수정
-  const endDate = new Date("2024-12-02"); // 종료 날짜 수정
+  const endDate = new Date("2024-12-03"); // 종료 날짜 수정
   const today = new Date();
   const daysPassed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
   const totalDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));

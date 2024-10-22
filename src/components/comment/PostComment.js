@@ -453,6 +453,7 @@ export default function PostComment({ postId }) {
                         onEdit={handleEdit}
                         onDelete={handleDeleteComment} // 삭제 핸들러 전달
                         isAdmin={userInfo.member?.memberType === "ROLE_ADMIN"} // 관리자 여부 전달
+                        isAuthor={comment.authorId === userInfo.member.id}
                       />
                     ) : null)}
                 </Box>

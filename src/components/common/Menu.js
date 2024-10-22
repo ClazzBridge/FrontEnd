@@ -14,6 +14,7 @@ export default function LongMenu({
   onEdit,
   onDelete,
   isAdmin, // 관리자인지 여부를 나타내는 prop 추가
+  isAuthor,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(false); // 모달 상태 추가
@@ -47,7 +48,7 @@ export default function LongMenu({
     }
   };
 
-  const options = isAdmin ? ["삭제"] : ["수정", "삭제"]; // 관리자는 삭제만, 일반 사용자는 수정과 삭제
+  const options = isAdmin && !isAuthor ? ["삭제"] : ["수정", "삭제"];
 
   return (
     <div>

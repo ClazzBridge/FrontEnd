@@ -36,12 +36,13 @@ const columns = [
       <Box
         sx={{
           backgroundColor:
-            params.row.boardType === "공지사항"
-              ? "antiquewhite"
-              : "transparent", // 공지사항일 때 배경색 지정
-          borderRadius: "25px", // 둥근 모서리
-          padding: "4px 8px", // 여백 (위아래 4px, 좌우 8px)
-          fontWeight: params.row.boardType === "공지사항" ? "600" : "normal", // 글씨체 조정
+            params.row.boardType === "공지사항" ? "#E3EFFB" : "transparent", // 공지사항일 때 배경색 지정
+          borderRadius: "20px", // 둥근 모서리
+          position: params.row.boardType === "공지사항" ? "relative" : "",
+          padding: params.row.boardType === "공지사항" ? "4px 8px" : "0px",
+          right: params.row.boardType === "공지사항" ? "8px" : "",
+          fontWeight: params.row.boardType === "공지사항" ? "500" : "normal", // 글씨체 조정
+          color: params.row.boardType === "공지사항" ? "#12467B" : "balck",
           fontSize: "inherit", // 부모 요소의 글자 크기를 상속받음
           display: "inline",
         }}
@@ -80,7 +81,6 @@ export default function FreeBoardData() {
   const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false); // Snackbar 열기 상태
   const [errorMessage, setErrorMessage] = useState("");
   const [courseId, setCourseId] = useState(""); // 강의 ID 상태 추가
-  const [courseName, setCourseName] = useState("");
 
   const [originalRow, setOriginalRow] = useState(null);
   const [courses, setCourses] = useState([]);
@@ -183,9 +183,6 @@ export default function FreeBoardData() {
 
   const handleBoardIdChange = (event) => {
     setBoardId(event.target.value); // 선택된 카테고리 ID
-    if (event.target.value === "공지사항") {
-      setCourseName("");
-    }
   };
 
   const handleTitleChange = (event) => {

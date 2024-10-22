@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import MuiAppBar from "@mui/material/AppBar";
@@ -10,7 +10,16 @@ import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import { Box, IconButton } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Cookies from "js-cookie";
@@ -114,8 +123,9 @@ const TopBar = ({ open }) => {
     },
   }));
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [isNotificationOpen, setNotificationOpen] = useState(false);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -160,7 +170,11 @@ const TopBar = ({ open }) => {
   };
 
   const handleNotificationClick = () => {
-    alert("알림");
+    setNotificationOpen(true); // 알림창 열기
+  };
+
+  const handleNotificationClose = () => {
+    setNotificationOpen(false); // 알림창 닫기
   };
 
   const menuId = "primary-search-account-menu";
@@ -252,7 +266,9 @@ const TopBar = ({ open }) => {
     >
       <Toolbar
         sx={{
-          backgroundColor: "#f6f8fa",
+          // backgroundColor: "#f6f8fa",
+          backgroundColor: "white",
+          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
           color: "black",
           justifyContent: "space-between",
         }}
@@ -330,6 +346,15 @@ const TopBar = ({ open }) => {
         </Box>
       </Toolbar>
       {renderMobileMenu}
+      <Dialog open={isNotificationOpen} onClose={handleNotificationClose}>
+        <DialogTitle>알림</DialogTitle>
+        <DialogContent>
+          <DialogContentText>여기에 알림 내용을 표시합니다.</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleNotificationClose}>닫기</Button>
+        </DialogActions>
+      </Dialog>
       {renderMenu}
     </AppBar>
   );
