@@ -1,7 +1,7 @@
 #베이스 이미지를 명시해준다.
 FROM node:16-alpine
 
-WORKDIR /FrontEnd/src/app
+WORKDIR /FrontEnd
 
 COPY package.json ./
 
