@@ -418,7 +418,6 @@ const MemberManager = () => {
 
                                 }
                             }
-
                         },
                         { field: 'name', headerName: '이름', flex: 1 },
                         { field: 'memberId', headerName: '아이디', flex: 1 },
@@ -443,10 +442,6 @@ const MemberManager = () => {
                     selectionModel={selectedMembers} // 선택된 ID 목록
                 />
             </Box>
-
-
-
-
 
             {/* 등록, 수정, 삭제 버튼 */}
             <Box mt={2} sx={{ display: "flex", justifyContent: "flex-end" }}>

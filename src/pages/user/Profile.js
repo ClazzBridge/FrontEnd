@@ -123,7 +123,7 @@ const ProfileForm = () => {
     apiClient
       .put("userlist", profile)
       .then((response) => {
-        setSnackbarMessage("변경되었습니다.");
+        setSnackbarMessage("프로필 정보가 수정되었습니다.");
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
         handleSubmit2();
@@ -154,7 +154,7 @@ const ProfileForm = () => {
 
   return (
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-          {/* 커스텀 스낵바 */}
+           커스텀 스낵바 
           <CustomSnackbar
               open={openSnackbar}
               message={snackbarMessage}
@@ -263,7 +263,6 @@ const ProfileForm = () => {
                   onChange={handleChange}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6}>
                 <TextField
                   variant="outlined"
@@ -271,12 +270,15 @@ const ProfileForm = () => {
                   onChange={handleChange}
                   label="전화번호"
                   name="phone"
-                  error={!!error && error === "올바른 전화번호 형식이 아닙니다."}
-                  helperText={
-                    error === "올바른 전화번호 형식이 아닙니다." ? error : ""
-                  }
+                  error={!!error && error === "올바른 전화번호 형식이 아닙니다."} // 에러 여부 설정
                   fullWidth
                 />
+                  {error === "올바른 전화번호 형식이 아닙니다." && (
+                    <Typography variant="caption" color="error" sx={{ mt: 1 }}>
+                        올바른 전화번호 형식이 아닙니다.<br />
+                        예: 010-xxxx-xxxx
+                    </Typography>
+                    )}
               </Grid>
 
               {/* 공개/비공개 선택 라디오 버튼 */}
