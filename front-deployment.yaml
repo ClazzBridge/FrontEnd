@@ -12,6 +12,8 @@ spec:
       labels:
         app: react-app
     spec:
+      imagePullSecrets:
+      - name: regcred  # 생성한 Secret 이름
       containers:
       - name: react-container
         image: contest78.kr.ncr.ntruss.com/contest78-docker:latest
