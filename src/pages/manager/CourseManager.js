@@ -215,7 +215,9 @@ const CourseManager = () => {
                 })
                 .catch(error => {
                     console.error('강의 정보를 삭제하지 못했습니다.', error.response.data);
-                    alert('강의 삭제 실패: ' + error.response.data.message); // 서버에서 받은 오류 메시지를 출력
+                    setSnackbarMessage('강의 삭제 실패: ' + error.response.data.message); // 서버에서 받은 오류 메시지를 출력
+                    setSnackbarSeverity("error");
+                    setOpenSnackbar(true);
                 });
         } else {
             // 사용자가 삭제를 취소했을 때의 처리
