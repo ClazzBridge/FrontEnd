@@ -19,10 +19,3 @@ spec:
         image: contest78.kr.ncr.ntruss.com/contest78-docker:latest
         ports:
         - containerPort: 3000  # React 앱의 기본 포트
-        resources:  # 리소스 제한 추가
-          requests:
-            memory: "256Mi"  # 최소 메모리 요청
-            cpu: "500m"      # 최소 CPU 요청
-          limits:
-            memory: "512Mi"  # 최대 메모리 제한
-            cpu: "1"         # 최대 CPU 제한
