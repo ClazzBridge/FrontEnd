@@ -10,7 +10,7 @@ spec:
   template:
     metadata:
       labels:
-        app: clazz-bridg
+        app: clazz-bridge
     spec:
       imagePullSecrets:
       - name: regcred  # 생성한 Secret 이름
