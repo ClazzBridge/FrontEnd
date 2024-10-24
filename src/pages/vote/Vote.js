@@ -15,12 +15,10 @@ const Vote = () => {
 
 	// 폼 입력 상태 관리
 	const [newEventId, setNewEventId] = useState(''); 
-	const [newEventCourse, setNewEventCourse] = useState('');
 	const [newEventTitle, setNewEventTitle] = useState('');
-	const [newEventDescription, setNewEventDescription] = useState('');
-	const [newEventStart, setNewEventStart] = useState(moment());
+    const [newEventDescription, setNewEventDescription] = useState('');
+    const [newEventStart, setNewEventStart] = useState(moment());
     const [newEventEnd, setNewEventEnd] = useState(moment().add(1, 'hour'));
-    const [newEventIsExpired, setNewEventIsExpired] = useState('');
 
 	const [events, setEvents] = useState('');
 	const [courseOption, setCourseOption] = useState('');
@@ -32,10 +30,6 @@ const Vote = () => {
 	const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // 스낵바 성공/실패 유무
 	const handleCloseSnackbar = () => {
 		setOpenSnackbar(false); // 스낵바 닫기
-    };
-
-    const formatDateTime = (dateTime) => {
-        return moment(dateTime).format('YYYY-MM-DD HH:mm');
     };
 
 	useEffect(() => {
@@ -70,7 +64,6 @@ const Vote = () => {
 
 	// 폼 초기화
 	const resetForm = () => {
-		setNewEventCourse('');
 		setNewEventTitle('');
 		setNewEventDescription('');
 		setNewEventStart(moment());
@@ -105,20 +98,17 @@ const Vote = () => {
 				fetchEvents(); // 추가 후 이벤트 목록 새로 고침
 			})
             .catch(error => {
-                console.log(setEvents);
+                console.log(newVote);
 				console.error('투표 추가에 실패했습니다.', error);
 			});
 	};
 
 	const handleSaveEvent = () => {
 		const newVote = {
-			id: newEventId,
-			courseTitle: newEventCourse,
 			title: newEventTitle,
 			description: newEventDescription,
-            startDate: newEventStart.format('YYYY-MM-DDTHH:mm:ss'),
-            endDate: newEventEnd.format('YYYY-MM-DDTHH:mm:ss'),
-            isExpired: newEventIsExpired,
+            startDate: newEventStart.format('YYYY-MM-DDTHH:mm'),
+            endDate: newEventEnd.format('YYYY-MM-DDTHH:mm'),
 		};
 
 		// 날짜 에러 메시지 띄우기
@@ -269,8 +259,8 @@ const Vote = () => {
                             { field: 'courseTitle', headerName: '강의명', flex: 1 },
                             { field: 'title', headerName: '제목', flex: 1.5 },
                             { field: 'description', headerName: '내용', flex: 1.5 },
-                            { field: 'startDate', headerName: '시작 날짜', flex: 1.3, valueFormatter: (params) => formatDateTime(params.value) },
-                            { field: 'endDate', headerName: '종료 날짜', flex: 1.3, valueFormatter: (params) => formatDateTime(params.value) },
+                            { field: 'startDate', headerName: '시작 날짜', flex: 1.3, renderCell: (params) => moment(params.value).format('YYYY-MM-DD HH:mm') },
+                            { field: 'endDate', headerName: '종료 날짜', flex: 1.3, renderCell: (params) => moment(params.value).format('YYYY-MM-DD HH:mm') },
                             { field: 'isExpired', headerName: '투표 여부', flex: 1.3 },
                         ]}
                         initialState={{
@@ -322,7 +312,7 @@ const Vote = () => {
                         }}
                     >
                         <Typography id="modal-title" variant="h6">
-                            {"강의 등록"}
+                            {"투표 등록"}
                         </Typography>
 
                         {/* 입력 필드 */}
