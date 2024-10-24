@@ -1,21 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: clazz-bridge
+  name: back-deployment
+  labels:
+    app: back
 spec:
-  replicas: 1
+  replicas: 1  # 원하는 복제본 수에 맞게 조정
   selector:
     matchLabels:
-      app: clazz-bridge
+      app: back
   template:
     metadata:
       labels:
-        app: clazz-bridge
+        app: back
     spec:
       imagePullSecrets:
-      - name: regcred  # 생성한 Secret 이름
+        - name: regcred  # 생성한 Secret 이름
       containers:
-      - name: react-container
-        image: contest78.kr.ncr.ntruss.com/contest78-docker:latest
-        ports:
-        - containerPort: 3000  # React 앱의 기본 포트
+        - name: back
+          image: contest78.kr.ncr.ntruss.com/back:latest  # 푸시한 Docker 이미지
+          ports:
+            - containerPort: 8080  # 컨테이너가 노출할 포트
+          resources:  # 리소스 제한 추가
+            requests:
+              memory: "256Mi"  # 최소 메모리 요청
+              cpu: "500m"      # 최소 CPU 요청
+            limits:
+              memory: "512Mi"  # 최대 메모리 제한
+              cpu: "1"         # 최대 CPU 제한
