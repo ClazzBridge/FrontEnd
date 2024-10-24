@@ -58,7 +58,7 @@ const Vote = () => {
 	};
 
 	const fetchCourse = () => {
-		// 투표 목록을 가져오는 API 호출
+		// 강의명 목록을 가져오는 API 호출
 		apiClient.get('course/title')
 			.then(response => {
 				setCourseOption(response.data); // 강의명 목록 설정
@@ -104,7 +104,8 @@ const Vote = () => {
 				handleClose();
 				fetchEvents(); // 추가 후 이벤트 목록 새로 고침
 			})
-			.catch(error => {
+            .catch(error => {
+                console.log(setEvents);
 				console.error('투표 추가에 실패했습니다.', error);
 			});
 	};
@@ -265,9 +266,9 @@ const Vote = () => {
                         columns={[
 
                             { field: 'id', headerName: '번호', flex: 0.5 },
-                            { field: 'course', headerName: '강의명', flex: 1 },
+                            { field: 'courseTitle', headerName: '강의명', flex: 1 },
                             { field: 'title', headerName: '제목', flex: 1.5 },
-                            { field: 'description', headerName: '내용', flex: 1.5},
+                            { field: 'description', headerName: '내용', flex: 1.5 },
                             { field: 'startDate', headerName: '시작 날짜', flex: 1.3, valueFormatter: (params) => formatDateTime(params.value) },
                             { field: 'endDate', headerName: '종료 날짜', flex: 1.3, valueFormatter: (params) => formatDateTime(params.value) },
                             { field: 'isExpired', headerName: '투표 여부', flex: 1.3 },
