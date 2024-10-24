@@ -37,6 +37,7 @@ import MemberManager from "../pages/manager/MemberManager";
 import ClassroomManager from "../pages/manager/ClassroomManager";
 
 const Router = ({ isLoggedIn }) => {
+  console.log("router, ", isLoggedIn);
   return (
     <Routes>
       <Route element={<LayoutWrapper />}>

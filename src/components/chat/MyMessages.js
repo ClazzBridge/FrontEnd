@@ -4,10 +4,39 @@ import Sheet from '@mui/joy/Sheet';
 import MessagesPane from './MessagesPane';
 import ChatsPane from './ChatsPane';
 import { ChatProps } from '../../models/chat';
-import { chats } from './DummyData';
+import { useSocket } from '../../context/SocketContext';
 
 export default function MyProfile() {
   const [selectedChat, setSelectedChat] = React.useState(null); // 초기 값 null
+  const [chats, setChats] = React.useState([]);
+  const socket = useSocket();
+
+  React.useEffect(() => {
+
+    socket.current.on('initCompleted', () => {
+      // 서버에 채팅방 목록 요청
+      console.log("connect complete")
+      socket.current.emit('requestChats');
+    })
+
+    // 서버에서 채팅방 목록을 받았을 때 실행
+    socket.current.on('chats', (fetchedChats) => {
+      console.log("chats fetched : ", fetchedChats);
+      setChats(fetchedChats);
+    });
+
+    // 서버에서 채팅방 목록을 받았을 때 실행
+    socket.current.on('initError',  errorMessage => {
+      console.error(errorMessage);
+    });
+
+    return () => {
+      if (socket.current) {
+        socket.current.disconnect();
+      }
+    }
+  }, [socket]);
+
 
   return (
       <Sheet
@@ -36,7 +65,7 @@ export default function MyProfile() {
             }}
         >
           <ChatsPane
-              chats={chats}
+              chats={chats} // 서버에서 받아온 채팅방 목록 사용
               selectedChatId={selectedChat ? selectedChat.id : null} // selectedChat이 있을 때만 id 접근
               setSelectedChat={setSelectedChat}
           />
