@@ -27,7 +27,7 @@ function Login() {
         try {
 
           const response = await axios.post(
-            "http://back-service.default.svc.cluster.local:8080/api/auth/refresh",
+            "http://default-back-service-e27ef-100126159-b0eb9aec7a73.kr.lb.naverncp.com:8080/api/auth/refresh",
             {
               value: refreshToken,
             },
