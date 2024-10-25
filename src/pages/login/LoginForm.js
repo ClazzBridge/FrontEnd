@@ -33,7 +33,7 @@ function LoginForm({ onLoginSuccess }) {
 
     try {
       console.log("1111=============>");
-      const response = await axios.post("http://198.19.160.20:8080/api/login", {
+      const response = await axios.post("http://back-service.default.svc.cluster.local:8080/api/login", {
         memberId,
         password,
       });

@@ -26,7 +26,7 @@ function QuestionDetail() {
   const { match } = useParams();
   const navigate = useNavigate(); // useNavigate 훅 사용
 
-  axios.defaults.baseURL = "http://198.19.160.20:8080";
+  axios.defaults.baseURL = "http://back-service.default.svc.cluster.local:8080";
 
   useEffect(() => {
     const fetchQuestionAndAnswers = async () => {
