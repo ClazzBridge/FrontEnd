@@ -19,7 +19,7 @@ function QuestionList() {
   const [page, setPage] = useState(1); // 현재 페이지 상태
   const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수 상태
 
-  axios.defaults.baseURL = "http://198.19.128.1:8080";
+  axios.defaults.baseURL = "http://198.19.160.20:8080";
 
 
   // 서버로부터 질문 목록을 가져오는 함수 (Axios 사용)
