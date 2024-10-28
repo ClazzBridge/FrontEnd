@@ -486,6 +486,7 @@ const Vote = () => {
                 >
                     <Box
                         sx={{
+                            overflow: "scroll",
                             display: "flex",
                             flexDirection: "column",
                             p: 4,
