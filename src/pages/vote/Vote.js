@@ -220,7 +220,7 @@ const Vote = () => {
                     ...response.data,
                     id: response.data.id || uuidv4(), // 서버가 `id`를 주지 않으면 클라이언트에서 임시로 생성
                 };
-                setEvents([...events, addedVote]); // 응답으로 받은 새 투표 추가
+                setEvents([addedVote, ...events]); // 응답으로 받은 새 투표 추가
                 setSnackbarMessage('투표가 추가되었습니다.');
                 setSnackbarSeverity('success');
                 setOpenSnackbar(true);
@@ -420,15 +420,18 @@ const Vote = () => {
 
                 <Modal open={openModalVoteInfo} onClose={() => setOpenModalVoteInfo(false)}>
                     <Box sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 400,
-                        bgcolor: 'background.paper',
-                        p: 4,
-                        borderRadius: '4px',
-                        boxShadow: 24,
+                        position: "absolute",
+                        borderRadius: "8px",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: 600,
+                        minHeight: 200,
+                        maxWidth: "100%",
+                        maxHeight: "90%",
+                        overflowY: "auto",
+                        padding: "26px",
+                        backgroundColor: 'white',
                     }}>
                         {voteInfo ? (
                             <>
@@ -486,16 +489,18 @@ const Vote = () => {
                 >
                     <Box
                         sx={{
-                            overflow: "scroll",
-                            display: "flex",
-                            flexDirection: "column",
-                            p: 4,
-                            backgroundColor: "white",
+                            position: "absolute",
                             borderRadius: "8px",
-                            maxWidth: "600px",
-                            margin: "auto",
-                            top: "20%",
-                            position: "relative",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            width: 600,
+                            minHeight: 200,
+                            maxWidth: "100%",
+                            maxHeight: "90%",
+                            overflowY: "auto",
+                            padding: "26px",
+                            backgroundColor: 'white',
                         }}
                     >
                         <Typography id="modal-title" variant="h6">
