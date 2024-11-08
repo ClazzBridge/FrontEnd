@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from "react";
 import apiClient from "../../shared/apiClient";
 import { UserContext } from "../../context/UserContext";
 import CustomSnackbar from "../../components/common/CustomSnackbar"; // 커스텀 스낵바
-
 import {
   Button,
   Radio,
@@ -43,7 +42,7 @@ const ProfileForm = () => {
   const [snackbarMessage, setSnackbarMessage] = useState(""); // 스낵바 메시지
   const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // 스낵바 성공/실패 유무
   const handleCloseSnackbar = () => {
-      setOpenSnackbar(false); // 스낵바 닫기
+    setOpenSnackbar(false); // 스낵바 닫기
   };
 
   useEffect(() => {
@@ -153,33 +152,52 @@ const ProfileForm = () => {
 
 
   return (
-      <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-          <CustomSnackbar
-              open={openSnackbar}
-              message={snackbarMessage}
-              severity={snackbarSeverity}
-              onClose={handleCloseSnackbar}
-          />
-      <CssBaseline />
+    <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
+      <CustomSnackbar
+        open={openSnackbar}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
+        onClose={handleCloseSnackbar}
+      />
+
       <Box sx={{ display: "flex", flexDirection: "row", backgroundColor: "" }}>
         {/* 좌측 프로필 이미지 */}
         <Box
           sx={{
-            flex: 1,
+            marginTop: 13,
+            flex: 2,
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            flexDirection: "column",   // 세로 정렬
+            alignItems: "center",      // 이미지와 텍스트를 중앙 정렬
+            justifyContent: "flex-start", // 위쪽으로 정렬
+            textAlign: "center",       // 텍스트를 중앙 정렬
           }}
         >
           <img
             src={selectedAvatar}
             alt={`${profile.name}'s profile`}
-            style={{ width: 250, height: 250, borderRadius: "50%" }}
+            style={{
+              width: "80%",
+              height: "auto",
+              borderRadius: "50%",
+              objectFit: "cover",
+              display: "block",
+              margin: "0 auto",         // 이미지 중앙 정렬
+              marginBottom: "8px"       // 이미지와 텍스트 간격
+            }}
           />
+          <Typography variant="h5" sx={{ mt: 1, mb: 1 }}>
+            <b>{profile.memberId}</b>
+          </Typography>
+          <Typography variant="h7" color="gray">
+            {profile.email}
+          </Typography>
+
         </Box>
 
+
         {/* 우측 폼 */}
-        <Box sx={{ flex: 3, ml: 4 }}>
+        <Box sx={{ flex: 7, ml: 5, justifyContent: "center" }}>
           <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
             프로필 수정
           </Typography>
@@ -272,12 +290,12 @@ const ProfileForm = () => {
                   error={!!error && error === "올바른 전화번호 형식이 아닙니다."} // 에러 여부 설정
                   fullWidth
                 />
-                  {error === "올바른 전화번호 형식이 아닙니다." && (
-                    <Typography variant="caption" color="error" sx={{ mt: 1 }}>
-                        올바른 전화번호 형식이 아닙니다.<br />
-                        예: 010-xxxx-xxxx
-                    </Typography>
-                    )}
+                {error === "올바른 전화번호 형식이 아닙니다." && (
+                  <Typography variant="caption" color="error" sx={{ mt: 1 }}>
+                    올바른 전화번호 형식이 아닙니다.<br />
+                    예: 010-xxxx-xxxx
+                  </Typography>
+                )}
               </Grid>
 
               {/* 공개/비공개 선택 라디오 버튼 */}

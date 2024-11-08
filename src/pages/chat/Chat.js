@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 
-const socket = io('default-websocket-servic-3b8f6-100169772-9abcce8b6147.kr.lb.naverncp.com:3001').emit('connected', localStorage.getItem('token'));
+const socket = io('localhost:3001').emit('connected', localStorage.getItem('token'));
 
 function Chat() {
   const [messages, setMessages] = useState([]);
