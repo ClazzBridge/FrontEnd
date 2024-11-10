@@ -9,7 +9,7 @@ import Grid from "@mui/material/Grid2";
 import HomeImage from "../../assets/images/homeImage6.jpeg";
 import backImage from "../../assets/images/photo_01_satur_-60.jpg";
 import logo from "../../assets/images/logo.png";
-import socket from "../../utils/socket";
+import socket from "../../config/socket";
 import apiClient from "../../shared/apiClient";
 
 function Login() {

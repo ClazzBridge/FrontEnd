@@ -11,7 +11,7 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ChatListItem from './ChatListItem';
 import { toggleMessagesPane } from '../../utils/chat/utils';
-import socket from '../../utils/socket';
+import socket from '../../config/socket';
 
 const ChatsPane = ({ chats, setSelectedChat, selectedChatId }) => {
   const [users, setUsers] = useState([]);

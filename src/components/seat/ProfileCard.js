@@ -26,7 +26,7 @@ import {
   getCourseId,
   getTeacherByCourseId,
 } from "../../services/apis/studentCourse/get";
-import socket from "../../utils/socket";
+import socket from "../../config/socket";
 
 function ProfileCard({
   seatId,

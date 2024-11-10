@@ -4,7 +4,7 @@ import Sheet from '@mui/joy/Sheet';
 import MessagesPane from './MessagesPane';
 import ChatsPane from './ChatsPane';
 import { ChatProps } from '../../models/chat';
-import socket from '../../utils/socket';
+import socket from '../../config/socket';
 
 export default function MyProfile() {
   const [selectedChat, setSelectedChat] = React.useState(null); // 초기 값 null

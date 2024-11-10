@@ -6,7 +6,7 @@ import AvatarWithStatus from './AvatarWithStatus';
 import ChatBubble from './ChatBubble';
 import MessageInput from './MessageInput';
 import MessagesPaneHeader from './MessagesPaneHeader';
-import socket from '../../utils/socket';
+import socket from '../../config/socket';
 
 export default function MessagesPane(props) {
   const { chat } = props;
