@@ -1,10 +1,10 @@
 // UserContext.js
-import React, { createContext, useState, useEffect } from "react";
+import React, {createContext, useState, useEffect, useContext} from "react";
 
 // 초기값을 null로 설정한 Context 생성
-export const UserContext = createContext();
+const UserContext = createContext();
 
-// Provider 컴포넌트 생성ㄴ
+// Provider 컴포넌트 생성
 export const UserProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(() => {
     // 로컬 스토리지에서 초기값 가져오기
@@ -28,3 +28,7 @@ export const UserProvider = ({ children }) => {
     </UserContext.Provider>
   );
 };
+
+export const useUser = () => {
+  return useContext(UserContext);
+}

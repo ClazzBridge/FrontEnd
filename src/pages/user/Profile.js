@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import apiClient from "../../shared/apiClient";
-import { UserContext } from "../../context/UserContext";
+import {useUser} from "../../context/UserContext";
 import CustomSnackbar from "../../components/common/CustomSnackbar"; // 커스텀 스낵바
 
 import {
@@ -37,7 +37,7 @@ const ProfileForm = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { setUserInfo } = useContext(UserContext);
+  const { setUserInfo } = useUser();
 
   const [openSnackbar, setOpenSnackbar] = useState(false); // 스낵바 열기 상태
   const [snackbarMessage, setSnackbarMessage] = useState(""); // 스낵바 메시지

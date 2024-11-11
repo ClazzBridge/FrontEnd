@@ -10,38 +10,22 @@ import HomeImage from "../../assets/images/homeImage6.jpeg";
 import backImage from "../../assets/images/photo_01_satur_-60.jpg";
 import logo from "../../assets/images/logo.png";
 import socket from "../../config/socket";
-import apiClient from "../../shared/apiClient";
+import {useLogin} from "../../context/LoginProvider";
 
 function Login() {
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("token")
-  );
+  const {isLoggedIn, handleLoginSuccess, handleLoginFail} = useLogin();
   const navigate = useNavigate();
-
-
-  useEffect(() => {
-    console.log("isLoggedIn 상태 변경:", isLoggedIn);
-  }, [isLoggedIn]);
 
   useEffect(() => {
     const checkToken = async () => {
       const token = localStorage.getItem("token");
       const refreshToken = Cookies.get("refreshToken");
 
-      socket.emit("fetchData", token);
-
-      console.log(token);
-
       if (token && isTokenValid(token)) {
-        setIsLoggedIn(true);
-        if (socket) {
-          console.log('Token updated');
-          socket.emit('token', token);
-        }
+        handleLoginSuccess();
       } else if (refreshToken) {
         try {
-
           const response = await axios.post(
             "http://default-back-service-e27ef-100126159-b0eb9aec7a73.kr.lb.naverncp.com:8080/api/auth/refresh",
             {
@@ -52,7 +36,7 @@ function Login() {
             }
           );
           localStorage.setItem("token", response.data.accessToken);
-          setIsLoggedIn(true);
+          handleLoginSuccess();
 
           if (socket) {
             console.log('Token updated');
@@ -93,38 +77,6 @@ function Login() {
       console.error("Token is invalid:", error);
       return false;
     }
-  };
-
-  const handleLoginSuccess = () => {
-    console.log("로그인");
-    setIsLoggedIn(true);
-
-    if (socket) {
-      console.log('Token updated');
-      socket.emit('token', localStorage.getItem("token"));
-    }
-  };
-  const handleLoginFail = async () => {
-    console.log("로그인 실패");
-    // 좌석 상태를 오프라인으로 업데이트하는 요청 보내기
-    try {
-      const id = localStorage.getItem("userId");
-      const memberId = id.toString();
-      console.log(memberId);
-      console.log("memberId===>", memberId);
-      await apiClient.post("/logout", { memberId });
-      console.log("좌석 상태를 오프라인으로 업데이트 완료");
-    } catch (error) {
-      console.error("좌석 상태 업데이트 중 오류 발생:", error);
-    }
-    setIsLoggedIn(false);
-    localStorage.removeItem("token");
-    localStorage.removeItem("membertype");
-    localStorage.removeItem("userInfo");
-    localStorage.removeItem("seatInfo");
-    localStorage.removeItem("userId");
-    Cookies.remove("refreshToken");
-    navigate("/"); // 로그인 페이지로 리다이렉트
   };
 
   if (isLoading) {

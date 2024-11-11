@@ -1,8 +1,7 @@
 import { io } from "socket.io-client";
-import config from "./config";
 
 const socket = io(
-  config.socketUrl,
+    "http://localhost:3001",
 );
 
 export default socket;

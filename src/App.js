@@ -6,6 +6,7 @@ import Router from "./shared/Router";
 import { UserProvider } from "./context/UserContext";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { SocketProvider } from "./context/SocketContext";
+import {LoginProvider} from "./context/LoginProvider";
 
 const theme = createTheme({
   typography: {
@@ -24,11 +25,17 @@ function App() {
     <ThemeProvider theme={theme}>
       <UserProvider>
         <SidebarProvider>
-          {isLoggedIn ? (
-            <Router /> // 로그인 후 Router 화면
-          ) : (
-            <Login /> // Login 컴포넌트
-          )}
+          <LoginProvider>
+            <TokenProvider>
+              <SocketProvider>
+                {isLoggedIn ? (
+                  <Router />
+                ) : (
+                  <Login onLoginSuccess={handleLoginSuccess} />
+                )}
+              </SocketProvider>
+            </TokenProvider>
+          </LoginProvider>
         </SidebarProvider>
       </UserProvider>
     </ThemeProvider>

@@ -27,7 +27,7 @@ import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import Stack from "@mui/material/Stack";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { GitHub } from "@mui/icons-material";
-import { UserContext } from "../../context/UserContext";
+import {useUser} from "../../context/UserContext";
 import apiClient from "../../shared/apiClient"; // default로 가져오기
 
 const drawerWidth = 240;
@@ -68,7 +68,7 @@ const CustomBadge = styled(Badge)({
 });
 
 const TopBar = ({ open }) => {
-  const { userInfo } = useContext(UserContext);
+  const { userInfo } = useUser();
   if (!userInfo == null) {
     console.log(userInfo.member.name);
   }

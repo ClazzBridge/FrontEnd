@@ -10,7 +10,7 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material";
-import { UserContext } from "../../context/UserContext";
+import {useUser} from "../../context/UserContext";
 import apiClient from "../../shared/apiClient"; // default로 가져오기
 
 function LoginForm({ onLoginSuccess }) {
@@ -20,7 +20,7 @@ function LoginForm({ onLoginSuccess }) {
   const [loading, setLoading] = useState(false);
   const [isSeatRegistered, setIsSeatRegistered] = useState(false); // 좌석 등록 여부 상태
   const [seatData, setSeatData] = useState(null); // 좌석 정보 상태
-  const { setUserInfo, addCourseIdToUserInfo } = useContext(UserContext); // addCourseIdToUserInfo 사용 가능
+  const { setUserInfo, addCourseIdToUserInfo } = useUser() // addCourseIdToUserInfo 사용 가능
 
   const minLength = 8;
 
