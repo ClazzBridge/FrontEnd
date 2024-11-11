@@ -17,3 +17,4 @@ WORKDIR /FrontEnd/build
 EXPOSE 3000
 
 CMD ["npx", "serve", "-s", "."] 
+

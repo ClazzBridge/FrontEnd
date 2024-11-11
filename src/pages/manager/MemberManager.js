@@ -61,6 +61,16 @@ const MemberManager = () => {
         }
     };
 
+    const classroom = () => {
+        apiClient.get('classroom')
+            .then(response => {
+
+            })
+            .catch(error => {
+                console.error('이벤트 데이터를 불러오지 못했습니다.', error);
+            });
+    };
+
     const validatePassword = (password) => {
         if (password.length < 8 || password.includes(" ") || password.length === 0) {
             setPasswordError("8글자 이상이거나 공백이 들어가면 안됩니다.");
@@ -74,6 +84,7 @@ const MemberManager = () => {
         // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
         fetchEvents();
         fetchCourse();
+
     }, []); // 빈 배열로 처음에 한 번만 실행
 
     const fetchEvents = () => {
