@@ -10,6 +10,7 @@ import {
     Alert
 } from "@mui/material";
 import apiClient from '../../shared/apiClient';
+import {useSelector} from "react-redux";
 
 
 const PasswordCheck = () => {
@@ -17,12 +18,13 @@ const PasswordCheck = () => {
     const [error, setError] = useState('');
     const [userId, setUserId] = useState(null); // userId 상태 추가
     const navigate = useNavigate(); // 추가
+    const userInfo = useSelector((state) => state.auth.user);
+    const token = useSelector((state) => state.auth.token);
+
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         if (token) {
             try {
-                const userId = userInfo.member.id; // userId 추출
+                const userId = userInfo.id; // userId 추출
                 setUserId(userId);
 
                 apiClient.get(`userlist/${userId}`)
@@ -42,9 +44,6 @@ const PasswordCheck = () => {
         e.preventDefault();
         try {
             console.log("userId : ", userId);
-
-            // JWT 토큰을 localStorage에서 가져옵니다.
-            const token = localStorage.getItem('token');
 
             // 서버에 비밀번호 확인 요청
             const response = await apiClient.post('userlist',

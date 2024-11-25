@@ -16,6 +16,7 @@ import moment from "moment";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "../../styles/assignment.css";
+import {debugLog} from "../../shared/debugLog";
 
 export default function AssignmentAccordion() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -59,6 +60,7 @@ export default function AssignmentAccordion() {
     if (currentUser) {
       try {
         const result = await getStudentCourseId();
+        debugLog("fetchStudentCourseId에서 result", result);
         setStudentCourseId(result.id);
         setCourseId(result.courseId);
         setCourseTitle(result.courseTitle);
@@ -155,9 +157,8 @@ export default function AssignmentAccordion() {
     try {
       let fetchedAssignments;
       if (
-        currentUser &&
-        currentUser.member &&
-        currentUser.member.memberType === "ROLE_ADMIN"
+          currentUser &&
+          currentUser.memberType === "ROLE_ADMIN"
       ) {
         fetchedAssignments = await getAllAssignments();
       } else {
@@ -179,8 +180,7 @@ export default function AssignmentAccordion() {
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ko}>
       {/* 과제 등록 버튼 */}
       {currentUser &&
-        currentUser.member &&
-        currentUser.member.memberType === "ROLE_TEACHER" && (
+        currentUser.memberType === "ROLE_TEACHER" && (
           <Box sx={{ marginBottom: "16px" }}>
             <Tooltip title="과제 작성">
               <Button

@@ -11,25 +11,26 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ChatListItem from './ChatListItem';
 import { toggleMessagesPane } from '../../utils/chat/utils';
-import socket from '../../utils/socket';
+import {useSocket} from "../../context/SocketContext";
 
 const ChatsPane = ({ chats, setSelectedChat, selectedChatId }) => {
   const [users, setUsers] = useState([]);
+  const {emitWithReconnect, onEvent, offEvent} = useSocket();
 
   useEffect(() => {
     // 서버에 courseId로 사용자 데이터 요청
-    socket.emit('fetchChatUserData');
+    emitWithReconnect('fetchChatUserData');
 
     // 서버에서 사용자 데이터 응답 받기
-    socket.on('fetchedChatUserData', (studentData) => {
+    onEvent('fetchedChatUserData', (studentData) => {
       setUsers(studentData);
     });
 
     // 클린업: 이벤트 리스너 제거
     return () => {
-      socket.off('fetchedChatUserData');
+      offEvent('fetchedChatUserData');
     };
-  }, [socket]);
+  }, []);
 
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState('');
@@ -64,7 +65,7 @@ const ChatsPane = ({ chats, setSelectedChat, selectedChatId }) => {
     console.log(`Selected user: ${selectedUser}`);
     console.log(`Text: ${text}`);
 
-    socket.emit('createChat', { username: [selectedUser, localStorage.getItem("userId")], text: text }, (response) => {
+    emitWithReconnect('createChat', { username: [selectedUser, localStorage.getItem("userId")], text: text }, (response) => {
       console.log(response);
     });
 

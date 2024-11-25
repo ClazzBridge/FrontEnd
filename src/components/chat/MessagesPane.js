@@ -6,12 +6,13 @@ import AvatarWithStatus from './AvatarWithStatus';
 import ChatBubble from './ChatBubble';
 import MessageInput from './MessageInput';
 import MessagesPaneHeader from './MessagesPaneHeader';
-import socket from '../../utils/socket';
+import {useSocket} from "../../context/SocketContext";
 
 export default function MessagesPane(props) {
   const { chat } = props;
   const [chatMessages, setChatMessages] = useState(chat.messages);
   const [textAreaValue, setTextAreaValue] = useState('');
+  const {emitWithReconnect, onEvent} = useSocket();
 
   useEffect(() => {
     setChatMessages(chat.messages);
@@ -70,13 +71,13 @@ export default function MessagesPane(props) {
               const newId = chatMessages.length + 1;
               const newIdString = newId.toString();
 
-              socket.emit('newMessage', {
+              emitWithReconnect('newMessage', {
                 chatId: chat.id,
                 messageId: newIdString,
                 message: textAreaValue,
               });
 
-              socket.on('newMessages', (msg) => {
+              onEvent('newMessages', (msg) => {
                 console.log('message: ' + msg);
                 setChatMessages([...chatMessages, msg]);
               });

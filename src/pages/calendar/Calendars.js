@@ -18,6 +18,7 @@ import apiClient from "../../shared/apiClient";
 import CustomModal from "../../components/common/CustomModal";
 import "../../styles/calendar.css";
 import "moment/locale/ko"; // 한국어 로케일 불러오기
+import {useSelector} from "react-redux";
 
 moment.locale("ko");
 
@@ -58,11 +59,13 @@ const Calendars = ({ readOnly }) => {
   const [events, setEvents] = useState([]);
   const [courseOptions, setcourseOptions] = useState([]); // 강의 옵션 상태
 
-  // role 상태
-  const [role, setType] = useState("");
 
   // course 상태
   const [course, setCourse] = useState("");
+
+  const {token, user} = useSelector((state) => state.auth);
+  const userInfo = useSelector((state) => state.auth.user)
+  const role = useSelector((state) => state.auth.user.memberType);
 
   useEffect(() => {
     // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
@@ -70,28 +73,22 @@ const Calendars = ({ readOnly }) => {
     fetchcourses();
     const fetchRole = async () => {
       try {
-        const token = localStorage.getItem("token"); // localStorage에서 token 가져오기
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
         if (!token) {
           console.log("No token found in localStorage");
           return;
         }
-        // API 요청 보내기
-        const role = localStorage.getItem("membertype");
 
         if (role !== "ROLE_ADMIN") {
           apiClient
-            .get(`user/check/${userInfo.member.id}`)
+            .get(`user/check/${userInfo.id}`)
             .then((response) => {
               setCourse(response.data); // 강의 목록 설정
-              console.log(response.data);
             })
             .catch((error) => {
               console.error("강의 목록을 불러오지 못했습니다.", error);
             });
         }
 
-        setType(role); // 받은 role을 상태로 저장
       } catch (error) {
         console.error("Error fetching role:", error);
       }
@@ -156,7 +153,6 @@ const Calendars = ({ readOnly }) => {
 
   // 이벤트 클릭 시 이벤트 처리
   const handleSelectEvent = (event) => {
-    console.log(event, "event");
     setSelectedEvent(event);
     setNewEventcourseTitle(event.courseTitle);
     setNewEventEventTitle(event.eventTitle);

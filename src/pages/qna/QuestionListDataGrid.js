@@ -22,7 +22,6 @@ import { deleteQuestionsApi } from "../../services/apis/question/delete";
 import { getQuestionsByCourseId } from "../../services/apis/question/get";
 import { updateQuestionApi } from "../../services/apis/question/put";
 import { toggleQuestionRecommendApi } from "../../services/apis/question/put";
-import { UserContext } from "../../context/UserContext";
 import { getAnswersByQuestionIdApi } from "../../services/apis/answer/get";
 import { saveAnswerApi } from "../../services/apis/answer/post";
 import { updateAnswerApi } from "../../services/apis/answer/put";
@@ -34,10 +33,11 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { formatDistanceToNow } from "date-fns";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { ko } from "date-fns/locale";
+import {useSelector} from "react-redux";
 
 export default function QuestionBoard() {
   // 상태 관리
-  const { userInfo } = useContext(UserContext);
+  const userInfo = useSelector((state) => state.auth.user);
   const [rows, setRows] = useState([]);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -82,13 +82,13 @@ export default function QuestionBoard() {
   };
 
   const hasTeacherAlreadyAnswered = useCallback(() => {
-    if (!answers || !userInfo?.member?.id) return false;
-    return answers.some((answer) => answer.teacherId === userInfo.member.id);
-  }, [answers, userInfo?.member?.id]);
+    if (!answers || !userInfo?.id) return false;
+    return answers.some((answer) => answer.teacherId === userInfo.id);
+  }, [answers, userInfo?.id]);
 
   // useEffect 추가 - selectedRow 변경 시 권한 재확인
   useEffect(() => {
-    if (selectedRow && userInfo?.member) {
+    if (selectedRow && userInfo) {
     }
   }, [selectedRow, userInfo]);
 
@@ -278,7 +278,7 @@ export default function QuestionBoard() {
   useEffect(() => {
     const fetchCourseId = async () => {
       try {
-        const memberType = userInfo?.member?.memberType;
+        const memberType = userInfo?.memberType;
         setType(memberType);
 
         if (!memberType) {
@@ -319,7 +319,7 @@ export default function QuestionBoard() {
       return;
     }
 
-    if (!userInfo?.member?.id || !courseId) {
+    if (!userInfo?.id || !courseId) {
       showSnackbar(
         "로그인 정보나 강의 정보가 필요합니다. 로그인 후 다시 시도하세요.",
         "error"
@@ -330,15 +330,15 @@ export default function QuestionBoard() {
     try {
       const newQuestion = await saveQuestionApi({
         content,
-        memberId: userInfo.member.id,
+        memberId: userInfo.id,
         courseId,
       });
 
       // 새 질문 데이터에 필요한 정보 추가
       const processedQuestion = {
         ...newQuestion,
-        studentId: userInfo.member.id, // studentId 명시적 추가
-        memberId: userInfo.member.id, // memberId 명시적 추가
+        studentId: userInfo.id, // studentId 명시적 추가
+        memberId: userInfo.id, // memberId 명시적 추가
       };
 
       // 새 질문을 목록에 추가
@@ -395,7 +395,7 @@ export default function QuestionBoard() {
       return (
         type === "ROLE_ADMIN" ||
         type === "ROLE_TEACHER" ||
-        (type === "ROLE_STUDENT" && question.studentId === userInfo?.member?.id)
+        (type === "ROLE_STUDENT" && question.studentId === userInfo?.id)
       );
     });
 
@@ -435,14 +435,14 @@ export default function QuestionBoard() {
       return;
     }
 
-    if (!userInfo?.member?.id) {
+    if (!userInfo?.id) {
       showSnackbar("사용자 정보가 없습니다. 로그인 해주세요.", "error");
       return;
     }
 
     try {
       const response = await saveAnswerApi({
-        teacherId: userInfo.member.id,
+        teacherId: userInfo.id,
         questionId: selectedRow.id,
         content: newAnswer,
       });
@@ -451,8 +451,8 @@ export default function QuestionBoard() {
         ...response,
         id: response.id,
         content: newAnswer,
-        teacherId: userInfo.member.id,
-        teacherName: userInfo.member.name,
+        teacherId: userInfo.id,
+        teacherName: userInfo.name,
         createdAt: new Date().toISOString(),
         isNewAnswer: true, // 이 플래그 추가
         questionId: selectedRow.id, // 질문 ID도 추가
@@ -507,8 +507,8 @@ export default function QuestionBoard() {
 
   // 권한 확인 함수 수정
   const canDeleteAnswer = (answer) => {
-    const memberType = userInfo?.member?.memberType;
-    const userId = userInfo?.member?.id;
+    const memberType = userInfo?.memberType;
+    const userId = userInfo?.id;
 
     // 관리자는 모든 답변 삭제 가능
     if (memberType === "ROLE_ADMIN") {
@@ -538,8 +538,8 @@ export default function QuestionBoard() {
       const hasPermission = canDeleteAnswer(answer);
       // console.log("Delete permission check:", {
       //   hasPermission,
-      //   memberType: userInfo?.member?.memberType,
-      //   userId: userInfo?.member?.id,
+      //   memberType: userInfo?.memberType,
+      //   userId: userInfo?.id,
       //   teacherId: answer.teacherId,
       // });
 
@@ -598,10 +598,10 @@ export default function QuestionBoard() {
 
   // 권한 체크 유틸리티 함수들
   const canEditQuestion = (question) => {
-    if (!question || !userInfo?.member) return false;
+    if (!question || !userInfo) return false;
 
-    const memberType = userInfo.member.memberType;
-    const userId = userInfo.member.id;
+    const memberType = userInfo.memberType;
+    const userId = userInfo.id;
     const questionUserId = question.studentId || question.memberId;
 
     // 관리자는 수정 권한 없음, 학생만 자신의 글 수정 가능
@@ -609,14 +609,14 @@ export default function QuestionBoard() {
   };
 
   const canManageRecommendation = () => {
-    const memberType = userInfo?.member?.memberType;
+    const memberType = userInfo?.memberType;
     // 추천 기능은 교사만 가능하도록 수정
     return memberType === "ROLE_TEACHER";
   };
 
   const canDeleteQuestion = (question) => {
-    const memberType = userInfo?.member?.memberType;
-    const userId = userInfo?.member?.id;
+    const memberType = userInfo?.memberType;
+    const userId = userInfo?.id;
 
     return (
       memberType === "ROLE_ADMIN" ||
@@ -626,7 +626,7 @@ export default function QuestionBoard() {
   };
 
   const canManageAnswers = () => {
-    const memberType = userInfo?.member?.memberType;
+    const memberType = userInfo?.memberType;
     // 답변 작성은 교사만 가능하도록 수정
     return memberType === "ROLE_TEACHER";
   };
@@ -685,8 +685,8 @@ export default function QuestionBoard() {
   };
 
   const canShowMenu = (answer) => {
-    const memberType = userInfo?.member?.memberType;
-    const userId = userInfo?.member?.id;
+    const memberType = userInfo?.memberType;
+    const userId = userInfo?.id;
 
     // 강사가 자신의 답변인 경우
     if (memberType === "ROLE_TEACHER" && answer.teacherId === userId) {
@@ -703,8 +703,8 @@ export default function QuestionBoard() {
 
   // 메뉴 아이템 표시 여부 결정하는 함수 추가
   const getMenuItems = (answer) => {
-    const memberType = userInfo?.member?.memberType;
-    const userId = userInfo?.member?.id;
+    const memberType = userInfo?.memberType;
+    const userId = userInfo?.id;
 
     // 강사가 자신의 답변인 경우
     if (memberType === "ROLE_TEACHER" && answer.teacherId === userId) {
@@ -810,7 +810,7 @@ export default function QuestionBoard() {
           marginBottom: 2,
         }}
       >
-        {userInfo?.member?.memberType === "ROLE_STUDENT" && (
+        {userInfo?.memberType === "ROLE_STUDENT" && (
           <Button
             variant="outlined"
             sx={{ width: "38px", height: "38px" }}
@@ -1252,7 +1252,7 @@ export default function QuestionBoard() {
                     <>
                       {/* 수정 버튼 - 본인 글인 학생만 가능 */}
                       {type === "ROLE_STUDENT" &&
-                        selectedRow?.studentId === userInfo?.member?.id && (
+                        selectedRow?.studentId === userInfo?.id && (
                           <Button
                             variant="outlined"
                             onClick={() => handleStartEdit(selectedRow.content)}
@@ -1264,7 +1264,7 @@ export default function QuestionBoard() {
                       {(type === "ROLE_ADMIN" ||
                         type === "ROLE_TEACHER" ||
                         (type === "ROLE_STUDENT" &&
-                          selectedRow?.studentId === userInfo?.member?.id)) && (
+                          selectedRow?.studentId === userInfo?.id)) && (
                         <Button
                           variant="outlined"
                           onClick={() => {

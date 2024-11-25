@@ -1,38 +1,26 @@
-import "./App.css";
-import React, { useEffect, useState } from "react";
-import { SidebarProvider } from "./context/SidebarContext";
+import React from "react";
+import { Box } from "@mui/material";
 import Login from "./pages/login/Login";
-import Router from "./shared/Router";
-import { UserProvider } from "./context/UserContext";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { SocketProvider } from "./context/SocketContext";
+import {SidebarProvider} from "./context/SidebarContext";
+import store, {persistor} from "./redux/store";
+import {Provider} from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import {SocketProvider} from "./context/SocketContext";
 
-const theme = createTheme({
-  typography: {
-    fontFamily: "Pretendard-Regular", // 선택한 폰트 설정
-  },
-});
-
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
-  };
-
+const App = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <UserProvider>
-        <SidebarProvider>
-          {isLoggedIn ? (
-            <Router /> // 로그인 후 Router 화면
-          ) : (
-            <Login /> // Login 컴포넌트
-          )}
-        </SidebarProvider>
-      </UserProvider>
-    </ThemeProvider>
-  );
-}
+      <Box>
+        <PersistGate loading={null} persistor={persistor}>
+          <Provider store={store}>
+            <SocketProvider>
+              <SidebarProvider>
+                <Login/>
+              </SidebarProvider>
+            </SocketProvider>
+          </Provider>
+        </PersistGate>
+      </Box>
+  )
+};
 
-export default App;
+export default App; // 기본 내보내기

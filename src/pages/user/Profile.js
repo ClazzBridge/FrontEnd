@@ -1,7 +1,8 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import apiClient from "../../shared/apiClient";
-import { UserContext } from "../../context/UserContext";
 import CustomSnackbar from "../../components/common/CustomSnackbar"; // 커스텀 스낵바
+import {updateUserInfo} from "../../redux/authSlice";
+
 import {
     Button,
     Radio,
@@ -19,6 +20,7 @@ import {
 
 // 아바타 이미지 파일들을 가져옵니다.
 import avatar1 from "../../assets/images/image1.jpeg";
+import {useDispatch} from "react-redux";
 
 const ProfileForm = () => {
     const [profile, setProfile] = useState({
@@ -36,7 +38,7 @@ const ProfileForm = () => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const { setUserInfo } = useContext(UserContext);
+    const dispatch = useDispatch();
 
     const [openSnackbar, setOpenSnackbar] = useState(false); // 스낵바 열기 상태
     const [snackbarMessage, setSnackbarMessage] = useState(""); // 스낵바 메시지
@@ -52,7 +54,7 @@ const ProfileForm = () => {
         if (token) {
             try {
 
-                const userId = userInfo.member.id; // userId 추출
+                const userId = userInfo.id; // userId 추출
 
                 apiClient
                     .get(`userlist/${userId}`)
@@ -137,17 +139,14 @@ const ProfileForm = () => {
             memberId: profile.memberId,
             password: profile.password,
         })
-            .then((response) => {
-                const { authResponseDTO: member } = response.data;
-                setUserInfo({ member });
-                localStorage.setItem("userInfo", JSON.stringify({ member })); // 로컬 스토리지에 저장
-                localStorage.setItem("userId", member.id); // 로컬 스토리지에 저장
-                localStorage.setItem("membertype", member.memberType); // 로컬 스토리지에 저장
-
-            })
-            .catch((error) => {
-                console.error("Update failed:", error);
-            });
+        .then((response) => {
+            const { authResponseDTO: member } = response.data;
+            const user = { member };
+            dispatch(updateUserInfo(user.member));
+        })
+        .catch((error) => {
+            console.error("Update failed:", error);
+        });
     }
 
     return (

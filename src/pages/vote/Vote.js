@@ -17,6 +17,7 @@ import { DataGrid } from "@mui/x-data-grid"; // DataGrid 임포트
 import { v4 as uuidv4 } from "uuid"; // 고유한 ID를 생성하기 위해 uuid 패키지 사용
 import CustomSnackbar from "../../components/common/CustomSnackbar"; // 커스텀 스낵바
 import CustomModal from "../../components/common/CustomModal"; // 커스텀 모달
+import {useSelector} from "react-redux"; // 커스텀 스낵바
 
 import PollIcon from "@mui/icons-material/Poll";
 import "../../styles/vote.css";
@@ -49,7 +50,7 @@ const Vote = () => {
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false); // 스낵바 닫기
   };
-  const role = localStorage.getItem("membertype");
+  const role = useSelector((state) => state.auth.user.memberType);
 
   const renderButtons = () => {
     if (role === "ROLE_TEACHER") {

@@ -27,6 +27,7 @@ import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import EventSeatOutlinedIcon from "@mui/icons-material/EventSeatOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import { useState } from "react";
+import {useSelector} from "react-redux";
 
 export const drawerWidth = 240;
 const closedDrawerWidth = 64;
@@ -34,20 +35,8 @@ const topBarHeight = 64; // 탑바의 높이 설정
 
 const SideBar = ({ open, handleDrawerToggle }) => {
   const location = useLocation();
-  const [type, setType] = useState(""); // role 상태 추가
+  const type = useSelector((state) => state.auth.user.memberType);
 
-  useEffect(() => {
-    const fetchRole = async () => {
-      try {
-        const role = localStorage.getItem("membertype");
-        setType(role);
-      } catch (error) {
-        console.error("Error fetching role:", error);
-      }
-    };
-
-    fetchRole();
-  }, []);
 
   const menuItems = [
     {
@@ -67,7 +56,7 @@ const SideBar = ({ open, handleDrawerToggle }) => {
       subItems: [
         // 관리자가 아닐 경우에만 하위 항목 추가
         ...(type !== "ROLE_ADMIN"
-          ? [
+            ? [
               {
                 title: "자유게시판",
                 notifications: 2,
@@ -81,7 +70,7 @@ const SideBar = ({ open, handleDrawerToggle }) => {
                 link: "/noticeboard",
               },
             ]
-          : []),
+            : []),
       ],
     },
     {
@@ -250,148 +239,148 @@ const SideBar = ({ open, handleDrawerToggle }) => {
   }));
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <MenuButtonContainer>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          onClick={handleDrawerToggle}
-          edge="start"
-          sx={{ margin: "auto" }}
-        >
-          {open ? <ChevronLeftIcon /> : <MenuIcon />}
-        </IconButton>
-      </MenuButtonContainer>
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader />
-        <List sx={{ padding: "0px" }}>
-          {menuItems.map((text, index) => (
-            <ListItem key={index} disablePadding sx={{ display: "block" }}>
-              <StyledListItemButton
-                selected={location.pathname === text.link}
-                component={Link}
-                to={text.link}
-                sx={[
-                  {
-                    minHeight: 48,
-                    px: 2.5,
-                  },
-                  open
-                    ? {
-                        justifyContent: "initial",
-                      }
-                    : {
-                        justifyContent: "center",
-                      },
-                ]}
-              >
-                <ListItemIcon
-                  sx={[
-                    {
-                      minWidth: 0,
-                      justifyContent: "center",
-                    },
-                    open
-                      ? {
-                          mr: 3,
-                          display: "none",
-                        }
-                      : {
-                          mr: "auto",
-                        },
-                  ]}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      lineHeight: "20px",
-
-                      margin: "0px",
-                    }}
-                  >
-                    {text.icon}
-                    <Typography
-                      sx={{
-                        width: "24px",
-                        fontSize: "10px",
-                        marginTop: "2px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                      }}
-                    >
-                      {text.title}
-                    </Typography>
-                  </Box>
-                </ListItemIcon>
-                <StyledListMainItemText
-                  primary={text.title}
-                  style={{
-                    display: open ? "block" : "none",
-                  }}
-                  sx={[
-                    open
-                      ? {
-                          opacity: 1,
-                        }
-                      : {
-                          opacity: 0,
-                        },
-                  ]}
-                />
-              </StyledListItemButton>
-
-              {text.subItems &&
-                text.subItems.map((subItem, subIndex) => (
+      <Box sx={{ display: "flex" }}>
+        <MenuButtonContainer>
+          <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerToggle}
+              edge="start"
+              sx={{ margin: "auto" }}
+          >
+            {open ? <ChevronLeftIcon /> : <MenuIcon />}
+          </IconButton>
+        </MenuButtonContainer>
+        <Drawer variant="permanent" open={open}>
+          <DrawerHeader />
+          <List sx={{ padding: "0px" }}>
+            {menuItems.map((text, index) => (
+                <ListItem key={index} disablePadding sx={{ display: "block" }}>
                   <StyledListItemButton
-                    selected={location.pathname === subItem.link}
-                    key={subIndex}
-                    style={{
-                      minHeight: 48,
-                      px: 2.5,
-                      justifyContent: "space-between",
-                      padding: "0px 18px 0px 18px ",
-                      height: "40px",
-                      display: open ? "flex" : "none",
-                      alignItems: "center",
-                      cursor: "pointer",
-                    }}
-                    component={Link}
-                    to={subItem.link}
-                  >
-                    <ListItemIcon
-                      style={{ width: "50px", display: "flex" }}
-                      sx={[open ? { display: "block" } : { display: "none" }]}
-                    >
-                      {subItem.icon}
-                    </ListItemIcon>
-
-                    <StyledListItemText
-                      primary={subItem.title}
-                      style={{ width: "50px" }}
+                      selected={location.pathname === text.link}
+                      component={Link}
+                      to={text.link}
                       sx={[
+                        {
+                          minHeight: 48,
+                          px: 2.5,
+                        },
                         open
-                          ? {
-                              display: "flex",
-                              marginLeft: "-10px",
-                              marginTop: 0,
-                              marginBottom: 0,
+                            ? {
+                              justifyContent: "initial",
                             }
-                          : {
-                              display: "none",
+                            : {
+                              justifyContent: "center",
                             },
                       ]}
+                  >
+                    <ListItemIcon
+                        sx={[
+                          {
+                            minWidth: 0,
+                            justifyContent: "center",
+                          },
+                          open
+                              ? {
+                                mr: 3,
+                                display: "none",
+                              }
+                              : {
+                                mr: "auto",
+                              },
+                        ]}
+                    >
+                      <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            lineHeight: "20px",
+
+                            margin: "0px",
+                          }}
+                      >
+                        {text.icon}
+                        <Typography
+                            sx={{
+                              width: "24px",
+                              fontSize: "10px",
+                              marginTop: "2px",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                            }}
+                        >
+                          {text.title}
+                        </Typography>
+                      </Box>
+                    </ListItemIcon>
+                    <StyledListMainItemText
+                        primary={text.title}
+                        style={{
+                          display: open ? "block" : "none",
+                        }}
+                        sx={[
+                          open
+                              ? {
+                                opacity: 1,
+                              }
+                              : {
+                                opacity: 0,
+                              },
+                        ]}
                     />
                   </StyledListItemButton>
-                ))}
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-    </Box>
+
+                  {text.subItems &&
+                      text.subItems.map((subItem, subIndex) => (
+                          <StyledListItemButton
+                              selected={location.pathname === subItem.link}
+                              key={subIndex}
+                              style={{
+                                minHeight: 48,
+                                px: 2.5,
+                                justifyContent: "space-between",
+                                padding: "0px 18px 0px 18px ",
+                                height: "40px",
+                                display: open ? "flex" : "none",
+                                alignItems: "center",
+                                cursor: "pointer",
+                              }}
+                              component={Link}
+                              to={subItem.link}
+                          >
+                            <ListItemIcon
+                                style={{ width: "50px", display: "flex" }}
+                                sx={[open ? { display: "block" } : { display: "none" }]}
+                            >
+                              {subItem.icon}
+                            </ListItemIcon>
+
+                            <StyledListItemText
+                                primary={subItem.title}
+                                style={{ width: "50px" }}
+                                sx={[
+                                  open
+                                      ? {
+                                        display: "flex",
+                                        marginLeft: "-10px",
+                                        marginTop: 0,
+                                        marginBottom: 0,
+                                      }
+                                      : {
+                                        display: "none",
+                                      },
+                                ]}
+                            />
+                          </StyledListItemButton>
+                      ))}
+                </ListItem>
+            ))}
+          </List>
+        </Drawer>
+      </Box>
   );
 };
 

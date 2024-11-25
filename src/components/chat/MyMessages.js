@@ -3,29 +3,29 @@ import Sheet from '@mui/joy/Sheet';
 
 import MessagesPane from './MessagesPane';
 import ChatsPane from './ChatsPane';
-import { ChatProps } from '../../models/chat';
-import socket from '../../utils/socket';
+import {useSocket} from "../../context/SocketContext";
 
 export default function MyProfile() {
   const [selectedChat, setSelectedChat] = React.useState(null); // 초기 값 null
   const [chats, setChats] = React.useState([]);
+  const {emitWithReconnect, onEvent} = useSocket()
 
   React.useEffect(() => {
 
-    socket.emit('requestChats'); // 서버에 채팅방 목록 요청
+    emitWithReconnect('requestChats'); // 서버에 채팅방 목록 요청
 
     // 서버에서 채팅방 목록을 받았을 때 실행
-    socket.on('chats', (fetchedChats) => {
+    onEvent('chats', (fetchedChats) => {
       console.log("chats fetched : ", fetchedChats);
       setChats(fetchedChats);
     });
 
     // 서버에서 채팅방 목록을 받았을 때 실행
-    socket.on('initError',  errorMessage => {
+    onEvent('initError',  errorMessage => {
       console.error(errorMessage);
     });
 
-  }, [socket]);
+  }, []);
 
 
   return (

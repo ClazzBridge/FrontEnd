@@ -10,20 +10,21 @@ import {
     Grid,
     Button,
 } from "@mui/material";
+import {useSelector} from "react-redux";
 
 const Home = () => {
-    // role 상태
-    const [role, setType] = useState("");
-    const [name, setName] = useState("");
-    // course 상태
-    const [course, setCourse] = useState("");
-    const [courseSize, setCourseSize] = useState("");
-    const [totalDate, setTotalDate] = useState("");
-    const [elapsedDate, setElapsedDate] = useState("");
-    const [startDate, setStartDate] = useState("");
-    const [enddate, setEndDate] = useState("");
-    const [restdate, setRestDate] = useState("");
-    const progressPercentage = elapsedDate / totalDate * 100;
+  // course 상태
+  const [course, setCourse] = useState("");
+  const [courseSize, setCourseSize] = useState("");
+  const [totalDate, setTotalDate] = useState("");
+  const [elapsedDate, setElapsedDate] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [enddate, setEndDate] = useState("");
+  const [restdate, setRestDate] = useState("");
+  const progressPercentage = elapsedDate / totalDate * 100;
+  const { token, user } = useSelector((state) => state.auth);
+  const role = useSelector((state) => state.auth.user.memberType);
+  const name = useSelector((state) => state.auth.user.name);
 
 
     const getWeatherDescriptionInKorean = (description) => {
@@ -90,27 +91,21 @@ const Home = () => {
         getLocationAndFetchWeather();
     }, []);
 
-    useEffect(() => {
-        // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
-        const fetchRole = async () => {
-            try {
-                const token = localStorage.getItem('token'); // localStorage에서 token 가져오기
-                const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  useEffect(() => {
+    // 페이지가 처음 로드될 때 API에서 데이터를 가져옵니다.
+    const fetchRole = async () => {
+      try {
+        const userInfo = user;
 
                 if (!token) {
                     console.log('No token found in localStorage');
                     return;
                 }
 
-                // API 요청 보내기
-                const role = localStorage.getItem('membertype');
-                setName(userInfo.member.name);
-
-
                 if (role !== "ROLE_ADMIN" && userInfo) {
-                    const response = await apiClient.get(`user/check/${userInfo.member.id}`);
+                    const response = await apiClient.get(`user/check/${userInfo.id}`);
                     setCourse(response.data); // 강의 목록 설정
-                    if (localStorage.getItem('membertype') !== "ROLE_ADMIN") {
+                    if (role !== "ROLE_ADMIN") {
                         const encodedCourse = encodeURIComponent(response.data);
                         const response2 = await apiClient.get(`/course/time/${encodedCourse}`);
                         setElapsedDate(response2.data[0]);
@@ -122,7 +117,6 @@ const Home = () => {
                         console.log(response2.data);
                     }
                 }
-                setType(role); // 받은 role을 상태로 저장
             } catch (error) {
                 console.error('Error fetching role:', error);
             }

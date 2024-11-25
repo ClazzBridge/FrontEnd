@@ -21,7 +21,7 @@ const MessageProps = {
 };
 
 // ChatProps 구조
-const ChatProps = {
+export const ChatProps = {
   id: '',       // string
   sender: UserProps,  // UserProps 구조
   messages: [MessageProps]  // MessageProps 배열

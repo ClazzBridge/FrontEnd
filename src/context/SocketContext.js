@@ -1,39 +1,105 @@
-import React, { createContext, useContext, useRef, useEffect } from 'react';
-import io from 'socket.io-client';
-import socket from '../utils/socket';
+import { useDispatch, useSelector } from "react-redux";
+import { io } from "socket.io-client";
+import { setConnected, setDisconnected } from "../redux/socketSlice";
+import React, { createContext, useContext, useEffect, useRef } from "react";
 
-// Context 생성
 const SocketContext = createContext();
 
-// Provider 컴포넌트
-export const SocketProvider = ({children}) => {
-  console.log("socket provider called");
-  const token = localStorage.getItem("token");
+export const SocketProvider = ({ children }) => {
+  const token = useSelector((state) => state.auth.token);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const socketRef = useRef(null);
+
+  const initializeSocket = () => {
+    if (!socketRef.current) {
+      socketRef.current = io(process.env.REACT_APP_SOCKET_SERVER_URI, {
+        autoConnect: false,
+        auth: { token },
+      });
+
+      socketRef.current.on("connect", () => {
+        console.log("Socket connected, id is :", socketRef.current.id);
+      });
+
+      socketRef.current.on("disconnect", () => {
+        console.log("Socket disconnected");
+      });
+
+      socketRef.current.on("initError", (errorMessage) => {
+        console.error("Init error:", errorMessage);
+      });
+    }
+  };
+
+  const connectSocket = () => {
+    socketRef.current.connect();
+  };
+
+  const disconnectSocket = () => {
+    socketRef.current.disconnect();
+  };
+
+
+  // emitWithReconnect: 연결 상태 확인 후 명령 실행
+  const emitWithReconnect = async (event, data) => {
+    if (!socketRef.current.connected) {
+      console.log("Socket not connected. Attempting to reconnect...");
+      connectSocket();
+      await new Promise((resolve) =>
+          socketRef.current.once("connect", resolve) // 연결될 때까지 대기
+      );
+    }
+
+    // 연결 후 명령 실행
+    socketRef.current.emit(event, data);
+    console.log(`Event emitted: ${event}`, data);
+  };
+
+  // onEvent: 이벤트 리스너 추가
+  const onEvent = (event, callback) => {
+    if (socketRef.current) {
+      socketRef.current.on(event, callback);
+      console.log(`Event listener added for: ${event}`);
+    }
+  };
+
+  // offEvent: 이벤트 리스너 제거
+  const offEvent = (event) => {
+    if (socketRef.current) {
+      socketRef.current.off(event);
+      console.log(`Event listener removed for: ${event}`);
+    }
+  };
 
   useEffect(() => {
-    console.log("socket provider useEffect called");
+    initializeSocket();
+    console.log(isLoggedIn, socketRef.current.connected);
 
-      socket.emit('connected', token);
-      console.log('WebSocket connected');
+    if (isLoggedIn && !socketRef.current.connected) {
+      connectSocket();
+    } else if (!isLoggedIn && socketRef.current.connected) {
+      disconnectSocket();
+    }
 
-      socket.on('initError', errorMessage => {
-        console.error(errorMessage);
-      });
-
-      socket.on('initCompleted', () => {
-        console.log("socket init complete")
-      });
-
-  }, []);
+    return () => {
+      disconnectSocket(); // 컴포넌트 언마운트 시 소켓 연결 해제
+    };
+  }, [isLoggedIn]);
 
   return (
-      <SocketContext.Provider value={socket}>
+      <SocketContext.Provider
+          value={{
+            socket: socketRef.current,
+            emitWithReconnect,
+            onEvent,
+            offEvent,
+          }}
+      >
         {children}
       </SocketContext.Provider>
   );
 };
 
-// SocketContext를 사용하는 커스텀 훅
 export const useSocket = () => {
   return useContext(SocketContext);
 };
