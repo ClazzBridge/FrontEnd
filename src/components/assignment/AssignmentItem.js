@@ -544,7 +544,19 @@ export default function AssignmentItem({
           );
         })
       ) : (
-        <Typography>과제가 없습니다.</Typography> // 과제가 없을 때 메시지 표시
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            maxWidth: "100%",
+            maxHeight: "90%",
+            overflowY: "auto",
+          }}
+        >
+          <Typography>과제가 없습니다.</Typography>
+        </Box>
       )}
       <CustomSnackbar
         open={openSnackbar}

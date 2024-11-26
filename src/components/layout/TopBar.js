@@ -190,7 +190,6 @@ const TopBar = ({ open }) => {
     localStorage.removeItem("seatInfo");
     console.log("토큰 제거 완료", localStorage.getItem("token"));
 
-
     // 페이지를 새로 고치거나 로그인 화면으로 이동
     window.location.reload();
   };
@@ -294,7 +293,7 @@ const TopBar = ({ open }) => {
         sx={{
           // backgroundColor: "#f6f8fa",
           backgroundColor: "white",
-          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          // borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
           color: "black",
           justifyContent: "space-between",
         }}
