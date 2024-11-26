@@ -29,8 +29,8 @@ import {
   getCourseId,
   getTeacherByCourseId,
 } from "../../services/apis/studentCourse/get";
-import {useSelector} from "react-redux";
-import {useSocket} from "../../context/SocketContext";
+import { useSelector } from "react-redux";
+import { useSocket } from "../../context/SocketContext";
 
 function ProfileCard({
   seatId,
@@ -63,7 +63,7 @@ function ProfileCard({
       color: "#ffffff",
       boxShadow: `0 0 0 1px ${theme.palette.background.paper}`,
       "&::after": isGoodOnline
-          ? {
+        ? {
             position: "absolute",
             top: 0,
             left: 0,
@@ -74,7 +74,7 @@ function ProfileCard({
             border: "1px solid currentColor",
             content: '""',
           }
-          : {},
+        : {},
     },
     "@keyframes ripple": {
       "0%": {
@@ -89,52 +89,137 @@ function ProfileCard({
   }));
 
   return (
-      <Card
-          sx={{
-            marginTop: "10px",
-            borderRadius: "8px",
-            width: "200px",
-            textAlign: "center",
-            height: "145px",
-            boxShadow: isSelf
-                ? "0 1px 0px rgba(0, 0, 0, 0.2)"
-                : "0 1px 0px rgba(0, 0, 0, 0.1)",
-            border:
-                !isOffline && isSelf && isUnderstanding
-                    ? "1px solid #28a745"
-                    : !isOffline && isSelf && !isUnderstanding
-                        ? "1px solid transparent"
-                        : !isOffline && isTeacher && isUnderstanding
-                            ? "1px solid #28a745"
-                            : "none",
-            backgroundImage:
-                !isOffline && isSelf && !isUnderstanding
-                    ? "linear-gradient(white, white), linear-gradient(to right, #6a0dad, #1e90ff)"
-                    : "none",
-            backgroundOrigin: "border-box",
-            backgroundClip: "content-box, border-box",
-            filter: isEmpty || isOffline ? "grayscale(100%)" : "none",
-            cursor:
-                isTeacher || isAdmin || userHasSeat
-                    ? "default"
-                    : isEmpty && !userHasSeat
-                        ? "pointer"
-                        : "default",
-            pointerEvents:
-                isEmpty && (isTeacher || isAdmin || userHasSeat)
-                    ? "none"
-                    : isTeacher || isAdmin || isStudent
-                        ? "auto"
-                        : "none",
+    <Card
+      sx={{
+        marginTop: "10px",
+        borderRadius: "8px",
+        width: "200px",
+        textAlign: "center",
+        height: "145px",
+        boxShadow: isSelf
+          ? "0 1px 0px rgba(0, 0, 0, 0.2)"
+          : "0 1px 0px rgba(0, 0, 0, 0.1)",
+        border:
+          !isOffline && isSelf && isUnderstanding
+            ? "1px solid #28a745"
+            : !isOffline && isSelf && !isUnderstanding
+              ? "1px solid transparent"
+              : !isOffline && isTeacher && isUnderstanding
+                ? "1px solid #28a745"
+                : "none",
+        backgroundImage:
+          !isOffline && isSelf && !isUnderstanding
+            ? "linear-gradient(white, white), linear-gradient(to right, #6a0dad, #1e90ff)"
+            : "none",
+        backgroundOrigin: "border-box",
+        backgroundClip: "content-box, border-box",
+        filter: isEmpty || isOffline ? "grayscale(100%)" : "none",
+        cursor:
+          isTeacher || isAdmin || userHasSeat
+            ? "default"
+            : isEmpty && !userHasSeat
+              ? "pointer"
+              : "default",
+        pointerEvents:
+          isEmpty && (isTeacher || isAdmin || userHasSeat)
+            ? "none"
+            : isTeacher || isAdmin || isStudent
+              ? "auto"
+              : "none",
+      }}
+      onClick={
+        isTeacher
+          ? () =>
+              openModal(seatId, name, email, github, phone, bio, imgSrc, isSelf)
+          : isEmpty && !userHasSeat && !isTeacher && !isAdmin
+            ? () => onRegisterSeatClick()
+            : () =>
+                openModal(
+                  seatId,
+                  name,
+                  email,
+                  github,
+                  phone,
+                  bio,
+                  imgSrc,
+                  isSelf
+                )
+      }
+    >
+      <CardContent sx={{ padding: "6px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            backgroundColor: "#f4f4f9",
+            alignItems: "center",
+            position: "relative",
+            padding: "0px",
+            marginLeft: "-9px",
+            marginRight: "-9px",
+            top: "-6px",
+            height: "30px",
           }}
-          onClick={
-            isTeacher
-                ? () =>
-                    openModal(seatId, name, email, github, phone, bio, imgSrc, isSelf)
-                : isEmpty && !userHasSeat && !isTeacher && !isAdmin
-                    ? () => onRegisterSeatClick()
-                    : () =>
-                        openModal(
+        >
+          <Typography
+            sx={{
+              fontSize: "12px",
+              fontWeight: "500",
+              color: isGoodOnline ? "#333" : "#b0b0b0",
+              margin: "8px",
+            }}
+          >
+            {`${seatNumber}`}
+          </Typography>
+        </div>
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Box
+            sx={{
+              position: "relative",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              top: "14px",
+            }}
+          >
+            {isEmpty && !userHasSeat && isStudent ? (
+              <AddIcon
+                sx={{
+                  position: "absolute",
+                  height: "29px",
+                  width: "29px",
+                  color: "darkGray",
+                  marginTop: "75px",
+                  cursor: "pointer", // 커서 스타일 추가
+                }}
+                onClick={() => onRegisterSeatClick()} // 빈 좌석 클릭 이벤트
+              />
+            ) : !isEmpty ? (
+              <StyledBadge
+                overlap="circular"
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                variant="dot"
+              >
+                <Avatar
+                  sx={{
+                    width: "48px",
+                    height: "48px",
+                    filter: isOffline ? "grayscale(100%)" : "none",
+                    cursor: "pointer",
+                    border: "1px solid #ddd",
+                    boxShadow: "0 1px 3px",
+                  }}
+                  src={imgSrc}
+                  alt={`${name}'s profile`}
+                  onClick={
+                    isTeacher
+                      ? () =>
+                          openModal(
                             seatId,
                             name,
                             email,
@@ -143,123 +228,38 @@ function ProfileCard({
                             bio,
                             imgSrc,
                             isSelf
-                        )
-          }
-      >
-        <CardContent sx={{ padding: "6px" }}>
-          <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                backgroundColor: "#f4f4f9",
-                alignItems: "center",
-                position: "relative",
-                padding: "0px",
-                marginLeft: "-9px",
-                marginRight: "-9px",
-                top: "-6px",
-                height: "30px",
-              }}
+                          )
+                      : () =>
+                          openModal(
+                            seatId,
+                            name,
+                            email,
+                            github,
+                            phone,
+                            bio,
+                            imgSrc,
+                            isSelf
+                          )
+                  }
+                />
+              </StyledBadge>
+            ) : null}
+          </Box>
+        </Stack>
+        {(!isEmpty || isTeacher || isAdmin) && (
+          <Typography
+            sx={{
+              marginTop: "20px",
+              fontSize: "16px",
+              fontWeight: "600",
+              color: isGoodOnline ? "#333" : "#b0b0b0",
+            }}
           >
-            <Typography
-                sx={{
-                  fontSize: "12px",
-                  fontWeight: "500",
-                  color: isGoodOnline ? "#333" : "#b0b0b0",
-                  margin: "8px",
-                }}
-            >
-              {`${seatNumber}`}
-            </Typography>
-          </div>
-          <Stack
-              direction="row"
-              spacing={1}
-              justifyContent="center"
-              alignItems="center"
-          >
-            <Box
-                sx={{
-                  position: "relative",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  top: "14px",
-                }}
-            >
-              {isEmpty && !userHasSeat && isStudent ? (
-                  <AddIcon
-                      sx={{
-                        position: "absolute",
-                        height: "29px",
-                        width: "29px",
-                        color: "darkGray",
-                        marginTop: "75px",
-                        cursor: "pointer", // 커서 스타일 추가
-                      }}
-                      onClick={() => onRegisterSeatClick()} // 빈 좌석 클릭 이벤트
-                  />
-              ) : !isEmpty ? (
-                  <StyledBadge
-                      overlap="circular"
-                      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                      variant="dot"
-                  >
-                    <Avatar
-                        sx={{
-                          width: "48px",
-                          height: "48px",
-                          filter: isOffline ? "grayscale(100%)" : "none",
-                          cursor: "pointer",
-                          border: "1px solid #ddd",
-                          boxShadow: "0 1px 3px",
-                        }}
-                        src={imgSrc}
-                        alt={`${name}'s profile`}
-                        onClick={
-                          isTeacher
-                              ? () =>
-                                  openModal(
-                                      seatId,
-                                      name,
-                                      email,
-                                      github,
-                                      phone,
-                                      bio,
-                                      imgSrc,
-                                      isSelf
-                                  )
-                              : () =>
-                                  openModal(
-                                      seatId,
-                                      name,
-                                      email,
-                                      github,
-                                      phone,
-                                      bio,
-                                      imgSrc,
-                                      isSelf
-                                  )
-                        }
-                    />
-                  </StyledBadge>
-              ) : null}
-            </Box>
-          </Stack>
-          {(!isEmpty || isTeacher || isAdmin) && (
-              <Typography
-                  sx={{
-                    marginTop: "20px",
-                    fontSize: "16px",
-                    fontWeight: "600",
-                    color: isGoodOnline ? "#333" : "#b0b0b0",
-                  }}
-              >
-                {name}
-              </Typography>
-          )}
-        </CardContent>
-      </Card>
+            {name}
+          </Typography>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -282,7 +282,7 @@ export default function StudentRoom() {
   const [seatId, setSeatId] = useState(null);
   const [isOnline, setIsOnline] = useState(false); // 좌석 상태 관리
   const { emitWithReconnect, onEvent } = useSocket();
-  const {token} = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -325,8 +325,8 @@ export default function StudentRoom() {
           await fetchSeatsByCourse(storedCourseId);
         }
       } else if (
-          memberType === "ROLE_STUDENT" ||
-          memberType === "ROLE_TEACHER"
+        memberType === "ROLE_STUDENT" ||
+        memberType === "ROLE_TEACHER"
       ) {
         // 학생/교사는 자신의 강의실 보기
         try {
@@ -461,8 +461,8 @@ export default function StudentRoom() {
       fetchSeatsByCourse(fetchedCourseId);
     } catch (error) {
       console.error(
-          "강의 정보를 불러오는 중 오류가 발생했습니다. fetchStudentCourse ",
-          error
+        "강의 정보를 불러오는 중 오류가 발생했습니다. fetchStudentCourse ",
+        error
       );
     }
   };
@@ -522,17 +522,17 @@ export default function StudentRoom() {
       setCourses(response.data);
     } catch (error) {
       console.error(
-          "강의 목록을 불러오는 중 오류가 발생했습니다. fetchCourses ",
-          error
+        "강의 목록을 불러오는 중 오류가 발생했습니다. fetchCourses ",
+        error
       );
     }
   }, []);
 
   useEffect(() => {
     if (
-        currentUser &&
-        (currentUser.memberType === "ROLE_ADMIN" ||
-            currentUser.memberType === "ROLE_TEACHER")
+      currentUser &&
+      (currentUser.memberType === "ROLE_ADMIN" ||
+        currentUser.memberType === "ROLE_TEACHER")
     ) {
       fetchCourses();
     }
@@ -544,7 +544,7 @@ export default function StudentRoom() {
       let redis_response;
 
       // 데이터 요청
-      await emitWithReconnect("fetchStudentData", courseId)
+      await emitWithReconnect("fetchStudentData", courseId);
 
       // 데이터 수신
       onEvent("fetchedStudentData", (data) => {
@@ -563,14 +563,14 @@ export default function StudentRoom() {
 
       // 좌석 정렬 및 상태 업데이트
       const sortedSeats = response.data.sort(
-          (a, b) => a.seatNumber - b.seatNumber
+        (a, b) => a.seatNumber - b.seatNumber
       );
       console.log(sortedSeats);
       setProfiles(sortedSeats);
     } catch (error) {
       console.error(
-          "좌석 정보를 불러오는 중 오류가 발생했습니다 fetchSeatsByCourse :",
-          error
+        "좌석 정보를 불러오는 중 오류가 발생했습니다 fetchSeatsByCourse :",
+        error
       );
     }
   };
@@ -588,8 +588,8 @@ export default function StudentRoom() {
       return response.data.length > 0;
     } catch (error) {
       console.error(
-          "좌석 등록 여부 확인 중    발생 checkIfSeatsRegistered :",
-          error
+        "좌석 등록 여부 확인 중    발생 checkIfSeatsRegistered :",
+        error
       );
       return false;
     }
@@ -608,14 +608,14 @@ export default function StudentRoom() {
   };
 
   const openProfileModal = (
-      seatId,
-      name,
-      email,
-      github,
-      phone,
-      bio,
-      imgSrc,
-      isSelf
+    seatId,
+    name,
+    email,
+    github,
+    phone,
+    bio,
+    imgSrc,
+    isSelf
   ) => {
     setCurrentProfile({
       seatId,
@@ -636,287 +636,287 @@ export default function StudentRoom() {
   };
 
   return (
-      <div>
-        {currentUser && currentUser.memberType === "ROLE_ADMIN" && (
-            <Box
-                sx={{
-                  position: "flex", // 화면에 고정
-                  top: 80, // 화면 위쪽에서 20px 내려오도록 설정
-                  right: 20, // 화면 오른쪽에서 20px 떨어지도록 설정
-                  display: "flex",
-                  flexDirection: { xs: "column", sm: "row" }, // 작은 화면에서는 세로, 큰 화면에서는 가로 정렬
-                  gap: 2, // 버튼 간 간격 설정
-                  alignItems: "center",
-                  padding: 2,
-                  marginBottom: "50px",
-                  backgroundColor: "white",
-                  borderRadius: 1,
-                  boxShadow: 0, // 그림자 효과로 돋보이게
-                  zIndex: 1000, // 다른 요소보다 위에 표시
-                }}
-            >
-              {/* 강의 선택 드롭다운 */}
-              <TextField
-                  sx={{ minWidth: { xs: "170px", sm: "300px" } }}
-                  select
-                  id="courseSelect"
-                  label="강의 선택"
-                  value={selectedCourseId}
-                  onChange={handleCourseChange} // handleCourseChange 함수로 대체
-              >
-                {courses.map((course) => (
-                    <MenuItem key={course.id} value={course.id}>
-                      {course.courseTitle}
-                    </MenuItem>
-                ))}
-              </TextField>
-
-              {/* 좌석 등록 버튼 */}
-              <Button
-                  variant="contained"
-                  color=""
-                  onClick={() => setOpenSeatDialog(true)}
-              >
-                좌석 등록
-              </Button>
-
-              {/* 좌석 삭제 버튼 */}
-              <Button
-                  variant="contained"
-                  color=""
-                  onClick={() => setOpenDeleteDialog(true)}
-              >
-                좌석 삭제
-              </Button>
-            </Box>
-        )}
-        <FloatingActionButtons/>
-
-        {selectedCourseId && (
-            <div
-                style={{
-                  display: "grid",
-                  gap: "0px",
-                  padding: "0px",
-                  justifyContent: "center",
-                  maxWidth: "1320px",
-                  minWidth: "200px", // 최소 너비로 2열 유지
-                  margin: "0 auto",
-                  marginTop:
-                      currentUser &&
-                      (currentUser.memberType === "ROLE_ADMIN" ||
-                          currentUser.memberType === "ROLE_TEACHER")
-                          ? "40px"
-                          : "0",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-                }}
-            >
-              {profiles.map((profile, index) => (
-                  <ProfileCard
-                      key={profile.id}
-                      seatNumber={profile.seatNumber}
-                      seatId={profile.id}
-                      name={profile.member ? profile.member.name : ""}
-                      imgSrc={profile.member ? profile.member.avatarImageUrl : ""}
-                      email={profile.member ? profile.member.email : ""}
-                      github={profile.member ? profile.member.gitUrl : ""}
-                      phone={profile.member ? profile.member.phone : ""}
-                      bio={profile.member ? profile.member.bio : ""}
-                      isOnline={profile.isOnline}
-                      isUnderstanding={
-                          profile.member?.studentStatusDTO?.isUnderstanding ?? false
-                      }
-                      isHandRaised={
-                          profile.member?.studentStatusDTO?.isHandRaised ?? false
-                      }
-                      isSelf={
-                          profile.member && profile.member.id === currentUser.memberId
-                      }
-                      isEmpty={!profile.member}
-                      openModal={openProfileModal}
-                      userHasSeat={
-                          userSeat !== null && currentUser.memberType === "ROLE_STUDENT"
-                      }
-                      isAdmin={currentUser.memberType === "ROLE_ADMIN"}
-                      isTeacher={currentUser.memberType === "ROLE_TEACHER"}
-                      isStudent={currentUser.memberType === "ROLE_STUDENT"}
-                      onRegisterSeatClick={() => {
-                        setRegisterDialogOpen(true);
-                        setSelectedSeat(profile.seatNumber);
-                        setSeatId(profile.id);
-                      }}
-                  />
-              ))}
-              {currentUser.memberType === "ROLE_STUDENT" ? (
-                  <FloatingActionButtons />
-              ) : null}
-              {currentUser.memberType === "ROLE_TEACHER" ? (
-                  <FloatingActionButtonsForTeacher />
-              ) : null}
-            </div>
-        )}
-
-        <Dialog
-            open={open}
-            onClose={closeProfileModal}
-            BackdropProps={{ style: { backgroundColor: "transparent" } }}
+    <div>
+      {currentUser && currentUser.memberType === "ROLE_ADMIN" && (
+        <Box
+          sx={{
+            position: "flex", // 화면에 고정
+            top: 80, // 화면 위쪽에서 20px 내려오도록 설정
+            right: 20, // 화면 오른쪽에서 20px 떨어지도록 설정
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" }, // 작은 화면에서는 세로, 큰 화면에서는 가로 정렬
+            gap: 2, // 버튼 간 간격 설정
+            alignItems: "center",
+            padding: 2,
+            marginBottom: "50px",
+            backgroundColor: "white",
+            borderRadius: 1,
+            boxShadow: 0, // 그림자 효과로 돋보이게
+            zIndex: 1000, // 다른 요소보다 위에 표시
+          }}
         >
-          <DialogContent>
-            <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  padding: 1,
-                }}
-            >
-              <Avatar
-                  src={currentProfile.imgSrc}
-                  alt={`${currentProfile.name}'s profile`}
-                  sx={{ width: 100, height: 100, mt: 1, mb: 1 }}
-              />
-              <Box sx={{ width: "100%", mt: 1 }}>
-                {[
-                  { label: "Name", value: currentProfile.name },
-                  { label: "Phone Number", value: currentProfile.phone },
-                  { label: "Email", value: currentProfile.email },
-                  { label: "GitHub", value: currentProfile.github, isLink: true },
-                  { label: "Bio", value: currentProfile.bio, isMultiline: true },
-                ].map((item, index) => (
-                    <Box key={index} sx={{ mt: 1 }}>
-                      <Typography
-                          variant="subtitle2"
-                          gutterBottom
-                          sx={{ fontSize: "0.7rem" }}
-                      >
-                        {item.label}
-                      </Typography>
-                      {item.isLink ? (
-                          <Link
-                              href={item.value}
-                              target="_blank"
-                              style={{ textDecoration: "none" }}
-                          >
-                            <TextField
-                                fullWidth
-                                variant="outlined"
-                                value={item.value}
-                                InputProps={{ readOnly: true }}
-                                sx={{ fontSize: "0.55rem" }}
-                            />
-                          </Link>
-                      ) : (
-                          <TextField
-                              fullWidth
-                              variant="outlined"
-                              value={item.value}
-                              InputProps={{
-                                readOnly: true,
-                                style: { pointerEvents: "none" },
-                              }}
-                              multiline={item.isMultiline}
-                              rows={item.isMultiline ? 3 : 1}
-                              sx={{ fontSize: "0.55rem" }}
-                          />
-                      )}
-                    </Box>
-                ))}
-              </Box>
-              {currentProfile.isSelf && (
-                  <Button variant="text" onClick={() => setReleaseDialogOpen(true)}>
-                    자리 해제
-                  </Button>
-              )}
-            </Box>
-          </DialogContent>
-        </Dialog>
+          {/* 강의 선택 드롭다운 */}
+          <TextField
+            sx={{ minWidth: { xs: "170px", sm: "300px" } }}
+            select
+            id="courseSelect"
+            label="강의 선택"
+            value={selectedCourseId}
+            onChange={handleCourseChange} // handleCourseChange 함수로 대체
+          >
+            {courses.map((course) => (
+              <MenuItem key={course.id} value={course.id}>
+                {course.courseTitle}
+              </MenuItem>
+            ))}
+          </TextField>
 
-        <Dialog open={openSeatDialog} onClose={() => setOpenSeatDialog(false)}>
-          <DialogTitle>좌석 등록</DialogTitle>
-          <DialogContent>
-            <Typography>등록할 좌석 수를 입력하세요.</Typography>
-            <TextField
-                autoFocus
-                margin="dense"
-                label="좌석 수"
-                type="number"
-                fullWidth
-                variant="standard"
-                value={seatCount}
-                onChange={(e) => setSeatCount(e.target.value)}
+          {/* 좌석 등록 버튼 */}
+          <Button
+            variant="contained"
+            color=""
+            onClick={() => setOpenSeatDialog(true)}
+          >
+            좌석 등록
+          </Button>
+
+          {/* 좌석 삭제 버튼 */}
+          <Button
+            variant="contained"
+            color=""
+            onClick={() => setOpenDeleteDialog(true)}
+          >
+            좌석 삭제
+          </Button>
+        </Box>
+      )}
+      <FloatingActionButtons />
+
+      {selectedCourseId && (
+        <div
+          style={{
+            display: "grid",
+            gap: "0px",
+            padding: "0px",
+            justifyContent: "center",
+            maxWidth: "1320px",
+            minWidth: "200px", // 최소 너비로 2열 유지
+            margin: "0 auto",
+            marginTop:
+              currentUser &&
+              (currentUser.memberType === "ROLE_ADMIN" ||
+                currentUser.memberType === "ROLE_TEACHER")
+                ? "40px"
+                : "0",
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+          }}
+        >
+          {profiles.map((profile, index) => (
+            <ProfileCard
+              key={profile.id}
+              seatNumber={profile.seatNumber}
+              seatId={profile.id}
+              name={profile.member ? profile.member.name : ""}
+              imgSrc={profile.member ? profile.member.avatarImageUrl : ""}
+              email={profile.member ? profile.member.email : ""}
+              github={profile.member ? profile.member.gitUrl : ""}
+              phone={profile.member ? profile.member.phone : ""}
+              bio={profile.member ? profile.member.bio : ""}
+              isOnline={profile.isOnline}
+              isUnderstanding={
+                profile.member?.studentStatusDTO?.isUnderstanding ?? false
+              }
+              isHandRaised={
+                profile.member?.studentStatusDTO?.isHandRaised ?? false
+              }
+              isSelf={
+                profile.member && profile.member.id === currentUser.memberId
+              }
+              isEmpty={!profile.member}
+              openModal={openProfileModal}
+              userHasSeat={
+                userSeat !== null && currentUser.memberType === "ROLE_STUDENT"
+              }
+              isAdmin={currentUser.memberType === "ROLE_ADMIN"}
+              isTeacher={currentUser.memberType === "ROLE_TEACHER"}
+              isStudent={currentUser.memberType === "ROLE_STUDENT"}
+              onRegisterSeatClick={() => {
+                setRegisterDialogOpen(true);
+                setSelectedSeat(profile.seatNumber);
+                setSeatId(profile.id);
+              }}
             />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenSeatDialog(false)}>취소</Button>
-            <Button onClick={handleRegisterSeats}>등록</Button>
-          </DialogActions>
-        </Dialog>
+          ))}
+          {currentUser.memberType === "ROLE_STUDENT" ? (
+            <FloatingActionButtons />
+          ) : null}
+          {currentUser.memberType === "ROLE_TEACHER" ? (
+            <FloatingActionButtonsForTeacher />
+          ) : null}
+        </div>
+      )}
 
-        <Dialog
-            open={seatRegisteredWarning}
-            onClose={() => setSeatRegisteredWarning(false)}
-        >
-          <DialogTitle>좌석 등록 불가</DialogTitle>
-          <DialogContent>
-            <Typography>
-              이미 좌석이 등록되어 있습니다. 삭제 후 재등록 해주세요.
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setSeatRegisteredWarning(false)}>확인</Button>
-          </DialogActions>
-        </Dialog>
+      <Dialog
+        open={open}
+        onClose={closeProfileModal}
+        BackdropProps={{ style: { backgroundColor: "transparent" } }}
+      >
+        <DialogContent>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: 1,
+            }}
+          >
+            <Avatar
+              src={currentProfile.imgSrc}
+              alt={`${currentProfile.name}'s profile`}
+              sx={{ width: 100, height: 100, mt: 1, mb: 1 }}
+            />
+            <Box sx={{ width: "100%", mt: 1 }}>
+              {[
+                { label: "Name", value: currentProfile.name },
+                { label: "Phone Number", value: currentProfile.phone },
+                { label: "Email", value: currentProfile.email },
+                { label: "GitHub", value: currentProfile.github, isLink: true },
+                { label: "Bio", value: currentProfile.bio, isMultiline: true },
+              ].map((item, index) => (
+                <Box key={index} sx={{ mt: 1 }}>
+                  <Typography
+                    variant="subtitle2"
+                    gutterBottom
+                    sx={{ fontSize: "0.7rem" }}
+                  >
+                    {item.label}
+                  </Typography>
+                  {item.isLink ? (
+                    <Link
+                      href={item.value}
+                      target="_blank"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        value={item.value}
+                        InputProps={{ readOnly: true }}
+                        sx={{ fontSize: "0.55rem" }}
+                      />
+                    </Link>
+                  ) : (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      value={item.value}
+                      InputProps={{
+                        readOnly: true,
+                        style: { pointerEvents: "none" },
+                      }}
+                      multiline={item.isMultiline}
+                      rows={item.isMultiline ? 3 : 1}
+                      sx={{ fontSize: "0.55rem" }}
+                    />
+                  )}
+                </Box>
+              ))}
+            </Box>
+            {currentProfile.isSelf && (
+              <Button variant="text" onClick={() => setReleaseDialogOpen(true)}>
+                자리 해제
+              </Button>
+            )}
+          </Box>
+        </DialogContent>
+      </Dialog>
 
-        <Dialog
-            open={openDeleteDialog}
-            onClose={() => setOpenDeleteDialog(false)}
-        >
-          <DialogTitle>좌석 삭제</DialogTitle>
-          <DialogContent>
-            <Typography>정말로 좌석을 삭제하시겠습니까?</Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenDeleteDialog(false)}>취소</Button>
-            <Button onClick={handleDeleteSeats} color="error">
-              삭제
-            </Button>
-          </DialogActions>
-        </Dialog>
+      <Dialog open={openSeatDialog} onClose={() => setOpenSeatDialog(false)}>
+        <DialogTitle>좌석 등록</DialogTitle>
+        <DialogContent>
+          <Typography>등록할 좌석 수를 입력하세요.</Typography>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="좌석 수"
+            type="number"
+            fullWidth
+            variant="standard"
+            value={seatCount}
+            onChange={(e) => setSeatCount(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenSeatDialog(false)}>취소</Button>
+          <Button onClick={handleRegisterSeats}>등록</Button>
+        </DialogActions>
+      </Dialog>
 
-        {/* 좌석 해제 확인 다이얼로그 */}
-        <Dialog
-            open={releaseDialogOpen}
-            onClose={() => setReleaseDialogOpen(false)}
-        >
-          <DialogTitle>자리 해제 하시겠습니까?</DialogTitle>
-          <DialogActions>
-            <Button
-                onClick={() => handleStudentSeatRelease(currentProfile.seatId)}
-                color="primary"
-            >
-              해제
-            </Button>
-            <Button onClick={() => setReleaseDialogOpen(false)} color="secondary">
-              취소
-            </Button>
-          </DialogActions>
-        </Dialog>
+      <Dialog
+        open={seatRegisteredWarning}
+        onClose={() => setSeatRegisteredWarning(false)}
+      >
+        <DialogTitle>좌석 등록 불가</DialogTitle>
+        <DialogContent>
+          <Typography>
+            이미 좌석이 등록되어 있습니다. 삭제 후 재등록 해주세요.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSeatRegisteredWarning(false)}>확인</Button>
+        </DialogActions>
+      </Dialog>
 
-        {/* 좌석 등록 확인 다이얼로그 */}
-        <Dialog open={registerDialogOpen} onClose={handleCancelRegisterSeat}>
-          <DialogTitle>{selectedSeat}번 좌석에 등록하시겠습니까?</DialogTitle>
-          <DialogActions>
-            <Button
-                onClick={() => handleStudentSeatRegistration(seatId)}
-                color="primary"
-            >
-              등록
-            </Button>
-            <Button onClick={handleCancelRegisterSeat} color="secondary">
-              취소
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+      <Dialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+      >
+        <DialogTitle>좌석 삭제</DialogTitle>
+        <DialogContent>
+          <Typography>정말로 좌석을 삭제하시겠습니까?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)}>취소</Button>
+          <Button onClick={handleDeleteSeats} color="error">
+            삭제
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 좌석 해제 확인 다이얼로그 */}
+      <Dialog
+        open={releaseDialogOpen}
+        onClose={() => setReleaseDialogOpen(false)}
+      >
+        <DialogTitle>자리 해제 하시겠습니까?</DialogTitle>
+        <DialogActions>
+          <Button
+            onClick={() => handleStudentSeatRelease(currentProfile.seatId)}
+            color="primary"
+          >
+            해제
+          </Button>
+          <Button onClick={() => setReleaseDialogOpen(false)} color="secondary">
+            취소
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 좌석 등록 확인 다이얼로그 */}
+      <Dialog open={registerDialogOpen} onClose={handleCancelRegisterSeat}>
+        <DialogTitle>{selectedSeat}번 좌석에 등록하시겠습니까?</DialogTitle>
+        <DialogActions>
+          <Button
+            onClick={() => handleStudentSeatRegistration(seatId)}
+            color="primary"
+          >
+            등록
+          </Button>
+          <Button onClick={handleCancelRegisterSeat} color="secondary">
+            취소
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 }

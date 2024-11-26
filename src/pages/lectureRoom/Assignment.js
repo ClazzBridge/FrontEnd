@@ -281,7 +281,7 @@ export default function AssignmentAccordion() {
                     "& .MuiBadge-badge": {
                       backgroundColor: "#D8EFFF", // 커스텀 색상
                       color: "#1976D2", // 텍스트 색상
-                      fontSize: "10px", // 폰트 크기
+
                       padding: "0 6px", // 내부 여백
                       borderRadius: "8px", // 둥근 모서리
                     },
@@ -303,7 +303,6 @@ export default function AssignmentAccordion() {
                     "& .MuiBadge-badge": {
                       backgroundColor: "#DFFFE5", // 커스텀 색상
                       color: "#388E3C", // 텍스트 색상
-                      fontSize: "10px", // 폰트 크기
                       padding: "0 6px", // 내부 여백
                       borderRadius: "8px", // 둥근 모서리
                     },
@@ -325,7 +324,6 @@ export default function AssignmentAccordion() {
                     "& .MuiBadge-badge": {
                       backgroundColor: "#FFE4E6", // 커스텀 색상
                       color: "#D32F2F", // 텍스트 색상
-                      fontSize: "10px", // 폰트 크기
                       padding: "0 6px", // 내부 여백
                       borderRadius: "8px", // 둥근 모서리
                     },
@@ -347,7 +345,6 @@ export default function AssignmentAccordion() {
                     "& .MuiBadge-badge": {
                       backgroundColor: "#FFF9DB", // 커스텀 색상
                       color: "#FBC02D", // 텍스트 색상
-                      fontSize: "10px", // 폰트 크기
                       padding: "0 6px", // 내부 여백
                       borderRadius: "8px", // 둥근 모서리
                     },
