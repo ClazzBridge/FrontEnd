@@ -82,17 +82,17 @@ export default function AssignmentItem({
           // 학생인 경우 자신의 제출 상태 가져오기
           try {
             const submissionResults = await Promise.all(
-                assignments.map((assignment) => {
-                  return checkSubmission(
-                      assignment.assignmentId,
-                      studentCourseId
-                  );
-                })
+              assignments.map((assignment) => {
+                return checkSubmission(
+                  assignment.assignmentId,
+                  studentCourseId
+                );
+              })
             );
             const newSubmissions = submissionResults.map((result, index) => {
               if (!result) {
                 console.log(
-                    `No result for assignment ID: ${assignments[index].assignmentId}`
+                  `No result for assignment ID: ${assignments[index].assignmentId}`
                 );
                 return { text: "", submitted: false };
               }
@@ -117,22 +117,19 @@ export default function AssignmentItem({
 
   useEffect(() => {
     const fetchStudents = async () => {
-      if (
-          currentUser &&
-          currentUser.memberType === "ROLE_TEACHER"
-      ) {
+      if (currentUser && currentUser.memberType === "ROLE_TEACHER") {
         try {
           const allStudents = await Promise.all(
-              assignments.map(async (assignment) => {
-                const response = await getStudentsByCourseId(
-                    assignment.assignmentId
-                );
-                console.log(response, "response");
-                return {
-                  assignmentId: assignment.assignmentId,
-                  students: response,
-                };
-              })
+            assignments.map(async (assignment) => {
+              const response = await getStudentsByCourseId(
+                assignment.assignmentId
+              );
+              console.log(response, "response");
+              return {
+                assignmentId: assignment.assignmentId,
+                students: response,
+              };
+            })
           );
           setStudents(allStudents);
         } catch (error) {
@@ -210,455 +207,455 @@ export default function AssignmentItem({
   const sanitizer = dompurify.sanitize;
 
   return (
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        {assignments.length > 0 ? (
-            assignments.map((assignment, index) => {
-              const daysRemaining = getDaysRemaining(assignment.dueDate);
-              const submission = submissions[index] || {};
-              const isPastDue = daysRemaining < 0;
-              const assignmentStudents =
-                  students.find(
-                      (studentGroup) =>
-                          studentGroup.assignmentId === assignment.assignmentId
-                  )?.students || [];
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      {assignments.length > 0 ? (
+        assignments.map((assignment, index) => {
+          const daysRemaining = getDaysRemaining(assignment.dueDate);
+          const submission = submissions[index] || {};
+          const isPastDue = daysRemaining < 0;
+          const assignmentStudents =
+            students.find(
+              (studentGroup) =>
+                studentGroup.assignmentId === assignment.assignmentId
+            )?.students || [];
 
-              return (
-                  <Accordion key={assignment.assignmentId}>
-                    <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls={`panel${assignment.assignmentId}-content`}
-                        id={`panel${assignment.assignmentId}-header`}
-                        sx={{ backgroundColor: "#f6f8fa" }}
+          return (
+            <Accordion key={assignment.assignmentId}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls={`panel${assignment.assignmentId}-content`}
+                id={`panel${assignment.assignmentId}-header`}
+                sx={{ backgroundColor: "#f6f8fa" }}
+              >
+                <Box>
+                  <Typography sx={{ fontWeight: 600, marginBottom: 1 }}>
+                    {assignment.title}
+                    {currentUser && currentUser.memberType === "ROLE_ADMIN" && (
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "gray",
+                          marginLeft: "8px",
+                          fontWeight: 500,
+                        }}
+                      >
+                        ({assignment.courseName})
+                      </span>
+                    )}
+                  </Typography>
+                  <Typography sx={{ fontSize: "12px" }}>
+                    마감 날짜: {assignment.dueDate}
+                    <Typography
+                      component="span"
+                      sx={{
+                        marginLeft: 1,
+                        fontSize: "12px",
+                        display: "inline",
+                        color: "darkred",
+                      }}
                     >
-                      <Box>
-                        <Typography sx={{ fontWeight: 600, marginBottom: 1 }}>
-                          {assignment.title}
-                          {currentUser &&
-                              currentUser.memberType === "ROLE_ADMIN" && (
-                                  <span
-                                      style={{
-                                        fontSize: "12px",
-                                        color: "gray",
-                                        marginLeft: "8px",
-                                        fontWeight: 500,
-                                      }}
-                                  >
-                          ({assignment.courseName})
-                        </span>
-                              )}
-                        </Typography>
-                        <Typography sx={{ fontSize: "12px" }}>
-                          마감 날짜: {assignment.dueDate}
-                          <Typography
-                              component="span"
-                              sx={{
-                                marginLeft: 1,
-                                fontSize: "12px",
-                                display: "inline",
-                                color: "darkred",
-                              }}
-                          >
-                            {daysRemaining > 0
-                                ? `${daysRemaining}일 남았습니다 🔥`
-                                : daysRemaining === 0
-                                    ? "마감 당일입니다 🧨"
-                                    : "마감 완료"}
-                          </Typography>
+                      {daysRemaining > 0
+                        ? `${daysRemaining}일 남았습니다 🔥`
+                        : daysRemaining === 0
+                          ? "마감 당일입니다 🧨"
+                          : "마감 완료"}
+                    </Typography>
+                  </Typography>
+                </Box>
+                {currentUser && currentUser.memberType === "ROLE_STUDENT" && (
+                  <>
+                    {submission.submitted ? (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginLeft: "auto",
+                          marginRight: "16px",
+                        }}
+                      >
+                        <CheckCircleIcon
+                          sx={{ color: "darkgreen", marginRight: "4px" }}
+                        />
+                        <Typography sx={{ color: "darkgreen" }}>
+                          제출 완료
                         </Typography>
                       </Box>
-                      {currentUser &&
-                          currentUser.memberType === "ROLE_STUDENT" && (
-                              <>
-                                {submission.submitted ? (
-                                    <Box
-                                        sx={{
-                                          display: "flex",
-                                          alignItems: "center",
-                                          marginLeft: "auto",
-                                          marginRight: "16px",
-                                        }}
-                                    >
-                                      <CheckCircleIcon
-                                          sx={{ color: "darkgreen", marginRight: "4px" }}
-                                      />
-                                      <Typography sx={{ color: "darkgreen" }}>
-                                        제출 완료
-                                      </Typography>
-                                    </Box>
-                                ) : (
-                                    <Box
-                                        sx={{
-                                          display: "flex",
-                                          alignItems: "center",
-                                          marginLeft: "auto",
-                                          marginRight: "16px",
-                                        }}
-                                    >
-                                      <CancelIcon
-                                          sx={{ color: "brown", marginRight: "4px" }}
-                                      />
-                                      <Typography sx={{ color: "brown" }}>
-                                        미제출
-                                      </Typography>
-                                    </Box>
-                                )}
-                              </>
-                          )}
-                    </AccordionSummary>
-                    <AccordionDetails
+                    ) : (
+                      <Box
                         sx={{
-                          padding: "16px",
                           display: "flex",
-                          flexDirection: "column",
-                          gap: "16px",
+                          alignItems: "center",
+                          marginLeft: "auto",
+                          marginRight: "16px",
                         }}
-                    >
-                      <div
-                          className="assignmentImage"
-                          style={{ margin: "16px 0px" }}
-                          dangerouslySetInnerHTML={{
-                            __html: sanitizer(`${assignment.description}`),
-                          }}
-                      />
-                      {currentUser &&
-                          currentUser.memberType === "ROLE_STUDENT" &&
-                          !submission.submitted && (
-                              <ReactQuill
-                                  theme="snow"
-                                  value={submission.text}
-                                  onChange={(value) => handleSubmissionChange(index, value)}
-                                  modules={modules}
-                                  style={{ width: "100%" }}
-                              />
-                          )}
-                      {currentUser &&
-                          currentUser.memberType === "ROLE_STUDENT" &&
-                          submission.submitted && (
-                              <>
-                                <Typography
-                                    className="submissionImage"
-                                    dangerouslySetInnerHTML={{
-                                      __html: sanitizer(`${submission.text}`),
-                                    }}
-                                    sx={{
-                                      borderTop: "1px solid #e0e0e0",
-                                      whiteSpace: "pre-wrap",
-                                    }}
-                                />
-                                <Typography
-                                    sx={{
-                                      paddingTop: 2,
-                                      fontSize: "12px",
-                                    }}
-                                >
-                                  제출 날짜: {submission.submissionDate}
-                                </Typography>
-                              </>
-                          )}
-                      {currentUser &&
-                          currentUser.memberType === "ROLE_STUDENT" && (
-                              <AccordionActions sx={{ padding: 0 }}>
-                                <Button
-                                    onClick={() => handleSubmit(index)}
-                                    disabled={
-                                        submission.submitted || isPastDue || !submission.text
-                                    }
-                                    variant="contained"
-                                >
-                                  제출
-                                </Button>
-                              </AccordionActions>
-                          )}
-                      {currentUser &&
-                          currentUser.memberType === "ROLE_TEACHER" && (
-                              <Box sx={{ borderTop: "1px solid #e0e0e0" }}>
-                                <Typography
-                                    sx={{
-                                      fontSize: "12px",
-                                      marginTop: 1,
-                                      marginBottom: "2px",
-                                    }}
-                                >
-                                  총 수강생 수: {assignmentStudents.length}명
-                                </Typography>
-                                <Typography
-                                    sx={{
-                                      fontSize: "12px",
-                                      color: "gray",
-                                      marginBottom: 1,
-                                    }}
-                                >
-                                  수강생 이름을 클릭해 제출 내용을 확인해보세요!
-                                </Typography>
-
-                                <Box
-                                    sx={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                      width: "50%",
-                                      marginBottom: 2,
-                                    }}
-                                >
-                                  <Box
-                                      sx={{
-                                        flex: 1,
-                                        marginRight: 2,
-                                        borderRadius: 1,
-                                      }}
-                                  >
-                                    <Typography
-                                        sx={{
-                                          fontWeight: 600,
-                                          fontSize: "14px",
-                                          color: "darkgreen",
-                                        }}
-                                    >
-                                      제출 완료 (
-                                      {
-                                        assignmentStudents.filter(
-                                            (student) => student.submitted
-                                        ).length
-                                      }
-                                      명)
-                                    </Typography>
-                                    <List sx={{ maxHeight: 150, overflowY: "auto" }}>
-                                      {assignmentStudents
-                                      .filter((student) => student.submitted)
-                                      .map((student, subIndex) => (
-                                          <ListItem
-                                              key={subIndex}
-                                              sx={{ paddingLeft: 0 }}
-                                          >
-                                            <Box
-                                                sx={{
-                                                  display: "flex",
-                                                  alignItems: "center",
-                                                }}
-                                            >
-                                              <img
-                                                  src={student.avatarImage} // 프로필 사진 URL
-                                                  alt={`${student.name}'s profile`}
-                                                  style={{
-                                                    width: 30,
-                                                    height: 30,
-                                                    borderRadius: "50%",
-                                                    marginRight: 8,
-                                                  }}
-                                              />
-                                              <Typography
-                                                  onClick={() =>
-                                                      openSubmissionModal(student)
-                                                  }
-                                                  sx={{
-                                                    fontWeight: 600,
-                                                    cursor: "pointer",
-                                                  }}
-                                              >
-                                                {student.name}
-                                              </Typography>
-                                            </Box>
-                                          </ListItem>
-                                      ))}
-                                    </List>
-                                  </Box>
-
-                                  <Box
-                                      sx={{
-                                        flex: 1,
-                                        borderRadius: 1,
-                                      }}
-                                  >
-                                    <Typography
-                                        sx={{
-                                          fontWeight: 600,
-                                          fontSize: "14px",
-                                          color: "darkred",
-                                        }}
-                                    >
-                                      미제출 (
-                                      {
-                                        assignmentStudents.filter(
-                                            (student) => !student.submitted
-                                        ).length
-                                      }
-                                      명)
-                                    </Typography>
-                                    <List
-                                        sx={{
-                                          maxHeight: 150,
-                                          overflowY: "auto",
-                                        }}
-                                    >
-                                      {assignmentStudents
-                                      .filter((student) => !student.submitted)
-                                      .map((student, subIndex) => (
-                                          <ListItem
-                                              key={subIndex}
-                                              sx={{ paddingLeft: 0 }}
-                                          >
-                                            <Box
-                                                sx={{
-                                                  display: "flex",
-                                                  alignItems: "center",
-                                                }}
-                                            >
-                                              <img
-                                                  src={student.avatarImage} // 프로필 사진 URL
-                                                  alt={`${student.name}'s profile`}
-                                                  style={{
-                                                    width: 30,
-                                                    height: 30,
-                                                    borderRadius: "50%",
-                                                    marginRight: 8,
-                                                  }}
-                                              />
-                                              <Typography>{student.name}</Typography>
-                                            </Box>
-                                          </ListItem>
-                                      ))}
-                                    </List>
-                                  </Box>
-                                </Box>
-                                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                                  <Button
-                                      onClick={() =>
-                                          openDeleteModal(assignment.assignmentId)
-                                      }
-                                      variant="outlined"
-                                      color="error"
-                                  >
-                                    삭제
-                                  </Button>
-                                </Box>
-                              </Box>
-                          )}
-                    </AccordionDetails>
-                  </Accordion>
-              );
-            })
-        ) : (
-            <Typography>과제가 없습니다.</Typography> // 과제가 없을 때 메시지 표시
-        )}
-        <CustomSnackbar
-            open={openSnackbar}
-            message={snackbarMessage}
-            severity={snackbarSeverity}
-            onClose={handleCloseSnackbar}
-        />
-
-        <CustomModal isOpen={isDeleteModalOpen} closeModal={closeDeleteModal}>
-          <Box
-              sx={{
-                display: "flex",
-                margin: "auto",
-                width: "100%",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
-                gap: "10px",
-              }}
-          >
-            <h3>과제 삭제하기</h3>
-            <p>해당 과제를 삭제하시겠습니까?</p>
-
-            <Box
+                      >
+                        <CancelIcon
+                          sx={{ color: "brown", marginRight: "4px" }}
+                        />
+                        <Typography sx={{ color: "brown" }}>미제출</Typography>
+                      </Box>
+                    )}
+                  </>
+                )}
+              </AccordionSummary>
+              <AccordionDetails
                 sx={{
+                  padding: "16px",
                   display: "flex",
-                  width: "100%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "row",
-                  gap: "24px",
-                  margin: "16px 0",
+                  flexDirection: "column",
+                  gap: "16px",
                 }}
-            >
-              <Button
-                  variant="outlined"
-                  onClick={closeDeleteModal}
-                  sx={{
-                    width: "120px",
-                    height: "40px",
-                    borderColor: "#34495e",
-                    color: "#34495e",
-                  }}
               >
-                취소
-              </Button>
-              <Button
-                  variant="contained"
-                  onClick={() => {
-                    handleDelete(assignmentToDelete);
-                  }}
-                  sx={{
-                    width: "120px",
-                    height: "40px",
-                    backgroundColor: "#34495e",
-                    fontWeight: 600,
-                  }}
-              >
-                삭제하기
-              </Button>
-            </Box>
-          </Box>
-        </CustomModal>
-
-        <CustomModal
-            isOpen={isSubmissionModalOpen}
-            closeModal={closeSubmissionModal}
-        >
-          <Box
-              sx={{
-                display: "flex",
-                margin: "auto",
-                width: "100%",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
-                gap: "10px",
-              }}
-          >
-            <h3>
-              {submissionStudent ? submissionStudent.name : ""}님의 제출 내용
-            </h3>
-            <Box
-                sx={{
-                  width: "100%",
-                  border: "1px solid #e0e0e0",
-                  borderRadius: 1,
-                  padding: 2,
-                  whiteSpace: "pre-wrap",
-                }}
-            >
-              <Typography
+                <div
+                  className="assignmentImage"
+                  style={{ margin: "16px 0px" }}
                   dangerouslySetInnerHTML={{
-                    __html: sanitizer(
-                        `${submissionStudent ? submissionStudent.content : ""}`
-                    ),
+                    __html: sanitizer(`${assignment.description}`),
                   }}
-              ></Typography>
-            </Box>
-            <Box
-                sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}
-            >
-              <Typography sx={{ fontSize: "12px", color: "gray" }}>
-                제출 날짜:{" "}
-                {submissionStudent ? submissionStudent.submissionDate : ""}
-              </Typography>
-            </Box>
+                />
+                {currentUser &&
+                  currentUser.memberType === "ROLE_STUDENT" &&
+                  !submission.submitted && (
+                    <ReactQuill
+                      theme="snow"
+                      value={submission.text}
+                      onChange={(value) => handleSubmissionChange(index, value)}
+                      modules={modules}
+                      style={{ width: "100%" }}
+                    />
+                  )}
+                {currentUser &&
+                  currentUser.memberType === "ROLE_STUDENT" &&
+                  submission.submitted && (
+                    <>
+                      <Typography
+                        className="submissionImage"
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizer(`${submission.text}`),
+                        }}
+                        sx={{
+                          borderTop: "1px solid #e0e0e0",
+                          padding: "16px 0px",
+                          whiteSpace: "pre-wrap",
+                        }}
+                      />
+                      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                        <Typography
+                          sx={{
+                            paddingTop: 2,
+                            fontSize: "12px",
+                            color: "gray",
+                          }}
+                        >
+                          제출 날짜: {submission.submissionDate}
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
+                {currentUser && currentUser.memberType === "ROLE_STUDENT" && (
+                  <AccordionActions sx={{ padding: 0 }}>
+                    <Button
+                      onClick={() => handleSubmit(index)}
+                      disabled={
+                        submission.submitted || isPastDue || !submission.text
+                      }
+                      variant="contained"
+                    >
+                      제출
+                    </Button>
+                  </AccordionActions>
+                )}
+                {currentUser && currentUser.memberType === "ROLE_TEACHER" && (
+                  <Box sx={{ borderTop: "1px solid #e0e0e0" }}>
+                    <Typography
+                      sx={{
+                        fontSize: "12px",
+                        marginTop: 1,
+                        marginBottom: "2px",
+                      }}
+                    >
+                      총 수강생 수: {assignmentStudents.length}명
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "12px",
+                        color: "gray",
+                        marginBottom: 1,
+                      }}
+                    >
+                      수강생 이름을 클릭해 제출 내용을 확인해보세요!
+                    </Typography>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        width: "50%",
+                        marginBottom: 2,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          flex: 1,
+                          marginRight: 2,
+                          borderRadius: 1,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: "14px",
+                            color: "darkgreen",
+                          }}
+                        >
+                          제출 완료 (
+                          {
+                            assignmentStudents.filter(
+                              (student) => student.submitted
+                            ).length
+                          }
+                          명)
+                        </Typography>
+                        <List sx={{ maxHeight: 150, overflowY: "auto" }}>
+                          {assignmentStudents
+                            .filter((student) => student.submitted)
+                            .map((student, subIndex) => (
+                              <ListItem key={subIndex} sx={{ paddingLeft: 0 }}>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <img
+                                    src={student.avatarImage} // 프로필 사진 URL
+                                    alt={`${student.name}'s profile`}
+                                    style={{
+                                      width: 30,
+                                      height: 30,
+                                      borderRadius: "50%",
+                                      marginRight: 8,
+                                    }}
+                                  />
+                                  <Typography
+                                    onClick={() => openSubmissionModal(student)}
+                                    sx={{
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    {student.name}
+                                  </Typography>
+                                </Box>
+                              </ListItem>
+                            ))}
+                        </List>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          flex: 1,
+                          borderRadius: 1,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: "14px",
+                            color: "darkred",
+                          }}
+                        >
+                          미제출 (
+                          {
+                            assignmentStudents.filter(
+                              (student) => !student.submitted
+                            ).length
+                          }
+                          명)
+                        </Typography>
+                        <List
+                          sx={{
+                            maxHeight: 150,
+                            overflowY: "auto",
+                          }}
+                        >
+                          {assignmentStudents
+                            .filter((student) => !student.submitted)
+                            .map((student, subIndex) => (
+                              <ListItem key={subIndex} sx={{ paddingLeft: 0 }}>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <img
+                                    src={student.avatarImage} // 프로필 사진 URL
+                                    alt={`${student.name}'s profile`}
+                                    style={{
+                                      width: 30,
+                                      height: 30,
+                                      borderRadius: "50%",
+                                      marginRight: 8,
+                                    }}
+                                  />
+                                  <Typography>{student.name}</Typography>
+                                </Box>
+                              </ListItem>
+                            ))}
+                        </List>
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                      <Button
+                        onClick={() => openDeleteModal(assignment.assignmentId)}
+                        variant="outlined"
+                        color="error"
+                      >
+                        삭제
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
+              </AccordionDetails>
+            </Accordion>
+          );
+        })
+      ) : (
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            maxWidth: "100%",
+            maxHeight: "90%",
+            overflowY: "auto",
+          }}
+        >
+          <Typography>과제가 없습니다.</Typography>
+        </Box>
+      )}
+      <CustomSnackbar
+        open={openSnackbar}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
+        onClose={handleCloseSnackbar}
+      />
+
+      <CustomModal isOpen={isDeleteModalOpen} closeModal={closeDeleteModal}>
+        <Box
+          sx={{
+            display: "flex",
+            margin: "auto",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            gap: "10px",
+          }}
+        >
+          <h3>과제 삭제하기</h3>
+          <p>해당 과제를 삭제하시겠습니까?</p>
+
+          <Box
+            sx={{
+              display: "flex",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "row",
+              gap: "24px",
+              margin: "16px 0",
+            }}
+          >
             <Button
-                variant="outlined"
-                onClick={closeSubmissionModal}
-                sx={{
-                  width: "120px",
-                  height: "40px",
-                  borderColor: "#34495e",
-                  color: "#34495e",
-                }}
+              variant="outlined"
+              onClick={closeDeleteModal}
+              sx={{
+                width: "120px",
+                height: "40px",
+                borderColor: "#34495e",
+                color: "#34495e",
+              }}
             >
-              닫기
+              취소
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                handleDelete(assignmentToDelete);
+              }}
+              sx={{
+                width: "120px",
+                height: "40px",
+                backgroundColor: "#34495e",
+                fontWeight: 600,
+              }}
+            >
+              삭제하기
             </Button>
           </Box>
-        </CustomModal>
-      </Box>
+        </Box>
+      </CustomModal>
+
+      <CustomModal
+        isOpen={isSubmissionModalOpen}
+        closeModal={closeSubmissionModal}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            margin: "auto",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            gap: "10px",
+          }}
+        >
+          <h3>
+            {submissionStudent ? submissionStudent.name : ""}님의 제출 내용
+          </h3>
+          <Box
+            sx={{
+              width: "100%",
+              border: "1px solid #e0e0e0",
+              borderRadius: 1,
+              padding: 2,
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            <Typography
+              dangerouslySetInnerHTML={{
+                __html: sanitizer(
+                  `${submissionStudent ? submissionStudent.content : ""}`
+                ),
+              }}
+            ></Typography>
+          </Box>
+          <Box
+            sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}
+          >
+            <Typography sx={{ fontSize: "12px", color: "gray" }}>
+              제출 날짜:{" "}
+              {submissionStudent ? submissionStudent.submissionDate : ""}
+            </Typography>
+          </Box>
+          <Button
+            variant="outlined"
+            onClick={closeSubmissionModal}
+            sx={{
+              width: "120px",
+              height: "40px",
+              borderColor: "#34495e",
+              color: "#34495e",
+            }}
+          >
+            닫기
+          </Button>
+        </Box>
+      </CustomModal>
+    </Box>
   );
 }

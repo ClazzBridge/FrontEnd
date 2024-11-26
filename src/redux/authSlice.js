@@ -3,7 +3,10 @@ import Cookies from "js-cookie";
 
 const initialState = {
   isLoggedIn: JSON.parse(localStorage.getItem("isLoggedIn")) || false,
-  user: JSON.parse(localStorage.getItem("userInfo")) || { id: null, name: null },
+  user: JSON.parse(localStorage.getItem("userInfo")) || {
+    id: null,
+    name: null,
+  },
   token: localStorage.getItem("token") || null,
   isValid: false,
 };
@@ -45,7 +48,7 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.isLoggedIn = action.payload.isLoggedIn;
       state.isValid = isTokenValid(state.token);
-      localStorage.setItem("userInfo", JSON.stringify(action.payload.user))
+      localStorage.setItem("userInfo", JSON.stringify(action.payload.user));
       localStorage.setItem("token", action.payload.token);
       localStorage.setItem("isLoggedIn", action.payload.isLoggedIn);
     },
@@ -57,7 +60,7 @@ export const isTokenValid = (token) => {
     const base64Url = token.split(".")[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
-        atob(base64)
+      atob(base64)
         .split("")
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
         .join("")
@@ -70,8 +73,9 @@ export const isTokenValid = (token) => {
     console.error("Token is invalid:", error);
     return false;
   }
-}
+};
 
-export const { login, logout, setSocket, updateUserInfo, updateUserState } = authSlice.actions;
+export const { login, logout, setSocket, updateUserInfo, updateUserState } =
+  authSlice.actions;
 
 export default authSlice.reducer;

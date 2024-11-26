@@ -30,3 +30,14 @@ export const getCourseIdForUser = async () => {
     throw error;
   }
 };
+
+export const getCoursTitle = async () => {
+  try {
+    const response = await axios.get(`course/title`);
+    console.log(response, "title");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching course:", error);
+    throw error;
+  }
+};

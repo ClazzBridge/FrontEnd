@@ -1,11 +1,20 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AssignmentItem from "../../components/assignment/AssignmentItem";
 import { getStudentCourseId } from "../../services/apis/studentCourse/get";
-import { Button, Tooltip, Box, TextField, Tabs, Tab } from "@mui/material";
+import {
+  Button,
+  Tooltip,
+  Box,
+  TextField,
+  Tabs,
+  Tab,
+  Badge,
+} from "@mui/material";
 import CustomModal from "../../components/common/CustomModal";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { getAssignmentsByCourseId } from "../../services/apis/assignment/get";
 import { getAllAssignments } from "../../services/apis/assignment/get"; // getAllSubmissions API import
+import { getCoursTitle } from "../../services/apis/course/get";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { createAssignment } from "../../services/apis/assignment/post";
@@ -16,7 +25,8 @@ import moment from "moment";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "../../styles/assignment.css";
-import {debugLog} from "../../shared/debugLog";
+import { debugLog } from "../../shared/debugLog";
+import ReusableSelect from "../../components/common/ReusableSelect";
 
 export default function AssignmentAccordion() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -36,6 +46,10 @@ export default function AssignmentAccordion() {
   const [assignments, setAssignments] = useState([]); // assignments 상태 추가
 
   const [selectedTab, setSelectedTab] = useState("all"); // 탭 상태 추가
+  const [courseNames, setCourseNames] = useState([
+    { courseId: "all", courseTitle: "전체" },
+  ]); // "전체" 추가
+  const [selectedCourseName, setSelectedCourseName] = useState("all");
 
   // 탭 변경 핸들러
   const handleTabChange = (event, newValue) => {
@@ -156,15 +170,26 @@ export default function AssignmentAccordion() {
   const fetchAssignments = useCallback(async () => {
     try {
       let fetchedAssignments;
-      if (
-          currentUser &&
-          currentUser.memberType === "ROLE_ADMIN"
-      ) {
+      if (currentUser && currentUser.memberType === "ROLE_ADMIN") {
         fetchedAssignments = await getAllAssignments();
+        const response = await getCoursTitle();
+        setCourseNames([{ courseId: "all", courseTitle: "전체" }, ...response]);
+        console.log(courseNames, "courseNames");
       } else {
         fetchedAssignments = await getAssignmentsByCourseId(courseId);
       }
-      setAssignments(fetchedAssignments);
+      // 각 과제에 status 속성 추가
+      const assignmentsWithStatus = fetchedAssignments.map((assignment) => {
+        const daysRemaining = getDaysRemaining(assignment.dueDate);
+        let status = "ONGOING"; // 기본값은 진행 중
+        if (daysRemaining < 0) {
+          status = "EXPIRED"; // 마감된 과제
+        } else if (daysRemaining === 0) {
+          status = "COMPLETED"; // 마감 당일 과제
+        }
+        return { ...assignment, status };
+      });
+      setAssignments(assignmentsWithStatus);
     } catch (error) {
       console.error("과제 목록을 가져오는 데 오류가 발생했습니다.", error);
     }
@@ -176,23 +201,48 @@ export default function AssignmentAccordion() {
     }
   }, [currentUser, courseId, fetchAssignments]);
 
+  const filterAssignmentsByTab = (assignments, selectedTab) => {
+    return assignments.filter((assignment) => {
+      if (selectedTab === "all") {
+        return true; // 전체 과제 보여주기
+      } else if (selectedTab === "ongoing") {
+        return assignment.status === "ONGOING"; // 진행 중인 과제만
+      } else if (selectedTab === "completed") {
+        return assignment.status === "COMPLETED"; // 마감 당일 과제만
+      } else if (selectedTab === "expired") {
+        return assignment.status === "EXPIRED"; // 마감된 과제만
+      }
+      return true;
+    });
+  };
+  const getDaysRemaining = (dueDate) => {
+    const due = new Date(dueDate);
+    const today = new Date();
+    const timeDiff = due - today;
+    return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+  };
+  // 각 탭에 해당하는 게시글의 개수
+  const getTabCount = (tab) => {
+    return filterAssignmentsByTab(assignments, tab).length;
+  };
+  const filteredAssignments = filterAssignmentsByTab(assignments, selectedTab);
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ko}>
       {/* 과제 등록 버튼 */}
-      {currentUser &&
-        currentUser.memberType === "ROLE_TEACHER" && (
-          <Box sx={{ marginBottom: "16px" }}>
-            <Tooltip title="과제 작성">
-              <Button
-                variant="outlined"
-                sx={{ height: "38px" }}
-                onClick={openModal}
-              >
-                과제 등록
-              </Button>
-            </Tooltip>
-          </Box>
-        )}
+      {currentUser && currentUser.memberType === "ROLE_TEACHER" && (
+        <Box sx={{ marginBottom: "16px" }}>
+          <Tooltip title="과제 작성">
+            <Button
+              variant="outlined"
+              sx={{ height: "38px" }}
+              onClick={openModal}
+            >
+              과제 등록
+            </Button>
+          </Tooltip>
+        </Box>
+      )}
 
       <Box sx={{ marginBottom: "16px" }}>
         {/* 내비바 시작 */}
@@ -207,7 +257,6 @@ export default function AssignmentAccordion() {
               minWidth: "auto",
               padding: "8px 16px",
               fontSize: "14px",
-              // fontWeight: selectedTab === "all" ? "bold" : "normal",
               color: "#666",
               "&.Mui-selected": {
                 color: "#34495e",
@@ -219,22 +268,115 @@ export default function AssignmentAccordion() {
             },
           }}
         >
-          <Tab label="전체" value="all" />
-          <Tab label="진행 중" value="웅" />
-          <Tab label="마감 완료" value="웅냥" />
-          {/* {courseTitle.map((type) => (
-          <Tab key={type.id} label={type.type} value={type.type} />
-        ))} */}
+          <Tab
+            sx={{ width: "auto" }}
+            label={
+              <Box display="flex" alignItems="center">
+                전체
+                <Badge
+                  badgeContent={getTabCount("all")}
+                  showZero={true}
+                  sx={{
+                    ml: 2, // 텍스트와 Badge 간 간격
+                    "& .MuiBadge-badge": {
+                      backgroundColor: "#D8EFFF", // 커스텀 색상
+                      color: "#1976D2", // 텍스트 색상
+                      fontSize: "10px", // 폰트 크기
+                      padding: "0 6px", // 내부 여백
+                      borderRadius: "8px", // 둥근 모서리
+                    },
+                  }}
+                />
+              </Box>
+            }
+            value="all"
+          />
+          <Tab
+            label={
+              <Box display="flex" alignItems="center">
+                진행 중
+                <Badge
+                  badgeContent={getTabCount("ongoing")}
+                  showZero={true}
+                  sx={{
+                    ml: 2, // 텍스트와 Badge 간 간격
+                    "& .MuiBadge-badge": {
+                      backgroundColor: "#DFFFE5", // 커스텀 색상
+                      color: "#388E3C", // 텍스트 색상
+                      fontSize: "10px", // 폰트 크기
+                      padding: "0 6px", // 내부 여백
+                      borderRadius: "8px", // 둥근 모서리
+                    },
+                  }}
+                />
+              </Box>
+            }
+            value="ongoing"
+          />
+          <Tab
+            label={
+              <Box display="flex" alignItems="center">
+                마감 당일
+                <Badge
+                  badgeContent={getTabCount("completed")}
+                  showZero={true}
+                  sx={{
+                    ml: 2, // 텍스트와 Badge 간 간격
+                    "& .MuiBadge-badge": {
+                      backgroundColor: "#FFE4E6", // 커스텀 색상
+                      color: "#D32F2F", // 텍스트 색상
+                      fontSize: "10px", // 폰트 크기
+                      padding: "0 6px", // 내부 여백
+                      borderRadius: "8px", // 둥근 모서리
+                    },
+                  }}
+                />
+              </Box>
+            }
+            value="completed"
+          />
+          <Tab
+            label={
+              <Box display="flex" alignItems="center">
+                마감
+                <Badge
+                  badgeContent={getTabCount("expired")}
+                  showZero={true}
+                  sx={{
+                    ml: 2, // 텍스트와 Badge 간 간격
+                    "& .MuiBadge-badge": {
+                      backgroundColor: "#FFF9DB", // 커스텀 색상
+                      color: "#FBC02D", // 텍스트 색상
+                      fontSize: "10px", // 폰트 크기
+                      padding: "0 6px", // 내부 여백
+                      borderRadius: "8px", // 둥근 모서리
+                    },
+                  }}
+                />
+              </Box>
+            }
+            value="expired"
+          />
         </Tabs>
         {/* 내비바 끝 */}
       </Box>
+      {/* <Box>
+        <ReusableSelect
+          value={selectedCourseName}
+          onChange={setSelectedCourseName}
+          options={courseNames}
+          optionLabel={(option) => option.courseTitle}
+          optionValue={(option) => option.courseId}
+          width={300}
+        />
+      </Box> */}
 
       <AssignmentItem
         currentUser={currentUser}
         courseId={courseId}
         studentCourseId={studentCourseId}
         fetchAssignments={fetchAssignments}
-        assignments={assignments} // assignments props 전달
+        assignments={filteredAssignments} // assignments props 전달
       />
 
       <CustomModal isOpen={isModalOpen} closeModal={closeModal}>

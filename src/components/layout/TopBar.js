@@ -28,8 +28,8 @@ import Stack from "@mui/material/Stack";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { GitHub } from "@mui/icons-material";
 import apiClient from "../../shared/apiClient";
-import {useDispatch, useSelector} from "react-redux";
-import {logoutAsync} from "../../redux/authActions"; // default로 가져오기
+import { useDispatch, useSelector } from "react-redux";
+import { logoutAsync } from "../../redux/authActions"; // default로 가져오기
 
 const drawerWidth = 240;
 const closedDrawerWidth = 64; // 슬라이드바가 닫혔을 때의 넓이
@@ -117,7 +117,7 @@ const TopBar = ({ open }) => {
   };
 
   const LightTooltip = styled(({ className, ...props }) => (
-      <Tooltip {...props} classes={{ popper: className }} />
+    <Tooltip {...props} classes={{ popper: className }} />
   ))(({ theme }) => ({
     [`& .${tooltipClasses.tooltip}`]: {
       backgroundColor: theme.palette.common.white,
@@ -179,183 +179,183 @@ const TopBar = ({ open }) => {
 
   const menuId = "primary-search-account-menu";
   const renderMenu = (
-      <Menu
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          id={menuId}
-          keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={isMenuOpen}
-          onClose={handleMenuClose}
-          sx={{
-            top: "48px",
-          }}
-      >
-        <MenuItem onClick={handleProfileClick}>마이페이지</MenuItem>
-        <MenuItem onClick={handleLogoutClick}>로그아웃</MenuItem>
-      </Menu>
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+      sx={{
+        top: "48px",
+      }}
+    >
+      <MenuItem onClick={handleProfileClick}>마이페이지</MenuItem>
+      <MenuItem onClick={handleLogoutClick}>로그아웃</MenuItem>
+    </Menu>
   );
 
   const mobileMenuId = "primary-search-account-menu-mobile";
   const renderMobileMenu = (
-      <Menu
-          anchorEl={mobileMoreAnchorEl}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          id={mobileMenuId}
-          keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={isMobileMenuOpen}
-          onClose={handleMobileMenuClose}
-      >
-        <MenuItem>
-          <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-            <Badge badgeContent={4} color="error">
-              <ForumOutlinedIcon />
-            </Badge>
-          </IconButton>
-          <p>Messages</p>
-        </MenuItem>
-        <MenuItem>
-          <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-          >
-            <Badge badgeContent={17} color="error">
-              <NotificationsNoneOutlinedIcon />
-            </Badge>
-          </IconButton>
-          <p>Notifications</p>
-        </MenuItem>
-        <MenuItem onClick={handleProfileMenuOpen}>
-          <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="primary-search-account-menu"
-              aria-haspopup="true"
-              color="inherit"
-          >
-            <AccountCircle />
-          </IconButton>
-          <p>프로필수정</p>
-        </MenuItem>
-      </Menu>
+    <Menu
+      anchorEl={mobileMoreAnchorEl}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      id={mobileMenuId}
+      keepMounted
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      open={isMobileMenuOpen}
+      onClose={handleMobileMenuClose}
+    >
+      <MenuItem>
+        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <Badge badgeContent={4} color="error">
+            <ForumOutlinedIcon />
+          </Badge>
+        </IconButton>
+        <p>Messages</p>
+      </MenuItem>
+      <MenuItem>
+        <IconButton
+          size="large"
+          aria-label="show 17 new notifications"
+          color="inherit"
+        >
+          <Badge badgeContent={17} color="error">
+            <NotificationsNoneOutlinedIcon />
+          </Badge>
+        </IconButton>
+        <p>Notifications</p>
+      </MenuItem>
+      <MenuItem onClick={handleProfileMenuOpen}>
+        <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <AccountCircle />
+        </IconButton>
+        <p>프로필수정</p>
+      </MenuItem>
+    </Menu>
   );
 
   return (
-      <AppBar
-          position="fixed"
-          open={open}
-          sx={{
-            boxShadow: "none",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
+    <AppBar
+      position="fixed"
+      open={open}
+      sx={{
+        boxShadow: "none",
+        display: "flex",
+        justifyContent: "space-between",
+      }}
+    >
+      <Toolbar
+        sx={{
+          // backgroundColor: "#f6f8fa",
+          backgroundColor: "white",
+          // borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          color: "black",
+          justifyContent: "space-between",
+        }}
       >
-        <Toolbar
-            sx={{
-              // backgroundColor: "#f6f8fa",
-              backgroundColor: "white",
-              borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-              color: "black",
-              justifyContent: "space-between",
-            }}
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ display: { xs: "none", sm: "block" }, fontWeight: 700 }}
         >
-          <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ display: { xs: "none", sm: "block" }, fontWeight: 700 }}
-          >
-            {getTitle(location.pathname)}
-          </Typography>
+          {getTitle(location.pathname)}
+        </Typography>
 
-          <Box
-              sx={{
-                display: {
-                  xs: "none",
-                  md: "flex",
-                },
-                alignItems: "center",
-              }}
-          >
-            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-              {/* 깃허브 */}
-              <LightTooltip title="GitHub">
-                <CustomIconButton onClick={handleGitHubClick}>
-                  <GitHub fontSize="small" />
-                </CustomIconButton>
-              </LightTooltip>
+        <Box
+          sx={{
+            display: {
+              xs: "none",
+              md: "flex",
+            },
+            alignItems: "center",
+          }}
+        >
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+            {/* 깃허브 */}
+            <LightTooltip title="GitHub">
+              <CustomIconButton onClick={handleGitHubClick}>
+                <GitHub fontSize="small" />
+              </CustomIconButton>
+            </LightTooltip>
 
-              <LightTooltip title="채팅">
-                <CustomIconButton onClick={handleNotificationClick}>
-                  <CustomBadge badgeContent={4} color="error" max={9}>
-                    <ForumOutlinedIcon fontSize="small" />
-                  </CustomBadge>
-                </CustomIconButton>
-              </LightTooltip>
+            <LightTooltip title="채팅">
+              <CustomIconButton onClick={handleNotificationClick}>
+                <CustomBadge badgeContent={4} color="error" max={9}>
+                  <ForumOutlinedIcon fontSize="small" />
+                </CustomBadge>
+              </CustomIconButton>
+            </LightTooltip>
 
-              {/* 알림 */}
-              <LightTooltip title="알림">
-                <CustomIconButton onClick={handleNotificationClick}>
-                  <CustomBadge badgeContent={19} color="error" max={9}>
-                    <NotificationsNoneOutlinedIcon fontSize="small" />
-                  </CustomBadge>
-                </CustomIconButton>
-              </LightTooltip>
+            {/* 알림 */}
+            <LightTooltip title="알림">
+              <CustomIconButton onClick={handleNotificationClick}>
+                <CustomBadge badgeContent={19} color="error" max={9}>
+                  <NotificationsNoneOutlinedIcon fontSize="small" />
+                </CustomBadge>
+              </CustomIconButton>
+            </LightTooltip>
 
-              {/* 유저 */}
-              <IconButton
-                  onClick={handleProfileMenuOpen}
-                  sx={{ width: "40px", height: "40px" }}
-              >
-                <LightTooltip title="내 정보">
-                  <Avatar
-                      src={userInfo.profileImageUrl}
-                      sx={{ width: "40px", height: "40px", marginLeft: "8px" }}
-                  />
-                </LightTooltip>
-              </IconButton>
-            </Stack>
-          </Box>
-
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
+            {/* 유저 */}
             <IconButton
-                size="large"
-                aria-label="show more"
-                aria-controls={mobileMenuId}
-                aria-haspopup="true"
-                onClick={handleMobileMenuOpen}
-                color="inherit"
+              onClick={handleProfileMenuOpen}
+              sx={{ width: "40px", height: "40px" }}
             >
-              <MenuIcon />
+              <LightTooltip title="내 정보">
+                <Avatar
+                  src={userInfo.profileImageUrl}
+                  sx={{ width: "40px", height: "40px", marginLeft: "8px" }}
+                />
+              </LightTooltip>
             </IconButton>
-          </Box>
-        </Toolbar>
-        {renderMobileMenu}
-        <Dialog open={isNotificationOpen} onClose={handleNotificationClose}>
-          <DialogTitle>알림</DialogTitle>
-          <DialogContent>
-            <DialogContentText>업데이트 예정입니다.</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleNotificationClose}>닫기</Button>
-          </DialogActions>
-        </Dialog>
-        {renderMenu}
-      </AppBar>
+          </Stack>
+        </Box>
+
+        <Box sx={{ display: { xs: "flex", md: "none" } }}>
+          <IconButton
+            size="large"
+            aria-label="show more"
+            aria-controls={mobileMenuId}
+            aria-haspopup="true"
+            onClick={handleMobileMenuOpen}
+            color="inherit"
+          >
+            <MenuIcon />
+          </IconButton>
+        </Box>
+      </Toolbar>
+      {renderMobileMenu}
+      <Dialog open={isNotificationOpen} onClose={handleNotificationClose}>
+        <DialogTitle>알림</DialogTitle>
+        <DialogContent>
+          <DialogContentText>업데이트 예정입니다.</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleNotificationClose}>닫기</Button>
+        </DialogActions>
+      </Dialog>
+      {renderMenu}
+    </AppBar>
   );
 };
 

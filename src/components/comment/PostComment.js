@@ -191,291 +191,288 @@ export default function PostComment({ postId }) {
   };
 
   return (
-      <>
-        <Typography
-            sx={{
-              fontSize: "18px",
-              fontWeight: "600",
-            }}
-        >
-          댓글 {comments.length}개
-        </Typography>
+    <>
+      <Typography
+        sx={{
+          fontSize: "18px",
+          fontWeight: "600",
+        }}
+      >
+        댓글 {comments.length}개
+      </Typography>
 
-        <Box
-            sx={{
-              width: "100%", // Box의 너비 설정
-              display: "flex",
-              margin: "18px 0",
-              overflow: "hidden", // Box 밖으로 나가지 않도록 설정
-            }}
-        >
-          {userInfo && (
-              <>
-                <Avatar
-                    alt={userInfo.name || "User"}
-                    src={
-                        userInfo.profileImageUrl ||
-                        "/static/images/avatar/1.jpg"
-                    }
-                />
-              </>
-          )}
-          <Box className="textBox" sx={{ width: "100%" }}>
-            <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="댓글을 입력하세요..."
-                value={newComment}
-                onInput={handleInput} // 입력 시 높이 조정
-                onChange={(e) => setNewComment(e.target.value)}
-                multiline
-                minRows={1}
-                maxRows={Infinity}
-                sx={{
-                  margin: "0px 1px",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    border: "none",
-                  },
-                  "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                      {
-                        border: "none",
-                      },
-                  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        border: "none",
-                      },
-                  "& .MuiInputBase-root": {
-                    padding: "8px 14px",
-                    display: "flex",
-                    whiteSpace: "pre-wrap", // 줄바꿈을 유지
-                    alignItems: "flex-start", // 텍스트가 위쪽에서 시작하도록 설정
-                    overflowY: "hidden", // 스크롤이 생기지 않게 설정
-                  },
-                  "& textarea": {
-                    lineHeight: "1.5",
-                    overflow: "hidden", // 스크롤 숨기기
-                    minHeight: "48px",
-                    height: "auto", // 자동으로 높이 조절
-                    boxSizing: "border-box", // padding과 border 고려하여 크기 계산
-                  },
-                  "& .MuiInputBase-input": {
-                    display: "flex",
-                    alignItems: "flex-start", // 텍스트가 상단에서 시작하도록 설정
-                    height: "auto", // 자동 높이 조정
-                    whiteSpace: "pre-wrap", // 줄바꿈을 유지
-                    textAlign: "left", // 텍스트를 왼쪽 정렬
-                  },
-                }}
+      <Box
+        sx={{
+          width: "100%", // Box의 너비 설정
+          display: "flex",
+          margin: "18px 0",
+          overflow: "hidden", // Box 밖으로 나가지 않도록 설정
+        }}
+      >
+        {userInfo && (
+          <>
+            <Avatar
+              alt={userInfo.name || "User"}
+              src={userInfo.profileImageUrl || "/static/images/avatar/1.jpg"}
             />
-          </Box>
-          <Button
-              variant="contained"
-              onClick={handleCommentSubmit}
-              disabled={!newComment.trim() || isSubmitting}
-              sx={{
-                backgroundColor: "#34495e",
-                maxHeight: "40px",
-              }}
-          >
-            작성
-          </Button>
-        </Box>
-
-        <Box
-            className="comments-container"
+          </>
+        )}
+        <Box className="textBox" sx={{ width: "100%" }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="댓글을 입력하세요..."
+            value={newComment}
+            onInput={handleInput} // 입력 시 높이 조정
+            onChange={(e) => setNewComment(e.target.value)}
+            multiline
+            minRows={1}
+            maxRows={Infinity}
             sx={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
+              margin: "0px 1px",
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+              "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                {
+                  border: "none",
+                },
+              "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                {
+                  border: "none",
+                },
+              "& .MuiInputBase-root": {
+                padding: "8px 14px",
+                display: "flex",
+                whiteSpace: "pre-wrap", // 줄바꿈을 유지
+                alignItems: "flex-start", // 텍스트가 위쪽에서 시작하도록 설정
+                overflowY: "hidden", // 스크롤이 생기지 않게 설정
+              },
+              "& textarea": {
+                lineHeight: "1.5",
+                overflow: "hidden", // 스크롤 숨기기
+                minHeight: "48px",
+                height: "auto", // 자동으로 높이 조절
+                boxSizing: "border-box", // padding과 border 고려하여 크기 계산
+              },
+              "& .MuiInputBase-input": {
+                display: "flex",
+                alignItems: "flex-start", // 텍스트가 상단에서 시작하도록 설정
+                height: "auto", // 자동 높이 조정
+                whiteSpace: "pre-wrap", // 줄바꿈을 유지
+                textAlign: "left", // 텍스트를 왼쪽 정렬
+              },
             }}
+          />
+        </Box>
+        <Button
+          variant="contained"
+          onClick={handleCommentSubmit}
+          disabled={!newComment.trim() || isSubmitting}
+          sx={{
+            backgroundColor: "#34495e",
+            maxHeight: "40px",
+          }}
         >
-          {comments.length > 0 && (
-              <Box className="comments-list" sx={{ width: "100%" }}>
-                {comments.map((comment) => (
+          작성
+        </Button>
+      </Box>
+
+      <Box
+        className="comments-container"
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        {comments.length > 0 && (
+          <Box className="comments-list" sx={{ width: "100%" }}>
+            {comments.map((comment) => (
+              <Box
+                key={comment.id}
+                className="comment-item"
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: "28px",
+                }}
+              >
+                <Box
+                  sx={{ display: "flex", flexDirection: "row", width: "100%" }}
+                >
+                  <Avatar
+                    alt={comment?.author || "User"}
+                    src={
+                      comment?.profileImageUrl || "/static/images/avatar/1.jpg"
+                    }
+                    sx={{ marginRight: 1.5 }}
+                  />
+                  <Box sx={{ width: "100%" }}>
                     <Box
-                        key={comment.id}
-                        className="comment-item"
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      <Typography
+                        className="comment-author"
+                        sx={{
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          marginRight: 1,
+                        }}
+                      >
+                        {comment.author}
+                      </Typography>
+                      <Box>
+                        <Typography
+                          className="comment-date"
+                          sx={{ fontSize: "12px", color: "gray" }}
+                        >
+                          {formatRelativeTime(comment.createdAt)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    {/* 댓글 내용 */}
+                    {editCommentId === comment.id ? (
+                      <Box
+                        className="menuBtnBox"
                         sx={{
                           display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          marginBottom: "28px",
+                          flexDirection: "column",
+                          alignItems: "end",
+                          width: "100%",
+                          marginTop: "8px",
                         }}
-                    >
-                      <Box
-                          sx={{ display: "flex", flexDirection: "row", width: "100%" }}
                       >
-                        <Avatar
-                            alt={comment?.author || "User"}
-                            src={
-                                comment?.profileImageUrl || "/static/images/avatar/1.jpg"
-                            }
-                            sx={{ marginRight: 1.5 }}
-                        />
-                        <Box sx={{ width: "100%" }}>
-                          <Box
-                              sx={{
+                        <Box
+                          className="editField"
+                          sx={{
+                            width: "100%",
+                            display: "flex",
+                            marginBottom: 1,
+                          }}
+                        >
+                          <TextField
+                            fullWidth
+                            variant="outlined"
+                            inputRef={textFieldRef} // ref를 TextField에 연결
+                            placeholder="댓글을 수정하세요..."
+                            value={editContent}
+                            onInput={handleInput} // 입력 시 높이 조정
+                            onChange={(e) => setEditContent(e.target.value)} // 수정할 내용 업데이트
+                            multiline
+                            minRows={1}
+                            maxRows={Infinity}
+                            sx={{
+                              flexGrow: 1,
+                              marginRight: "8px",
+                              // margin: "0px 1px",
+                              "& .MuiOutlinedInput-notchedOutline": {
+                                border: "none",
+                              },
+                              "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                                {
+                                  border: "none",
+                                },
+                              "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                {
+                                  border: "none",
+                                },
+                              "& .MuiInputBase-root": {
+                                padding: 0,
                                 display: "flex",
-                                flexDirection: "row",
-                                alignItems: "center",
-                                width: "100%",
-                              }}
+                                whiteSpace: "pre-wrap", // 줄바꿈을 유지
+                                alignItems: "flex-start", // 텍스트가 위쪽에서 시작하도록 설정
+                                overflowY: "hidden", // 스크롤이 생기지 않게 설정
+                              },
+                              "& textarea": {
+                                lineHeight: "1.5",
+                                overflow: "hidden", // 스크롤 숨기기
+                                minHeight: "48px",
+                                height: "auto", // 자동으로 높이 조절
+                                boxSizing: "border-box", // padding과 border 고려하여 크기 계산
+                              },
+                              "& .MuiInputBase-input": {
+                                display: "flex",
+                                alignItems: "flex-start", // 텍스트가 상단에서 시작하도록 설정
+                                height: "auto", // 자동 높이 조정
+                                whiteSpace: "pre-wrap", // 줄바꿈을 유지
+                                textAlign: "left", // 텍스트를 왼쪽 정렬
+                              },
+                            }}
+                          />
+                        </Box>
+                        <Box className="menuBtnMain" sx={{ display: "flex" }}>
+                          <Button
+                            variant="contained"
+                            onClick={handleCommentSubmit}
+                            sx={{
+                              backgroundColor: "#34495e",
+                              fontWeight: 600,
+                            }}
                           >
-                            <Typography
-                                className="comment-author"
-                                sx={{
-                                  fontSize: "13px",
-                                  fontWeight: 600,
-                                  marginRight: 1,
-                                }}
-                            >
-                              {comment.author}
-                            </Typography>
-                            <Box>
-                              <Typography
-                                  className="comment-date"
-                                  sx={{ fontSize: "12px", color: "gray" }}
-                              >
-                                {formatRelativeTime(comment.createdAt)}
-                              </Typography>
-                            </Box>
-                          </Box>
-                          {/* 댓글 내용 */}
-                          {editCommentId === comment.id ? (
-                              <Box
-                                  className="menuBtnBox"
-                                  sx={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "end",
-                                    width: "100%",
-                                    marginTop: "8px",
-                                  }}
-                              >
-                                <Box
-                                    className="editField"
-                                    sx={{
-                                      width: "100%",
-                                      display: "flex",
-                                      marginBottom: 1,
-                                    }}
-                                >
-                                  <TextField
-                                      fullWidth
-                                      variant="outlined"
-                                      inputRef={textFieldRef} // ref를 TextField에 연결
-                                      placeholder="댓글을 수정하세요..."
-                                      value={editContent}
-                                      onInput={handleInput} // 입력 시 높이 조정
-                                      onChange={(e) => setEditContent(e.target.value)} // 수정할 내용 업데이트
-                                      multiline
-                                      minRows={1}
-                                      maxRows={Infinity}
-                                      sx={{
-                                        flexGrow: 1,
-                                        marginRight: "8px",
-                                        // margin: "0px 1px",
-                                        "& .MuiOutlinedInput-notchedOutline": {
-                                          border: "none",
-                                        },
-                                        "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                                            {
-                                              border: "none",
-                                            },
-                                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                                            {
-                                              border: "none",
-                                            },
-                                        "& .MuiInputBase-root": {
-                                          padding: 0,
-                                          display: "flex",
-                                          whiteSpace: "pre-wrap", // 줄바꿈을 유지
-                                          alignItems: "flex-start", // 텍스트가 위쪽에서 시작하도록 설정
-                                          overflowY: "hidden", // 스크롤이 생기지 않게 설정
-                                        },
-                                        "& textarea": {
-                                          lineHeight: "1.5",
-                                          overflow: "hidden", // 스크롤 숨기기
-                                          minHeight: "48px",
-                                          height: "auto", // 자동으로 높이 조절
-                                          boxSizing: "border-box", // padding과 border 고려하여 크기 계산
-                                        },
-                                        "& .MuiInputBase-input": {
-                                          display: "flex",
-                                          alignItems: "flex-start", // 텍스트가 상단에서 시작하도록 설정
-                                          height: "auto", // 자동 높이 조정
-                                          whiteSpace: "pre-wrap", // 줄바꿈을 유지
-                                          textAlign: "left", // 텍스트를 왼쪽 정렬
-                                        },
-                                      }}
-                                  />
-                                </Box>
-                                <Box className="menuBtnMain" sx={{ display: "flex" }}>
-                                  <Button
-                                      variant="contained"
-                                      onClick={handleCommentSubmit}
-                                      sx={{
-                                        backgroundColor: "#34495e",
-                                        fontWeight: 600,
-                                      }}
-                                  >
-                                    수정
-                                  </Button>
-                                  <Button
-                                      variant="outlined"
-                                      onClick={() => {
-                                        setEditCommentId(null); // 수정 모드 종료
-                                        setEditContent(""); // 입력 필드 초기화
-                                      }}
-                                      sx={{
-                                        marginLeft: "8px",
-                                      }}
-                                  >
-                                    취소
-                                  </Button>
-                                </Box>
-                              </Box>
-                          ) : (
-                              <Typography
-                                  className="comment-content"
-                                  sx={{ fontSize: "14px", whiteSpace: "pre-wrap" }}
-                              >
-                                {comment.content}
-                              </Typography>
-                          )}
+                            수정
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={() => {
+                              setEditCommentId(null); // 수정 모드 종료
+                              setEditContent(""); // 입력 필드 초기화
+                            }}
+                            sx={{
+                              marginLeft: "8px",
+                            }}
+                          >
+                            취소
+                          </Button>
                         </Box>
                       </Box>
+                    ) : (
+                      <Typography
+                        className="comment-content"
+                        sx={{ fontSize: "14px", whiteSpace: "pre-wrap" }}
+                      >
+                        {comment.content}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
 
-                      {/* 댓글 우측 수정/삭제 메뉴바 시작 */}
-                      <Box>
-                        {userInfo && // 본인 댓글이거나 관리자인 경우 메뉴 아이콘 표시
-                            (userInfo.id === comment.authorId ||
-                            userInfo.memberType === "ROLE_ADMIN" ? (
-                                <Menu
-                                    commentId={comment.id}
-                                    commentContent={comment.content} // 댓글 내용 전달
-                                    onEdit={handleEdit}
-                                    onDelete={handleDeleteComment} // 삭제 핸들러 전달
-                                    isAdmin={userInfo.memberType === "ROLE_ADMIN"} // 관리자 여부 전달
-                                    isAuthor={comment.authorId === userInfo.id}
-                                />
-                            ) : null)}
-                      </Box>
-                      {/* 댓글 우측 수정/삭제 메뉴바 끝 */}
-                    </Box>
-                ))}
+                {/* 댓글 우측 수정/삭제 메뉴바 시작 */}
+                <Box>
+                  {userInfo && // 본인 댓글이거나 관리자인 경우 메뉴 아이콘 표시
+                    (userInfo.id === comment.authorId ||
+                    userInfo.memberType === "ROLE_ADMIN" ? (
+                      <Menu
+                        commentId={comment.id}
+                        commentContent={comment.content} // 댓글 내용 전달
+                        onEdit={handleEdit}
+                        onDelete={handleDeleteComment} // 삭제 핸들러 전달
+                        isAdmin={userInfo.memberType === "ROLE_ADMIN"} // 관리자 여부 전달
+                        isAuthor={comment.authorId === userInfo.id}
+                      />
+                    ) : null)}
+                </Box>
+                {/* 댓글 우측 수정/삭제 메뉴바 끝 */}
               </Box>
-          )}
-        </Box>
+            ))}
+          </Box>
+        )}
+      </Box>
 
-        {/* 커스텀 스낵바 */}
-        <CustomSnackbar
-            open={openSnackbar}
-            message={snackbarMessage}
-            severity={snackbarSeverity}
-            onClose={handleCloseSnackbar}
-        />
-      </>
+      {/* 커스텀 스낵바 */}
+      <CustomSnackbar
+        open={openSnackbar}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
+        onClose={handleCloseSnackbar}
+      />
+    </>
   );
 }
