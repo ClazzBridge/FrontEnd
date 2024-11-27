@@ -7,7 +7,7 @@ import FloatingActionButtons, {
   FloatingActionButtonsForTeacher,
 } from "../lectureRoom/fab";
 import MenuItem from "@mui/material/MenuItem";
-import { getStudentOnlineStatus } from "../../services/apis/seat/getOnline";
+import { useSelector } from "react-redux";
 import { updateStudentOnlineStatus } from "../../services/apis/seat/updateOnline";
 import {
   Avatar,
@@ -29,7 +29,6 @@ import {
   getCourseId,
   getTeacherByCourseId,
 } from "../../services/apis/studentCourse/get";
-import { useSelector } from "react-redux";
 import { useSocket } from "../../context/SocketContext";
 
 function ProfileCard({
@@ -39,7 +38,6 @@ function ProfileCard({
   isOnline,
   seatNumber,
   isUnderstanding,
-  isHandRaised,
   openModal,
   email,
   github,
@@ -47,7 +45,6 @@ function ProfileCard({
   bio,
   isSelf,
   isEmpty,
-  role,
   onRegisterSeatClick,
   userHasSeat,
   isTeacher,
@@ -64,16 +61,16 @@ function ProfileCard({
       boxShadow: `0 0 0 1px ${theme.palette.background.paper}`,
       "&::after": isGoodOnline
         ? {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "110%",
-            height: "110%",
-            borderRadius: "50%",
-            animation: "ripple 1.2s infinite ease-in-out",
-            border: "1px solid currentColor",
-            content: '""',
-          }
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "110%",
+          height: "110%",
+          borderRadius: "50%",
+          animation: "ripple 1.2s infinite ease-in-out",
+          border: "1px solid currentColor",
+          content: '""',
+        }
         : {},
     },
     "@keyframes ripple": {
@@ -130,23 +127,25 @@ function ProfileCard({
       onClick={
         isTeacher
           ? () =>
-              openModal(seatId, name, email, github, phone, bio, imgSrc, isSelf)
+            openModal(seatId, name, email, github, phone, bio, imgSrc, isSelf)
           : isEmpty && !userHasSeat && !isTeacher && !isAdmin
             ? () => onRegisterSeatClick()
             : () =>
-                openModal(
-                  seatId,
-                  name,
-                  email,
-                  github,
-                  phone,
-                  bio,
-                  imgSrc,
-                  isSelf
-                )
+              openModal(
+                seatId,
+                name,
+                email,
+                github,
+                phone,
+                bio,
+                imgSrc,
+                isSelf
+              )
       }
     >
+
       <CardContent sx={{ padding: "6px" }}>
+        {/* 카드 헤더 부분 스타일 */}
         <div
           style={{
             display: "flex",
@@ -172,6 +171,7 @@ function ProfileCard({
             {`${seatNumber}`}
           </Typography>
         </div>
+        {/* 카드 내용 부분 스타일 */}
         <Stack
           direction="row"
           spacing={1}
@@ -219,27 +219,27 @@ function ProfileCard({
                   onClick={
                     isTeacher
                       ? () =>
-                          openModal(
-                            seatId,
-                            name,
-                            email,
-                            github,
-                            phone,
-                            bio,
-                            imgSrc,
-                            isSelf
-                          )
+                        openModal(
+                          seatId,
+                          name,
+                          email,
+                          github,
+                          phone,
+                          bio,
+                          imgSrc,
+                          isSelf
+                        )
                       : () =>
-                          openModal(
-                            seatId,
-                            name,
-                            email,
-                            github,
-                            phone,
-                            bio,
-                            imgSrc,
-                            isSelf
-                          )
+                        openModal(
+                          seatId,
+                          name,
+                          email,
+                          github,
+                          phone,
+                          bio,
+                          imgSrc,
+                          isSelf
+                        )
                   }
                 />
               </StyledBadge>
@@ -273,30 +273,21 @@ export default function StudentRoom() {
   const [currentProfile, setCurrentProfile] = useState({});
   const [profiles, setProfiles] = useState([]);
   const [userSeat, setUserSeat] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
+  // const [currentUser, setCurrentUser] = useState(null);
   const [courses, setCourses] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [seatRegisteredWarning, setSeatRegisteredWarning] = useState(false);
   const [releaseDialogOpen, setReleaseDialogOpen] = useState(false);
-  const [courseId, setCourseId] = useState(null);
   const [seatId, setSeatId] = useState(null);
-  const [isOnline, setIsOnline] = useState(false); // 좌석 상태 관리
+  // const [isOnline, setIsOnline] = useState(false); // 좌석 상태 관리 안쓰는데? 466, 468, 472 코드에 변경만 사용 중
   const { emitWithReconnect, onEvent } = useSocket();
-  const { token } = useSelector((state) => state.auth);
+  const token = useSelector((state) => state.auth.token)
+  const currentUser = useSelector((state) => state.auth.user)
 
   useEffect(() => {
     const fetchInitialData = async () => {
+
       if (!token) return;
-
-      const decodedToken = jwtDecode(token);
-      const memberType = decodedToken.role;
-
-      // 현재 사용자 정보 설정
-      setCurrentUser({
-        memberId: decodedToken.id,
-        memberType: memberType,
-        courseId: null,
-      });
 
       // 좌석 정보 확인
       const storedSeatId = localStorage.getItem("seatInfo");
@@ -317,7 +308,7 @@ export default function StudentRoom() {
       }
 
       // 강의실 정보 가져오기
-      if (memberType === "ROLE_ADMIN") {
+      if (currentUser.memberType === "ROLE_ADMIN") {
         // 관리자는 마지막으로 선택한 강의실 보기
         const storedCourseId = localStorage.getItem("selectedCourseId");
         if (storedCourseId) {
@@ -325,13 +316,13 @@ export default function StudentRoom() {
           await fetchSeatsByCourse(storedCourseId);
         }
       } else if (
-        memberType === "ROLE_STUDENT" ||
-        memberType === "ROLE_TEACHER"
+        currentUser.memberType === "ROLE_STUDENT" ||
+        currentUser.memberType === "ROLE_TEACHER"
       ) {
         // 학생/교사는 자신의 강의실 보기
         try {
           let fetchedCourseId = null;
-          if (memberType === "ROLE_STUDENT") {
+          if (currentUser.memberType === "ROLE_STUDENT") {
             fetchedCourseId = await getCourseId();
           } else {
             fetchedCourseId = await getTeacherByCourseId();
@@ -347,7 +338,7 @@ export default function StudentRoom() {
     };
 
     fetchInitialData();
-  }, []); // 컴포넌트 마운트 시 한 번만 실행
+  }, []); //컴포넌트 마운트 시 한 번만 실행
 
   const handleStudentSeatRegistration = async (seatId) => {
     const seatUpdateDTO = {
@@ -445,43 +436,43 @@ export default function StudentRoom() {
     setRegisterDialogOpen(false); // 좌석 등록 다이얼로그 닫기
   };
 
-  const fetchStudentCourse = async () => {
-    try {
-      const response = await apiClient.get(`studentCourses`);
-      const fetchedCourseId = response.data;
+  // 여기 코드 사용 안하는 중
+  // const fetchStudentCourse = async () => {
+  //   try {
+  //     const response = await apiClient.get(`studentCourses`);
+  //     const fetchedCourseId = response.data;
 
-      setCourseId(fetchedCourseId);
-      setSelectedCourseId(fetchedCourseId);
+  //     setSelectedCourseId(fetchedCourseId);
 
-      setCurrentUser((prevUser) => ({
-        ...prevUser,
-        courseId: fetchedCourseId,
-      }));
+  //     // setCurrentUser((prevUser) => ({
+  //     //   ...prevUser,
+  //     //   courseId: fetchedCourseId,
+  //     // }));
 
-      fetchSeatsByCourse(fetchedCourseId);
-    } catch (error) {
-      console.error(
-        "강의 정보를 불러오는 중 오류가 발생했습니다. fetchStudentCourse ",
-        error
-      );
-    }
-  };
+  //     fetchSeatsByCourse(fetchedCourseId);
+  //   } catch (error) {
+  //     console.error(
+  //       "강의 정보를 불러오는 중 오류가 발생했습니다. fetchStudentCourse ",
+  //       error
+  //     );
+  //   }
+  // };
 
   // 특정 사용자의 좌석 상태를 가져오는 함수
-  const fetchSeatStatus = async (memberId) => {
-    try {
-      const response = await apiClient.get(`seat/status/${memberId}`);
-      if (response.status === 200 && response.data) {
-        const seatStatus = response.data;
-        setIsOnline(seatStatus.isOnline); // 좌석 상태 업데이트
-      } else {
-        setIsOnline(false); // 좌석 상태가 없으면 오프라인으로 설정
-      }
-    } catch (error) {
-      console.error("좌석 상태를 가져오는 중 오류 발생: ", error);
-      setIsOnline(false);
-    }
-  };
+  // const fetchSeatStatus = async (memberId) => {
+  //   try {
+  //     const response = await apiClient.get(`seat/status/${memberId}`);
+  //     if (response.status === 200 && response.data) {
+  //       const seatStatus = response.data;
+  //       // setIsOnline(seatStatus.isOnline); // 좌석 상태 업데이트
+  //     } else {
+  //       //setIsOnline(false); // 좌석 상태가 없으면 오프라인으로 설정
+  //     }
+  //   } catch (error) {
+  //     console.error("좌석 상태를 가져오는 중 오류 발생: ", error);
+  //     // setIsOnline(false);
+  //   }
+  // };
 
   // useEffect(() => {
 
@@ -489,6 +480,7 @@ export default function StudentRoom() {
 
   useEffect(() => {
     const handleUserOnlineStatus = async () => {
+      const token = localStorage.getItem("token");
       if (!token) return;
 
       const decodedToken = jwtDecode(token);
@@ -544,20 +536,19 @@ export default function StudentRoom() {
       let redis_response;
 
       // 데이터 요청
-      await emitWithReconnect("fetchStudentData", courseId);
+      emitWithReconnect("fetchStudentData", courseId);
 
       // 데이터 수신
       onEvent("fetchedStudentData", (data) => {
         redis_response = data;
         console.log(redis_response); // 확인용 로그
 
-        // 데이터 변환
-        const processedData = redis_response.map((item) => ({
-          id: item.id,
-          isUnderstanding: item.isUnderstanding === "true",
-          isRaisedHand: item.isRaisedHand === "true",
-        }));
-
+        // 데이터 변환 // 아직 미사용 중
+        // const processedData = redis_response.map((item) => ({
+        //   id: item.id,
+        //   isUnderstanding: item.isUnderstanding === "true",
+        //   isRaisedHand: item.isRaisedHand === "true",
+        // }));
         // 추가적으로 processedData를 활용할 로직을 여기에 작성
       });
 
@@ -595,17 +586,18 @@ export default function StudentRoom() {
     }
   };
 
-  const handleSeatRegistration = async (seatId) => {
-    try {
-      const response = await apiClient.post(`/seat/register/${seatId}`, {
-        courseId: selectedCourseId,
-      });
+  // 사용 안하는 코드 // 호출되는 곳이 없음.
+  // const handleSeatRegistration = async (seatId) => {
+  //   try {
+  //     const response = await apiClient.post(`/seat/register/${seatId}`, {
+  //       courseId: selectedCourseId,
+  //     });
 
-      setProfiles(response.data);
-    } catch (error) {
-      console.error("좌석 등록 중 오류 발생 handleSeatRegistration :", error);
-    }
-  };
+  //     setProfiles(response.data);
+  //   } catch (error) {
+  //     console.error("좌석 등록 중 오류 발생 handleSeatRegistration :", error);
+  //   }
+  // };
 
   const openProfileModal = (
     seatId,
@@ -690,7 +682,6 @@ export default function StudentRoom() {
           </Button>
         </Box>
       )}
-      <FloatingActionButtons />
 
       {selectedCourseId && (
         <div
@@ -704,8 +695,8 @@ export default function StudentRoom() {
             margin: "0 auto",
             marginTop:
               currentUser &&
-              (currentUser.memberType === "ROLE_ADMIN" ||
-                currentUser.memberType === "ROLE_TEACHER")
+                (currentUser.memberType === "ROLE_ADMIN" ||
+                  currentUser.memberType === "ROLE_TEACHER")
                 ? "40px"
                 : "0",
             gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
@@ -753,6 +744,8 @@ export default function StudentRoom() {
           {currentUser.memberType === "ROLE_TEACHER" ? (
             <FloatingActionButtonsForTeacher />
           ) : null}
+
+
         </div>
       )}
 
