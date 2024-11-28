@@ -540,7 +540,7 @@ const Vote = () => {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: 400,
+              width: 500,
               bgcolor: "background.paper",
               p: 4,
               borderRadius: "4px",
@@ -548,8 +548,8 @@ const Vote = () => {
             }}
           >
             {voteInfo ? (
-              <>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                          <>
+                              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, fontSize: 20 }}>
                   제목: {voteInfo.voteTitle} (
                   {voteInfo.isExpired ? "투표 종료" : "투표 진행중"})
                 </Typography>
@@ -621,8 +621,7 @@ const Vote = () => {
                                 }
                               />
                             } // ROLE_ADMIN의 경우 비활성화
-                            label={`${option.optionText}`}
-                            // (현재 점유율: ${option.occupancyRate}, 투표 수: ${option.votes})
+                            label={`${option.optionText} (현재 점유율: ${option.occupancyRate}, 투표 수: ${option.votes})`}
                           />
                         </Box>
                       ))}
