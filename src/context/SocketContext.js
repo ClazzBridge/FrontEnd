@@ -7,6 +7,7 @@ const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
   const token = useSelector((state) => state.auth.token);
+  const user = useSelector((state) => state.auth.user);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const socketRef = useRef(null);
 
@@ -14,11 +15,15 @@ export const SocketProvider = ({ children }) => {
     if (!socketRef.current) {
       socketRef.current = io(process.env.REACT_APP_SOCKET_SERVER_URI, {
         autoConnect: false,
-        auth: { token },
+        auth: {
+          token: token,
+          user: user,
+        },
       });
 
       socketRef.current.on("connect", () => {
         console.log("Socket connected, id is :", socketRef.current.id);
+        emitWithReconnect("register", {userId : user.id, token : token});
       });
 
       socketRef.current.on("disconnect", () => {
@@ -28,14 +33,21 @@ export const SocketProvider = ({ children }) => {
       socketRef.current.on("initError", (errorMessage) => {
         console.error("Init error:", errorMessage);
       });
+
+      socketRef.current.on("initCompleted", () => {
+        console.log("Init completed");
+      });
+
     }
   };
 
   const connectSocket = () => {
+    console.log("connect!!!")
     socketRef.current.connect();
   };
 
   const disconnectSocket = () => {
+    console.log("disconnect!!!")
     socketRef.current.disconnect();
   };
 
@@ -50,9 +62,11 @@ export const SocketProvider = ({ children }) => {
       );
     }
 
+    const payload = { ...data, token: token};
+
     // 연결 후 명령 실행
-    socketRef.current.emit(event, data);
-    console.log(`Event emitted: ${event}`, data);
+    socketRef.current.emit(event, payload);
+    console.log(`Event emitted: ${event}`, payload);
   };
 
   // onEvent: 이벤트 리스너 추가

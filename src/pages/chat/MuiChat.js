@@ -8,7 +8,7 @@ export default function Chat() {
   return (
       <CssVarsProvider disableTransitionOnChange>
         <CssBaseline />
-        <Box className="chatBox" sx={{ display: 'flex', minHeight: '100px', height: '10px' }}>
+        <Box className="chatBox" sx={{ display: 'flex', minHeight: '100px', height: '100%' }}>
           <Box  component="main" className="MainContent" sx={{ flex: 1 }}>
             <MyMessages />
           </Box>

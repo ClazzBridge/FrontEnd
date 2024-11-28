@@ -7,16 +7,28 @@ import ChatBubble from './ChatBubble';
 import MessageInput from './MessageInput';
 import MessagesPaneHeader from './MessagesPaneHeader';
 import {useSocket} from "../../context/SocketContext";
+import {useSelector} from "react-redux";
 
 export default function MessagesPane(props) {
   const { chat } = props;
   const [chatMessages, setChatMessages] = useState(chat.messages);
   const [textAreaValue, setTextAreaValue] = useState('');
-  const {emitWithReconnect, onEvent} = useSocket();
+  const {emitWithReconnect, onEvent, offEvent} = useSocket();
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    setChatMessages(chat.messages);
-  }, [chat.messages]);
+    const handleNewMessage = (msg) => {
+      console.log('message: ' + msg);
+      setChatMessages(prevMessages => [...prevMessages, msg]);
+    };
+
+    onEvent('newMessages', handleNewMessage);
+
+    return () => {
+      offEvent('newMessages', handleNewMessage);
+    };
+  }, [onEvent, offEvent, chatMessages])
+
 
   return (
       <Sheet
@@ -43,7 +55,7 @@ export default function MessagesPane(props) {
         >
           <Stack spacing={2} sx={{justifyContent: 'flex-end'}}>
             {chatMessages.map((message, index) => {
-              const isYou = String(message.sender) === localStorage.getItem('userId');
+              const isYou = String(message.sender) === String(user.id);
               return (
                   <Stack
                       key={index}
@@ -68,19 +80,11 @@ export default function MessagesPane(props) {
             textAreaValue={textAreaValue}
             setTextAreaValue={setTextAreaValue}
             onSubmit={() => {
-              const newId = chatMessages.length + 1;
-              const newIdString = newId.toString();
-
               emitWithReconnect('newMessage', {
                 chatId: chat.id,
-                messageId: newIdString,
-                message: textAreaValue,
+                content: textAreaValue,
               });
 
-              onEvent('newMessages', (msg) => {
-                console.log('message: ' + msg);
-                setChatMessages([...chatMessages, msg]);
-              });
               setTextAreaValue('');
             }}
         />

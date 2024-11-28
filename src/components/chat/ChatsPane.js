@@ -12,10 +12,12 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ChatListItem from './ChatListItem';
 import { toggleMessagesPane } from '../../utils/chat/utils';
 import {useSocket} from "../../context/SocketContext";
+import {useSelector} from "react-redux";
 
 const ChatsPane = ({ chats, setSelectedChat, selectedChatId }) => {
   const [users, setUsers] = useState([]);
   const {emitWithReconnect, onEvent, offEvent} = useSocket();
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     // 서버에 courseId로 사용자 데이터 요청
@@ -65,7 +67,7 @@ const ChatsPane = ({ chats, setSelectedChat, selectedChatId }) => {
     console.log(`Selected user: ${selectedUser}`);
     console.log(`Text: ${text}`);
 
-    emitWithReconnect('createChat', { username: [selectedUser, localStorage.getItem("userId")], text: text }, (response) => {
+    emitWithReconnect('createChat', { selectedUserId: selectedUser, sendUserId: String(user.id), text: text }, (response) => {
       console.log(response);
     });
 
@@ -205,7 +207,7 @@ const ChatsPane = ({ chats, setSelectedChat, selectedChatId }) => {
                     onChange={handleUserChange}
                 >
                   {users.map((user) => (
-                      <Option key={user.username} value={user.id}>
+                      <Option key={user.name} value={user.id}>
                         {user.name}
                       </Option>
                   ))}
