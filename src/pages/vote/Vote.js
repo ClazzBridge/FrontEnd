@@ -630,7 +630,7 @@ const Vote = () => {
                     <Typography variant="body1">옵션이 없습니다.</Typography> // 옵션이 없을 때 메시지
                   )}
                   {/* 투표 버튼은 ROLE_ADMIN의 경우 표시하지 않음 */}
-                  {role !== ("ROLE_ADMIN" || "ROLE_TEACHER") && (
+                  {role !== "ROLE_ADMIN" && role !== "ROLE_TEACHER" && (
                     <Button
                       variant="outlined"
                       onClick={handleVoteSubmit}
