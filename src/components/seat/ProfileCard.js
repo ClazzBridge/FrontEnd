@@ -61,16 +61,16 @@ function ProfileCard({
       boxShadow: `0 0 0 1px ${theme.palette.background.paper}`,
       "&::after": isGoodOnline
         ? {
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "110%",
-          height: "110%",
-          borderRadius: "50%",
-          animation: "ripple 1.2s infinite ease-in-out",
-          border: "1px solid currentColor",
-          content: '""',
-        }
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "110%",
+            height: "110%",
+            borderRadius: "50%",
+            animation: "ripple 1.2s infinite ease-in-out",
+            border: "1px solid currentColor",
+            content: '""',
+          }
         : {},
     },
     "@keyframes ripple": {
@@ -127,23 +127,22 @@ function ProfileCard({
       onClick={
         isTeacher
           ? () =>
-            openModal(seatId, name, email, github, phone, bio, imgSrc, isSelf)
+              openModal(seatId, name, email, github, phone, bio, imgSrc, isSelf)
           : isEmpty && !userHasSeat && !isTeacher && !isAdmin
             ? () => onRegisterSeatClick()
             : () =>
-              openModal(
-                seatId,
-                name,
-                email,
-                github,
-                phone,
-                bio,
-                imgSrc,
-                isSelf
-              )
+                openModal(
+                  seatId,
+                  name,
+                  email,
+                  github,
+                  phone,
+                  bio,
+                  imgSrc,
+                  isSelf
+                )
       }
     >
-
       <CardContent sx={{ padding: "6px" }}>
         {/* 카드 헤더 부분 스타일 */}
         <div
@@ -219,27 +218,27 @@ function ProfileCard({
                   onClick={
                     isTeacher
                       ? () =>
-                        openModal(
-                          seatId,
-                          name,
-                          email,
-                          github,
-                          phone,
-                          bio,
-                          imgSrc,
-                          isSelf
-                        )
+                          openModal(
+                            seatId,
+                            name,
+                            email,
+                            github,
+                            phone,
+                            bio,
+                            imgSrc,
+                            isSelf
+                          )
                       : () =>
-                        openModal(
-                          seatId,
-                          name,
-                          email,
-                          github,
-                          phone,
-                          bio,
-                          imgSrc,
-                          isSelf
-                        )
+                          openModal(
+                            seatId,
+                            name,
+                            email,
+                            github,
+                            phone,
+                            bio,
+                            imgSrc,
+                            isSelf
+                          )
                   }
                 />
               </StyledBadge>
@@ -281,12 +280,11 @@ export default function StudentRoom() {
   const [seatId, setSeatId] = useState(null);
   // const [isOnline, setIsOnline] = useState(false); // 좌석 상태 관리 안쓰는데? 466, 468, 472 코드에 변경만 사용 중
   const { emitWithReconnect, onEvent } = useSocket();
-  const token = useSelector((state) => state.auth.token)
-  const currentUser = useSelector((state) => state.auth.user)
+  const token = useSelector((state) => state.auth.token);
+  const currentUser = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     const fetchInitialData = async () => {
-
       if (!token) return;
 
       // 좌석 정보 확인
@@ -505,6 +503,12 @@ export default function StudentRoom() {
       }
     };
 
+    // 데이터 수신
+    onEvent("fetchedStudentData", (data) => {
+      let redis_response = data;
+      console.log(redis_response); // 확인용 로그
+    });
+
     handleUserOnlineStatus();
   }, []);
 
@@ -536,21 +540,17 @@ export default function StudentRoom() {
       let redis_response;
 
       // 데이터 요청
-      emitWithReconnect("fetchStudentData", courseId);
+      console.log(currentUser, "dddd");
+      emitWithReconnect("fetchStudentData", { courseId: 4, token: token });
 
-      // 데이터 수신
-      onEvent("fetchedStudentData", (data) => {
-        redis_response = data;
-        console.log(redis_response); // 확인용 로그
-
-        // 데이터 변환 // 아직 미사용 중
-        // const processedData = redis_response.map((item) => ({
-        //   id: item.id,
-        //   isUnderstanding: item.isUnderstanding === "true",
-        //   isRaisedHand: item.isRaisedHand === "true",
-        // }));
-        // 추가적으로 processedData를 활용할 로직을 여기에 작성
-      });
+      // 데이터 변환 // 아직 미사용 중
+      // const processedData = redis_response.map((item) => ({
+      //   id: item.id,
+      //   isUnderstanding: item.isUnderstanding === "true",
+      //   isRaisedHand: item.isRaisedHand === "true",
+      // }));
+      // 추가적으로 processedData를 활용할 로직을 여기에 작성
+      // });
 
       // 좌석 정렬 및 상태 업데이트
       const sortedSeats = response.data.sort(
@@ -695,8 +695,8 @@ export default function StudentRoom() {
             margin: "0 auto",
             marginTop:
               currentUser &&
-                (currentUser.memberType === "ROLE_ADMIN" ||
-                  currentUser.memberType === "ROLE_TEACHER")
+              (currentUser.memberType === "ROLE_ADMIN" ||
+                currentUser.memberType === "ROLE_TEACHER")
                 ? "40px"
                 : "0",
             gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
@@ -744,8 +744,6 @@ export default function StudentRoom() {
           {currentUser.memberType === "ROLE_TEACHER" ? (
             <FloatingActionButtonsForTeacher />
           ) : null}
-
-
         </div>
       )}
 
